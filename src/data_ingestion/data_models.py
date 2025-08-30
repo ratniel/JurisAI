@@ -1,5 +1,5 @@
-from typing import List, Literal, Dict, Optional
 from pydantic import BaseModel, Field
+from typing import List, Literal, Dict, Optional
 
 class SchemeDetails(BaseModel):
     url: str = Field(..., description="The URL of the scheme")
@@ -12,5 +12,5 @@ class SchemeDetails(BaseModel):
     eligibility: str = Field(..., description="The eligibility of the scheme")
     application_process: str = Field(..., description="The application process of the scheme")
     documents_required: str = Field(..., description="The documents required for the scheme")
-    frequently_asked_questions: Dict[str, str] = Field(None, description="The frequently asked questions of the scheme")
-    sources_and_references: Optional[List[Dict[str, str]]] = Field(None, description="The sources and references of the scheme")
+    faqs: Dict[str, str] = Field(None, description="The frequently asked questions of the scheme")
+    sources: Optional[List[Dict[str, str]]] = Field(None, description="The sources and references of the scheme")

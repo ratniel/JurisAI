@@ -79,18 +79,32 @@ class ScrapeSchemes:
             scheme_page = await self.context.new_page()
             logger.info(f"Scraping scheme: {scheme_name} from {scheme_url}")
             await scheme_page.goto(scheme_url)
-            await scheme_page.wait_for_selector("div.scrollDiv")
+            scroll_div = scheme_page.locator("#scrollDiv")
+            await scroll_div.wait_for(state='visible')
             logger.info("Scheme page loaded")
 
-            
-        # return SchemeDetails()
-        pass
+            detail_sections = scroll_div.locator("> div[id]")
+
+            scheme_data = {}
+
+            for section in await detail_sections.all():
+                # Get the id of the section to use as the key
+                section_id = await section.get_attribute("id")
+                if section_id:
+                    # Get the entire inner text, preserving formatting
+                    section_text = await section.inner_text()
+                    scheme_data[section_id] = section_text
+
+            logger.info(f"Scheme data: {scheme_data}")
+            # return SchemeDetails()
+            return scheme_data
 
 
 if __name__ == "__main__":
     from rich import print
 
-    # URL = ""
-    # print(asyncio.run(ScrapeSchemes().scrape_scheme(URL)))
+    SCHEME_NAME = "Prime Minister’s Fellowship for Doctoral Research"
+    URL = "https://www.myscheme.gov.in/schemes/pmfdr"
+    print(asyncio.run(ScrapeSchemes().scrape_scheme(SCHEME_NAME, URL)))
 
-    print(asyncio.run(ScrapeSchemes().scrape_all_schemes()))
+    # print(asyncio.run(ScrapeSchemes().scrape_all_schemes()))
