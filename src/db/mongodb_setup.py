@@ -33,7 +33,7 @@ async def close_database_connection(client: AsyncIOMotorClient) -> None:
     """Close database connection"""
     if client:
         client.close()
-        logger.info("Database connection closed")
+        logger.info("Database connection closed successfully")
 
 
 if __name__ == "__main__":

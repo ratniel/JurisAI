@@ -1,6 +1,6 @@
 from beanie import Document
 from pydantic import BaseModel, Field
-from typing import List, Literal, Dict, Optional
+from typing import List, Literal, Dict, Optional, Union
 
 
 class Source(BaseModel):
@@ -20,8 +20,9 @@ class SchemeDetails(Document):
     tags: List[str] = Field(..., description="The tags of the scheme")
     details: str = Field(..., description="The details of the scheme")
     benefits: str = Field(..., description="The benefits of the scheme")
-    eligibility: str = Field(..., description="The eligibility of the scheme")
-    application_process: str = Field(
+    eligibility: str = Field(None, description="The eligibility of the scheme")
+    exclusions: Optional[str] = Field(None, description="The exclusions of the scheme")
+    application_process: Union[str, Dict[str, str]] = Field(
         ..., description="The application process of the scheme"
     )
     documents_required: str = Field(

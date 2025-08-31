@@ -5,20 +5,24 @@ from playwright.async_api import Locator
 
 async def scrape_scheme_details(detail_sections: Locator) -> Dict[str, str]:
     try:
+        target_section_id = ["details", "benefits", "eligibility", "exclusions", "application-process", "documents-required"]
         scheme_data = {}
-        count = 0
+        section_id = ""
         for section in await detail_sections.all():
-            count += 1
-            # handling rest class='id's differently
-            if count > 5:
+            if section_id == "faqs":
                 break
 
             # Get the id of the section to use as the key
             section_id = await section.get_attribute("id")
             
-            if section_id:
+            if section_id and section_id in target_section_id:
+                if section_id == "application-process":
+                    section_text = await get_application_process_text(section)
+                    scheme_data[section_id] = section_text
+                    continue
+                else:
+                    section_text = await section.inner_text()
                 # Get the entire inner text, preserving formatting
-                section_text = await section.inner_text()
 
                 # clean string from "Details\nPrime Minister's Fellowship for Do..."
                 # to "Prime Minister's Fellowship for Do..."
@@ -31,6 +35,33 @@ async def scrape_scheme_details(detail_sections: Locator) -> Dict[str, str]:
         logger.error(f"Error in scrape_scheme_details: {e}")
         raise
 
+async def get_application_process_text(section: Locator) -> str:
+    try:
+        section_text = await section.inner_text()
+        section_text_parts = section_text.split("\n")
+        section_text = "\n".join(section_text_parts[1:])
+
+        if section_text.startswith("Online\nOffline"):
+            online_process_text = section_text.split("Online\nOffline")[1]
+
+            offline_process_locator = section.locator("div.px-4.py-2.flex.items-start.justify-center.capitalize.hover\\:cursor-pointer").last
+            await offline_process_locator.click()
+            await offline_process_locator.wait_for(state="visible", timeout=5000)
+
+            # offline_process_text_locator = offline_process_locator.locator("div.markdown-options")
+            # offline_process_text = await offline_process_text_locator.inner_text()
+            section_text = await section.inner_text()
+            offline_process_text = section_text.split("Online\nOffline")[1]
+
+        else:
+            return section_text
+        return {
+            "online": online_process_text,
+            "offline": offline_process_text
+        }
+    except Exception as e:
+        logger.error(f"Error in get_application_process_text: {e}")
+        raise
 
 async def scrape_scheme_faqs(detail_sections: Locator) -> Dict[str, str]:
     """

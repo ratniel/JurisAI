@@ -55,7 +55,6 @@ class ScrapeSchemes:
 
         # Close database connection
         await close_database_connection(self.client)
-        logger.info("Database connection closed")
 
     async def scrape_all_schemes(self):
         """
@@ -80,7 +79,7 @@ class ScrapeSchemes:
                 page_num = 0
                 while True:
                     # TODO: Remove after testing
-                    if page_num == 3:
+                    if page_num == 1:
                         break
                     scheme_divs = await search_page.get_by_role("article").all()
                     schemes_on_page = {}
@@ -173,11 +172,12 @@ class ScrapeSchemes:
                 level=level,
                 provider=scheme_provider,
                 tags=tags,
-                details=scheme_data.get("details", ""),
-                benefits=scheme_data.get("benefits", ""),
-                eligibility=scheme_data.get("eligibility", ""),
-                application_process=scheme_data.get("application-process", ""),
-                documents_required=scheme_data.get("documents-required", ""),
+                details=scheme_data.get("details", None),
+                benefits=scheme_data.get("benefits", None),
+                eligibility=scheme_data.get("eligibility", None),
+                exclusions=scheme_data.get("exclusions", None),
+                application_process=scheme_data.get("application-process", None),
+                documents_required=scheme_data.get("documents-required", None),
                 faqs=faqs,
                 sources=sources,
             )
@@ -198,8 +198,8 @@ if __name__ == "__main__":
     # async def main():
     #     scraper = ScrapeSchemes()
     #     async with scraper:
-    #         SCHEME_NAME = "Prime Minister’s Fellowship for Doctoral Research"
-    #         URL = "https://www.myscheme.gov.in/schemes/pmfdr"
+    #         SCHEME_NAME = "Prime Minister's Employment Generation Programme"
+    #         URL = "https://www.myscheme.gov.in/schemes/pmegp"
     #         print(await scraper.scrape_scheme(SCHEME_NAME, URL))
 
     # asyncio.run(main())
