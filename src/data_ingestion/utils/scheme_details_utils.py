@@ -15,6 +15,7 @@ async def scrape_scheme_details(detail_sections: Locator) -> Dict[str, str]:
 
             # Get the id of the section to use as the key
             section_id = await section.get_attribute("id")
+            
             if section_id:
                 # Get the entire inner text, preserving formatting
                 section_text = await section.inner_text()

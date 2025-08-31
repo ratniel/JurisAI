@@ -1,3 +1,4 @@
+from beanie import Document
 from pydantic import BaseModel, Field
 from typing import List, Literal, Dict, Optional
 
@@ -7,7 +8,7 @@ class Source(BaseModel):
     url: str = Field(..., description="The URL of the source")
 
 
-class SchemeDetails(BaseModel):
+class SchemeDetails(Document):
     url: str = Field(..., description="The URL of the scheme")
     name: str = Field(..., description="The name of the scheme")
     level: Literal["central", "state"] = Field(
@@ -32,3 +33,6 @@ class SchemeDetails(BaseModel):
     sources: Optional[List[Source]] = Field(
         None, description="The sources and references of the scheme"
     )
+
+    class Settings:
+        name = "schemes"
