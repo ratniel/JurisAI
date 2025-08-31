@@ -9,6 +9,7 @@ from data_ingestion.utils.scheme_details_utils import (
     scrape_scheme_faqs,
     scrape_scheme_sources_and_references,
 )
+from db.mongodb_setup import init_database, close_database_connection
 
 
 class ScrapeSchemes:
@@ -16,6 +17,7 @@ class ScrapeSchemes:
         self.playwright = None
         self.browser = None
         self.context = None
+        self.client = None
         self.scheme_search_url = settings.base_url + "/search"
 
         logger.info("Launching browser")
@@ -32,6 +34,11 @@ class ScrapeSchemes:
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         )
         logger.info("Browser launched")
+
+        # Initialize database connection
+        self.client = await init_database()
+        logger.info("Database connection initialized")
+
         return self
 
     async def __aexit__(self, exc_type, exc_value, traceback):
@@ -46,6 +53,10 @@ class ScrapeSchemes:
             await self.playwright.stop()
         logger.info("Browser closed")
 
+        # Close database connection
+        await close_database_connection(self.client)
+        logger.info("Database connection closed")
+
     async def scrape_all_schemes(self):
         """
         1. Load search page
@@ -55,6 +66,7 @@ class ScrapeSchemes:
         """
         try:
             async with self:
+                # Load search page
                 search_page = await self.context.new_page()
                 await search_page.goto(self.scheme_search_url)
                 container_selector = (
@@ -62,7 +74,9 @@ class ScrapeSchemes:
                 )
                 await search_page.wait_for_selector(container_selector, state="visible")
 
-                all_scraped_schemes = []
+                # Scrape each scheme with scrape_scheme
+                # all_scraped_schemes = []
+                saved_count = 0
                 page_num = 0
                 while True:
                     # TODO: Remove after testing
@@ -81,7 +95,13 @@ class ScrapeSchemes:
                     for scheme_name, scheme_url in schemes_on_page.items():
                         try:
                             scheme = await self.scrape_scheme(scheme_name, scheme_url)
-                            all_scraped_schemes.append(scheme)
+                            logger.info(f"Storing {scheme_name} in MongoDB")
+                            # all_scraped_schemes.append(scheme)
+                            saved_count += 1
+
+                            # Save scheme to MongoDB
+                            await scheme.insert()
+
                         except Exception as e:
                             logger.error(
                                 f"Error scraping scheme: {scheme_name}. Error: {e}"
@@ -102,9 +122,9 @@ class ScrapeSchemes:
                     await search_page.wait_for_load_state("networkidle")
 
                     page_num += 1
-                    logger.info(f"Page {page_num} scraped")
+                    logger.success(f"Page {page_num} scraped. Total {saved_count} schemes saved.")
 
-                return all_scraped_schemes
+                return saved_count
         except Exception as e:
             logger.error(f"Error in scrape_all_schemes: {e}")
             raise
@@ -129,8 +149,8 @@ class ScrapeSchemes:
                 "h3"
             ).first.text_content()
             provider_parts = scheme_provider.split(" ")
-            # Heuristic: Assume "central" if provider name has > 2 words, else "state".
-            level = "central" if len(provider_parts) > 2 else "state"
+            is_central = provider_parts[0].lower() == "ministry"
+            level = "central" if is_central else "state"
 
             # tags
             tags_div = (
@@ -145,6 +165,7 @@ class ScrapeSchemes:
             scheme_data = await scrape_scheme_details(detail_sections)
             faqs = await scrape_scheme_faqs(detail_sections)
             sources = await scrape_scheme_sources_and_references(detail_sections)
+            logger.success(f"{scheme_name} scraped successfully")
 
             return SchemeDetails(
                 url=scheme_url,
@@ -155,8 +176,8 @@ class ScrapeSchemes:
                 details=scheme_data.get("details", ""),
                 benefits=scheme_data.get("benefits", ""),
                 eligibility=scheme_data.get("eligibility", ""),
-                application_process=scheme_data.get("application_process", ""),
-                documents_required=scheme_data.get("documents_required", ""),
+                application_process=scheme_data.get("application-process", ""),
+                documents_required=scheme_data.get("documents-required", ""),
                 faqs=faqs,
                 sources=sources,
             )
@@ -170,10 +191,15 @@ class ScrapeSchemes:
 
 
 if __name__ == "__main__":
-    from rich import print
+    asyncio.run(ScrapeSchemes().scrape_all_schemes())
 
-    # SCHEME_NAME = "Prime Minister’s Fellowship for Doctoral Research"
-    # URL = "https://www.myscheme.gov.in/schemes/pmfdr"
-    # print(asyncio.run(ScrapeSchemes().scrape_scheme(SCHEME_NAME, URL)))
+    # # TESTING SINGLE SCHEME SCRAPER
+    # from rich import print
+    # async def main():
+    #     scraper = ScrapeSchemes()
+    #     async with scraper:
+    #         SCHEME_NAME = "Prime Minister’s Fellowship for Doctoral Research"
+    #         URL = "https://www.myscheme.gov.in/schemes/pmfdr"
+    #         print(await scraper.scrape_scheme(SCHEME_NAME, URL))
 
-    print(asyncio.run(ScrapeSchemes().scrape_all_schemes()))
+    # asyncio.run(main())
