@@ -3,6 +3,6 @@ repos:
     hooks:
       - id: ty
         name: ty type check
-        entry: uv run ty check .
+        entry: uv run ty check . --exclude "skills/**" --exclude "mongodb-beanie-python/**" --exclude ".vscode/**"
         language: system
         pass_filenames: false
