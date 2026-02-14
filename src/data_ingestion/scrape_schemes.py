@@ -3,6 +3,7 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
+from urllib.parse import urljoin, urlparse
 
 from loguru import logger
 from playwright.async_api import Browser, BrowserContext, Page, Playwright, async_playwright
@@ -32,6 +33,11 @@ class ScrapeSchemes:
         self.context: BrowserContext | None = None
         self.client: AsyncMongoClient[dict[str, Any]] | None = None
         self.scheme_search_url = settings.base_url + "/search"
+        base_url = urlparse(settings.base_url)
+        if not base_url.scheme or not base_url.netloc:
+            raise ValueError("settings.base_url must include scheme and host.")
+        self.base_url_scheme = base_url.scheme
+        self.base_url_netloc = base_url.netloc
         self.batch_size = 100
         self.max_concurrency = 6
 
@@ -76,6 +82,17 @@ class ScrapeSchemes:
         if self.context is None:
             raise RuntimeError("Browser context is not initialized.")
         return self.context
+
+    def _resolve_scheme_url(self, href: str) -> str | None:
+        normalized_url = urljoin(f"{settings.base_url.rstrip('/')}/", href.strip())
+        parsed_url = urlparse(normalized_url)
+        if (
+            parsed_url.scheme != self.base_url_scheme
+            or parsed_url.netloc != self.base_url_netloc
+        ):
+            logger.warning(f"Skipping external scheme URL: {href}")
+            return None
+        return normalized_url
 
     async def _bulk_upsert_schemes(self, schemes: Sequence[SchemeDetails]) -> int:
         if not schemes:
@@ -148,9 +165,6 @@ class ScrapeSchemes:
                 scheme_batch: list[SchemeDetails] = []
                 page_num = 0
                 while True:
-                    if page_num == 3:
-                        break
-
                     scheme_divs = await search_page.get_by_role("article").all()
                     schemes_on_page: dict[str, str] = {}
                     for scheme_div in scheme_divs:
@@ -160,9 +174,9 @@ class ScrapeSchemes:
                         if not scheme_name or not href:
                             continue
 
-                        scheme_url = (
-                            href if href.startswith("http") else f"{settings.base_url}{href}"
-                        )
+                        scheme_url = self._resolve_scheme_url(href)
+                        if scheme_url is None:
+                            continue
                         schemes_on_page[scheme_name] = scheme_url
 
                     existing_urls, existing_names = await self._find_existing_schemes(

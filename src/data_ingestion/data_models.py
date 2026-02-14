@@ -38,7 +38,7 @@ class SchemeDetails(Document):
     class Settings:
         name = "schemes"
         indexes = [
-            IndexModel([("url", ASCENDING)], name="idx_scheme_url"),
+            IndexModel([("url", ASCENDING)], name="idx_scheme_url", unique=True),
             IndexModel([("name", ASCENDING)], name="idx_scheme_name"),
             IndexModel([("level", ASCENDING), ("provider", ASCENDING)], name="idx_level_provider"),
             IndexModel([("tags", ASCENDING)], name="idx_tags"),
