@@ -1,16 +1,18 @@
 import asyncio
-from motor.motor_asyncio import AsyncIOMotorClient
+from typing import Any
+
 from beanie import init_beanie
 from loguru import logger
+from pymongo import AsyncMongoClient
 
-from config.settings import settings
-from data_ingestion.data_models import SchemeDetails
+from src.config.settings import settings
+from src.data_ingestion.data_models import SchemeDetails
 
 
-async def init_database() -> AsyncIOMotorClient:
+async def init_database() -> AsyncMongoClient[dict[str, Any]]:
     """Initialize MongoDB connection and Beanie ODM"""
     try:
-        client = AsyncIOMotorClient(settings.mongodb_uri)
+        client: AsyncMongoClient[dict[str, Any]] = AsyncMongoClient(settings.mongodb_uri)
 
         # Get database
         database = client[settings.database_name]
@@ -29,10 +31,12 @@ async def init_database() -> AsyncIOMotorClient:
         raise
 
 
-async def close_database_connection(client: AsyncIOMotorClient) -> None:
+async def close_database_connection(
+    client: AsyncMongoClient[dict[str, Any]] | None,
+) -> None:
     """Close database connection"""
-    if client:
-        client.close()
+    if client is not None:
+        await client.close()
         logger.info("Database connection closed")
 
 
