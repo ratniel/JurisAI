@@ -3,9 +3,16 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
+from urllib.parse import urljoin, urlparse
 
 from loguru import logger
-from playwright.async_api import Browser, BrowserContext, Page, Playwright, async_playwright
+from playwright.async_api import (
+    Browser,
+    BrowserContext,
+    Page,
+    Playwright,
+    async_playwright,
+)
 from pymongo import ReplaceOne
 from pymongo.asynchronous.collection import AsyncCollection
 from pymongo.asynchronous.mongo_client import AsyncMongoClient
@@ -27,11 +34,17 @@ from src.db.mongodb_setup import close_database_connection, init_database
 
 class ScrapeSchemes:
     def __init__(self) -> None:
+        self.settings = settings
         self.playwright: Playwright | None = None
         self.browser: Browser | None = None
         self.context: BrowserContext | None = None
         self.client: AsyncMongoClient[dict[str, Any]] | None = None
-        self.scheme_search_url = settings.base_url + "/search"
+        self.scheme_search_url = self.settings.base_url + "/search"
+        base_url = urlparse(self.settings.base_url)
+        if not base_url.scheme or not base_url.netloc:
+            raise ValueError("settings.base_url must include scheme and host.")
+        self.base_url_scheme = base_url.scheme
+        self.base_url_netloc = base_url.netloc
         self.batch_size = 100
         self.max_concurrency = 6
 
@@ -77,11 +90,24 @@ class ScrapeSchemes:
             raise RuntimeError("Browser context is not initialized.")
         return self.context
 
+    def _resolve_scheme_url(self, href: str) -> str | None:
+        normalized_url = urljoin(f"{self.settings.base_url.rstrip('/')}/", href.strip())
+        parsed_url = urlparse(normalized_url)
+        if (
+            parsed_url.scheme != self.base_url_scheme
+            or parsed_url.netloc != self.base_url_netloc
+        ):
+            logger.warning(f"Skipping external scheme URL: {href}")
+            return None
+        return normalized_url
+
     async def _bulk_upsert_schemes(self, schemes: Sequence[SchemeDetails]) -> int:
         if not schemes:
             return 0
 
-        collection: AsyncCollection[dict[str, Any]] = SchemeDetails.get_pymongo_collection()
+        collection: AsyncCollection[dict[str, Any]] = (
+            SchemeDetails.get_pymongo_collection()
+        )
         operations = [
             ReplaceOne(
                 filter={"url": scheme.url},
@@ -100,17 +126,23 @@ class ScrapeSchemes:
         if not schemes_on_page:
             return set(), set()
 
-        collection: AsyncCollection[dict[str, Any]] = SchemeDetails.get_pymongo_collection()
+        collection: AsyncCollection[dict[str, Any]] = (
+            SchemeDetails.get_pymongo_collection()
+        )
         query = {
             "$or": [
                 {"url": {"$in": list(set(schemes_on_page.values()))}},
                 {"name": {"$in": list(set(schemes_on_page.keys()))}},
             ]
         }
-        docs = await collection.find(query, {"_id": 0, "url": 1, "name": 1}).to_list(length=None)
+        docs = await collection.find(query, {"_id": 0, "url": 1, "name": 1}).to_list(
+            length=None
+        )
 
         existing_urls = {doc["url"] for doc in docs if isinstance(doc.get("url"), str)}
-        existing_names = {doc["name"] for doc in docs if isinstance(doc.get("name"), str)}
+        existing_names = {
+            doc["name"] for doc in docs if isinstance(doc.get("name"), str)
+        }
         return existing_urls, existing_names
 
     async def _scrape_scheme_safe(
@@ -148,9 +180,6 @@ class ScrapeSchemes:
                 scheme_batch: list[SchemeDetails] = []
                 page_num = 0
                 while True:
-                    if page_num == 3:
-                        break
-
                     scheme_divs = await search_page.get_by_role("article").all()
                     schemes_on_page: dict[str, str] = {}
                     for scheme_div in scheme_divs:
@@ -160,9 +189,9 @@ class ScrapeSchemes:
                         if not scheme_name or not href:
                             continue
 
-                        scheme_url = (
-                            href if href.startswith("http") else f"{settings.base_url}{href}"
-                        )
+                        scheme_url = self._resolve_scheme_url(href)
+                        if scheme_url is None:
+                            continue
                         schemes_on_page[scheme_name] = scheme_url
 
                     existing_urls, existing_names = await self._find_existing_schemes(
@@ -171,9 +200,12 @@ class ScrapeSchemes:
                     schemes_to_scrape = [
                         (scheme_name, scheme_url)
                         for scheme_name, scheme_url in schemes_on_page.items()
-                        if scheme_url not in existing_urls and scheme_name not in existing_names
+                        if scheme_url not in existing_urls
+                        and scheme_name not in existing_names
                     ]
-                    skipped_existing_count = len(schemes_on_page) - len(schemes_to_scrape)
+                    skipped_existing_count = len(schemes_on_page) - len(
+                        schemes_to_scrape
+                    )
                     if skipped_existing_count > 0:
                         logger.info(
                             f"Skipping {skipped_existing_count} already-known schemes (url or name match)."
@@ -222,7 +254,9 @@ class ScrapeSchemes:
 
                 if scheme_batch:
                     saved_count += await self._bulk_upsert_schemes(scheme_batch)
-                    logger.info(f"Persisted final batch of {len(scheme_batch)} schemes in MongoDB")
+                    logger.info(
+                        f"Persisted final batch of {len(scheme_batch)} schemes in MongoDB"
+                    )
 
                 logger.success(
                     f"Scraping complete. Scraped {scraped_count}, persisted {saved_count}."
@@ -248,7 +282,9 @@ class ScrapeSchemes:
 
             # scheme provider
             scheme_details_header = scroll_div.locator("div.flex-1")
-            provider_text = await scheme_details_header.locator("h3").first.text_content()
+            provider_text = await scheme_details_header.locator(
+                "h3"
+            ).first.text_content()
             scheme_provider = (provider_text or "").strip() or "Unknown provider"
             provider_parts = scheme_provider.split(" ")
             is_central = provider_parts[0].lower() == "ministry"
