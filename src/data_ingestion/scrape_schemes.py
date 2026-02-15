@@ -110,8 +110,8 @@ class ScrapeSchemes:
         )
         operations = [
             ReplaceOne(
-                filter={"url": scheme.url},
-                replacement=scheme.model_dump(exclude_none=True),
+                filter={"$or": [{"url": scheme.url}, {"name": scheme.name}]},
+                replacement=scheme.model_dump(by_alias=True, exclude_none=True),
                 upsert=True,
             )
             for scheme in schemes
