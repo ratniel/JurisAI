@@ -110,7 +110,7 @@ class ScrapeSchemes:
         )
         operations = [
             ReplaceOne(
-                filter={"$or": [{"url": scheme.url}, {"name": scheme.name}]},
+                filter={"url": scheme.url},
                 replacement=scheme.model_dump(by_alias=True, exclude_none=True),
                 upsert=True,
             )
@@ -122,28 +122,38 @@ class ScrapeSchemes:
     async def _find_existing_schemes(
         self,
         schemes_on_page: dict[str, str],
-    ) -> tuple[set[str], set[str]]:
+    ) -> tuple[set[str], dict[str, set[str]]]:
         if not schemes_on_page:
-            return set(), set()
+            return set(), {}
 
         collection: AsyncCollection[dict[str, Any]] = (
             SchemeDetails.get_pymongo_collection()
         )
-        query = {
-            "$or": [
-                {"url": {"$in": list(set(schemes_on_page.values()))}},
-                {"name": {"$in": list(set(schemes_on_page.keys()))}},
-            ]
-        }
-        docs = await collection.find(query, {"_id": 0, "url": 1, "name": 1}).to_list(
-            length=None
-        )
+        page_urls = list(set(schemes_on_page.values()))
+        page_names = list(set(schemes_on_page.keys()))
 
-        existing_urls = {doc["url"] for doc in docs if isinstance(doc.get("url"), str)}
-        existing_names = {
-            doc["name"] for doc in docs if isinstance(doc.get("name"), str)
+        url_docs = await collection.find(
+            {"url": {"$in": page_urls}},
+            {"_id": 0, "url": 1},
+        ).to_list(length=None)
+        existing_urls = {
+            doc["url"] for doc in url_docs if isinstance(doc.get("url"), str)
         }
-        return existing_urls, existing_names
+
+        # Keep name matches as a signal only; do not use them as a write identity.
+        name_docs = await collection.find(
+            {"name": {"$in": page_names}},
+            {"_id": 0, "url": 1, "name": 1},
+        ).to_list(length=None)
+        existing_name_urls: dict[str, set[str]] = {}
+        for doc in name_docs:
+            name = doc.get("name")
+            url = doc.get("url")
+            if not isinstance(name, str) or not isinstance(url, str):
+                continue
+            existing_name_urls.setdefault(name, set()).add(url)
+
+        return existing_urls, existing_name_urls
 
     async def _scrape_scheme_safe(
         self,
@@ -194,21 +204,39 @@ class ScrapeSchemes:
                             continue
                         schemes_on_page[scheme_name] = scheme_url
 
-                    existing_urls, existing_names = await self._find_existing_schemes(
+                    existing_urls, existing_name_urls = await self._find_existing_schemes(
                         schemes_on_page
                     )
+                    name_url_mismatches = [
+                        (scheme_name, scheme_url, sorted(existing_name_urls[scheme_name]))
+                        for scheme_name, scheme_url in schemes_on_page.items()
+                        if scheme_name in existing_name_urls
+                        and scheme_url not in existing_name_urls[scheme_name]
+                    ]
+                    if name_url_mismatches:
+                        sample_name, sample_url, sample_existing_urls = name_url_mismatches[
+                            0
+                        ]
+                        logger.warning(
+                            (
+                                f"Detected {len(name_url_mismatches)} name collision(s) "
+                                "with differing URL(s). "
+                                f"Sample: name='{sample_name}', page_url='{sample_url}', "
+                                f"existing_urls={sample_existing_urls}"
+                            )
+                        )
+
                     schemes_to_scrape = [
                         (scheme_name, scheme_url)
                         for scheme_name, scheme_url in schemes_on_page.items()
                         if scheme_url not in existing_urls
-                        and scheme_name not in existing_names
                     ]
                     skipped_existing_count = len(schemes_on_page) - len(
                         schemes_to_scrape
                     )
                     if skipped_existing_count > 0:
                         logger.info(
-                            f"Skipping {skipped_existing_count} already-known schemes (url or name match)."
+                            f"Skipping {skipped_existing_count} already-known schemes (url match)."
                         )
 
                     semaphore = asyncio.Semaphore(self.max_concurrency)
