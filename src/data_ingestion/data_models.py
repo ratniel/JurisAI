@@ -1,6 +1,7 @@
 from beanie import Document
 from pydantic import BaseModel, Field
-from typing import List, Literal, Dict, Optional
+from pymongo import ASCENDING, IndexModel
+from typing import Dict, List, Literal
 
 
 class Source(BaseModel):
@@ -27,12 +28,18 @@ class SchemeDetails(Document):
     documents_required: str = Field(
         ..., description="The documents required for the scheme"
     )
-    faqs: Dict[str, str] = Field(
-        None, description="The frequently asked questions of the scheme"
+    faqs: Dict[str, str] | None = Field(
+        default=None, description="The frequently asked questions of the scheme"
     )
-    sources: Optional[List[Source]] = Field(
-        None, description="The sources and references of the scheme"
+    sources: List[Source] | None = Field(
+        default=None, description="The sources and references of the scheme"
     )
 
     class Settings:
         name = "schemes"
+        indexes = [
+            IndexModel([("url", ASCENDING)], name="idx_scheme_url", unique=True),
+            IndexModel([("name", ASCENDING)], name="idx_scheme_name"),
+            IndexModel([("level", ASCENDING), ("provider", ASCENDING)], name="idx_level_provider"),
+            IndexModel([("tags", ASCENDING)], name="idx_tags"),
+        ]

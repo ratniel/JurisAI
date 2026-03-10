@@ -2,6 +2,8 @@ from loguru import logger
 from typing import Dict, List
 from playwright.async_api import Locator
 
+from src.data_ingestion.data_models import Source
+
 
 async def scrape_scheme_details(detail_sections: Locator) -> Dict[str, str]:
     try:
@@ -15,7 +17,7 @@ async def scrape_scheme_details(detail_sections: Locator) -> Dict[str, str]:
 
             # Get the id of the section to use as the key
             section_id = await section.get_attribute("id")
-            
+
             if section_id:
                 # Get the entire inner text, preserving formatting
                 section_text = await section.inner_text()
@@ -73,13 +75,13 @@ async def scrape_scheme_faqs(detail_sections: Locator) -> Dict[str, str]:
 
 async def scrape_scheme_sources_and_references(
     detail_sections: Locator,
-) -> List[Dict[str, str]]:
+) -> List[Source]:
     """
     Scrapes all sources and references from the scheme details page,
-    returning them as a list of dictionaries.
+    returning them as a list of Source objects.
     """
     try:
-        sources_list = []
+        sources_list: List[Source] = []
         page = detail_sections.page
 
         sources_section = page.locator("#sources")
@@ -92,7 +94,7 @@ async def scrape_scheme_sources_and_references(
 
                 if link_text and link_url:
                     sources_list.append(
-                        {"text": link_text.strip(), "url": link_url.strip()}
+                        Source(text=link_text.strip(), url=link_url.strip())
                     )
 
             except Exception as e:
