@@ -1,0 +1,7477 @@
+{
+  "controlled_topics": [
+    "Agriculture",
+    "Animal Husbandry",
+    "Fisheries",
+    "Horticulture",
+    "Rural Development",
+    "Urban Development",
+    "Housing",
+    "Infrastructure",
+    "Education",
+    "Skill Development",
+    "Employment",
+    "Entrepreneurship",
+    "Healthcare",
+    "Nutrition",
+    "Women Welfare",
+    "Child Welfare",
+    "Social Welfare",
+    "Disability Support",
+    "Senior Citizens",
+    "Financial Inclusion",
+    "Environment",
+    "Energy",
+    "Science & Research",
+    "Sports",
+    "Culture"
+  ],
+  "topic_count_note": "The earlier taxonomy note said 22 topics, but the explicit topic list contains 25 labels. This experiment preserves the full explicit list and flags that mismatch for later consolidation.",
+  "unique_tag_count": 1596,
+  "status_counts": {
+    "unmapped": 661,
+    "mapped": 786,
+    "multi_topic": 149
+  },
+  "topic_hit_counts": {
+    "Education": 140,
+    "Healthcare": 73,
+    "Agriculture": 90,
+    "Social Welfare": 122,
+    "Housing": 18,
+    "Culture": 58,
+    "Child Welfare": 31,
+    "Women Welfare": 63,
+    "Skill Development": 34,
+    "Sports": 12,
+    "Animal Husbandry": 52,
+    "Environment": 14,
+    "Rural Development": 16,
+    "Financial Inclusion": 9,
+    "Disability Support": 50,
+    "Nutrition": 17,
+    "Horticulture": 39,
+    "Fisheries": 20,
+    "Infrastructure": 39,
+    "Science & Research": 59,
+    "Senior Citizens": 7,
+    "Energy": 18,
+    "Employment": 58,
+    "Entrepreneurship": 43,
+    "Urban Development": 3
+  },
+  "unmapped_reason_counts": {
+    "numeric_or_measurement": 3,
+    "beneficiary_only_tag": 52,
+    "needs_manual_review": 559,
+    "benefit_or_support_only_tag": 39,
+    "institution_or_brand_tag": 8
+  },
+  "multi_topic_tags": [
+    {
+      "tag": "AIIMS",
+      "normalized_tag": "aiims",
+      "topics": [
+        "Education",
+        "Healthcare"
+      ],
+      "matched_rules": [
+        "exact:aiims",
+        "pattern:Education:\\baiims\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Adolescent Girls",
+      "normalized_tag": "adolescent girls",
+      "topics": [
+        "Women Welfare",
+        "Child Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Women Welfare:\\bgirl",
+        "pattern:Child Welfare:\\badolescent"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Adventure Training",
+      "normalized_tag": "adventure training",
+      "topics": [
+        "Skill Development",
+        "Sports"
+      ],
+      "matched_rules": [
+        "pattern:Skill Development:\\btraining\\b",
+        "pattern:Sports:\\badventure training\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Agricultural Education",
+      "normalized_tag": "agricultural education",
+      "topics": [
+        "Agriculture",
+        "Education"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bagri",
+        "pattern:Education:\\beducat"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Agricultural Scholarship",
+      "normalized_tag": "agricultural scholarship",
+      "topics": [
+        "Agriculture",
+        "Education"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bagri",
+        "pattern:Education:\\bscholar"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Agriculture And Rural Development Bank",
+      "normalized_tag": "agriculture and rural development bank",
+      "topics": [
+        "Agriculture",
+        "Rural Development",
+        "Financial Inclusion"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bagri",
+        "pattern:Rural Development:\\brural\\b",
+        "pattern:Financial Inclusion:\\bbank"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Aids And Appliances",
+      "normalized_tag": "aids and appliances",
+      "topics": [
+        "Healthcare",
+        "Disability Support"
+      ],
+      "matched_rules": [
+        "pattern:Healthcare:\\baids\\b",
+        "pattern:Disability Support:\\baids and appliances\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Aids Appliances",
+      "normalized_tag": "aids appliances",
+      "topics": [
+        "Healthcare",
+        "Disability Support"
+      ],
+      "matched_rules": [
+        "pattern:Healthcare:\\baids\\b",
+        "pattern:Disability Support:\\baids appliances\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Anganwadi",
+      "normalized_tag": "anganwadi",
+      "topics": [
+        "Nutrition",
+        "Child Welfare"
+      ],
+      "matched_rules": [
+        "exact:anganwadi",
+        "pattern:Child Welfare:\\banganwadi\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Animal Farm",
+      "normalized_tag": "animal farm",
+      "topics": [
+        "Agriculture",
+        "Animal Husbandry"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Animal Husbandry:\\banimal"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Animals Health Cover",
+      "normalized_tag": "animals health cover",
+      "topics": [
+        "Animal Husbandry",
+        "Healthcare"
+      ],
+      "matched_rules": [
+        "pattern:Animal Husbandry:\\banimal",
+        "pattern:Healthcare:(?<!soil )\\bhealth\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Artist Scholarship",
+      "normalized_tag": "artist scholarship",
+      "topics": [
+        "Education",
+        "Culture"
+      ],
+      "matched_rules": [
+        "pattern:Education:\\bscholar",
+        "pattern:Culture:\\bartist"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "BPL Girl Student",
+      "normalized_tag": "bpl girl student",
+      "topics": [
+        "Education",
+        "Women Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Education:\\bstudent",
+        "pattern:Women Welfare:\\bgirl"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Battery Electric Vehicle",
+      "normalized_tag": "battery electric vehicle",
+      "topics": [
+        "Infrastructure",
+        "Energy"
+      ],
+      "matched_rules": [
+        "pattern:Infrastructure:\\bvehicle\\b",
+        "pattern:Energy:\\belectric"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Berozgari Bhatta",
+      "normalized_tag": "berozgari bhatta",
+      "topics": [
+        "Employment",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:berozgari bhatta"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Bio Pesticide",
+      "normalized_tag": "bio pesticide",
+      "topics": [
+        "Agriculture",
+        "Environment"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bpestic",
+        "pattern:Environment:\\bbio[ -]?pesticide\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Bio-pesticide",
+      "normalized_tag": "bio pesticide",
+      "topics": [
+        "Agriculture",
+        "Environment"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bpestic",
+        "pattern:Environment:\\bbio[ -]?pesticide\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Building Worker",
+      "normalized_tag": "building worker",
+      "topics": [
+        "Infrastructure",
+        "Employment"
+      ],
+      "matched_rules": [
+        "pattern:Infrastructure:\\bbuilding\\b",
+        "pattern:Employment:\\bworker\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Building Workers",
+      "normalized_tag": "building workers",
+      "topics": [
+        "Infrastructure",
+        "Employment"
+      ],
+      "matched_rules": [
+        "pattern:Infrastructure:\\bbuilding\\b",
+        "pattern:Employment:\\bworkers\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Cattle Farming",
+      "normalized_tag": "cattle farming",
+      "topics": [
+        "Agriculture",
+        "Animal Husbandry"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Animal Husbandry:\\bcattle\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Child Education",
+      "normalized_tag": "child education",
+      "topics": [
+        "Education",
+        "Child Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Education:\\beducat",
+        "pattern:Child Welfare:\\bchild"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Child Labour",
+      "normalized_tag": "child labour",
+      "topics": [
+        "Employment",
+        "Child Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Employment:\\blabou?r",
+        "pattern:Child Welfare:\\bchild"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Child Marriage",
+      "normalized_tag": "child marriage",
+      "topics": [
+        "Women Welfare",
+        "Child Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Women Welfare:\\bmarriage\\b",
+        "pattern:Child Welfare:\\bchild"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Child Marriage Prevention",
+      "normalized_tag": "child marriage prevention",
+      "topics": [
+        "Women Welfare",
+        "Child Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Women Welfare:\\bmarriage\\b",
+        "pattern:Child Welfare:\\bchild"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Child Nutrition",
+      "normalized_tag": "child nutrition",
+      "topics": [
+        "Nutrition",
+        "Child Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Nutrition:\\bnutrition\\b",
+        "pattern:Child Welfare:\\bchild"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Child Victim",
+      "normalized_tag": "child victim",
+      "topics": [
+        "Child Welfare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Child Welfare:\\bchild",
+        "pattern:Social Welfare:\\bvictim"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Child Victims",
+      "normalized_tag": "child victims",
+      "topics": [
+        "Child Welfare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Child Welfare:\\bchild",
+        "pattern:Social Welfare:\\bvictim"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Coaching Assistance",
+      "normalized_tag": "coaching assistance",
+      "topics": [
+        "Skill Development",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Skill Development:\\bcoaching\\b",
+        "pattern:Social Welfare:\\bassistance\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Compressed Air Vehicle",
+      "normalized_tag": "compressed air vehicle",
+      "topics": [
+        "Infrastructure",
+        "Energy"
+      ],
+      "matched_rules": [
+        "pattern:Infrastructure:\\bvehicle\\b",
+        "pattern:Energy:\\bcompressed air vehicle\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Construction Of House",
+      "normalized_tag": "construction of house",
+      "topics": [
+        "Housing",
+        "Infrastructure"
+      ],
+      "matched_rules": [
+        "exact:construction of house",
+        "pattern:Housing:\\bhouse\\b",
+        "pattern:Infrastructure:\\bconstruction\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Construction Worker",
+      "normalized_tag": "construction worker",
+      "topics": [
+        "Infrastructure",
+        "Employment"
+      ],
+      "matched_rules": [
+        "pattern:Infrastructure:\\bconstruction\\b",
+        "pattern:Employment:\\bworker\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Construction Workers",
+      "normalized_tag": "construction workers",
+      "topics": [
+        "Infrastructure",
+        "Employment"
+      ],
+      "matched_rules": [
+        "pattern:Infrastructure:\\bconstruction\\b",
+        "pattern:Employment:\\bworkers\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Crop Assistance",
+      "normalized_tag": "crop assistance",
+      "topics": [
+        "Agriculture",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bcrop\\b",
+        "pattern:Social Welfare:\\bassistance\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Crop Protection",
+      "normalized_tag": "crop protection",
+      "topics": [
+        "Agriculture",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bcrop\\b",
+        "pattern:Social Welfare:\\bprotection\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Dairy Farmer",
+      "normalized_tag": "dairy farmer",
+      "topics": [
+        "Agriculture",
+        "Animal Husbandry"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Animal Husbandry:\\bdairy\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Dairy Farming",
+      "normalized_tag": "dairy farming",
+      "topics": [
+        "Agriculture",
+        "Animal Husbandry"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Animal Husbandry:\\bdairy\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Destitute Children",
+      "normalized_tag": "destitute children",
+      "topics": [
+        "Child Welfare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Child Welfare:\\bchild",
+        "pattern:Social Welfare:\\bdestitute\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Destitute Widow",
+      "normalized_tag": "destitute widow",
+      "topics": [
+        "Women Welfare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Women Welfare:\\bwidow",
+        "pattern:Social Welfare:\\bdestitute\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Destitute Women",
+      "normalized_tag": "destitute women",
+      "topics": [
+        "Women Welfare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Women Welfare:\\bwomen\\b",
+        "pattern:Social Welfare:\\bdestitute\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Differently Abled Student",
+      "normalized_tag": "differently abled student",
+      "topics": [
+        "Education",
+        "Disability Support"
+      ],
+      "matched_rules": [
+        "pattern:Education:\\bstudent",
+        "pattern:Disability Support:\\bdifferently abled\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Disability Relief",
+      "normalized_tag": "disability relief",
+      "topics": [
+        "Social Welfare",
+        "Disability Support"
+      ],
+      "matched_rules": [
+        "exact:disability relief",
+        "pattern:Social Welfare:\\brelief\\b",
+        "pattern:Disability Support:\\bdisab"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Disabled Children",
+      "normalized_tag": "disabled children",
+      "topics": [
+        "Child Welfare",
+        "Disability Support"
+      ],
+      "matched_rules": [
+        "pattern:Child Welfare:\\bchild",
+        "pattern:Disability Support:\\bdisab"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Disabled Student",
+      "normalized_tag": "disabled student",
+      "topics": [
+        "Education",
+        "Disability Support"
+      ],
+      "matched_rules": [
+        "pattern:Education:\\bstudent",
+        "pattern:Disability Support:\\bdisab"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Drug Abuse",
+      "normalized_tag": "drug abuse",
+      "topics": [
+        "Healthcare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Healthcare:\\bdrug\\b",
+        "pattern:Social Welfare:\\babuse\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "E-YUVA",
+      "normalized_tag": "e yuva",
+      "topics": [
+        "Entrepreneurship",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "exact:e yuva"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Education Of School Dropouts",
+      "normalized_tag": "education of school dropouts",
+      "topics": [
+        "Education",
+        "Child Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Education:\\beducat",
+        "pattern:Child Welfare:\\bschool dropouts\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Educational Assistance",
+      "normalized_tag": "educational assistance",
+      "topics": [
+        "Education",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Education:\\beducat",
+        "pattern:Social Welfare:\\bassistance\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Engineering Course",
+      "normalized_tag": "engineering course",
+      "topics": [
+        "Education",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "pattern:Education:\\bcourse",
+        "pattern:Science & Research:\\bengineering\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Farmer Welfare",
+      "normalized_tag": "farmer welfare",
+      "topics": [
+        "Agriculture",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Social Welfare:\\bwelfare\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Farmers Children",
+      "normalized_tag": "farmers children",
+      "topics": [
+        "Agriculture",
+        "Child Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Child Welfare:\\bchild"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Farming Infrastructure",
+      "normalized_tag": "farming infrastructure",
+      "topics": [
+        "Agriculture",
+        "Infrastructure"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Infrastructure:\\binfrastructure\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Fellow",
+      "normalized_tag": "fellow",
+      "topics": [
+        "Education",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "exact:fellow",
+        "pattern:Science & Research:\\bfellow\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Fellowship",
+      "normalized_tag": "fellowship",
+      "topics": [
+        "Education",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "exact:fellowship",
+        "pattern:Science & Research:\\bfellowship\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Female Empowerment",
+      "normalized_tag": "female empowerment",
+      "topics": [
+        "Women Welfare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Women Welfare:\\bfemale\\b",
+        "pattern:Social Welfare:\\bempower"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Fish Culture",
+      "normalized_tag": "fish culture",
+      "topics": [
+        "Fisheries",
+        "Culture"
+      ],
+      "matched_rules": [
+        "pattern:Fisheries:\\bfish\\b",
+        "pattern:Culture:\\bculture\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Fish Farmer",
+      "normalized_tag": "fish farmer",
+      "topics": [
+        "Agriculture",
+        "Fisheries"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Fisheries:\\bfish\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Fish Farming",
+      "normalized_tag": "fish farming",
+      "topics": [
+        "Agriculture",
+        "Fisheries"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Fisheries:\\bfish\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Fish Seed Farm",
+      "normalized_tag": "fish seed farm",
+      "topics": [
+        "Agriculture",
+        "Fisheries"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Fisheries:\\bfish\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Food Assistance",
+      "normalized_tag": "food assistance",
+      "topics": [
+        "Nutrition",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:food assistance",
+        "pattern:Nutrition:\\bfood\\b",
+        "pattern:Social Welfare:\\bassistance\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Free House Construction",
+      "normalized_tag": "free house construction",
+      "topics": [
+        "Housing",
+        "Infrastructure"
+      ],
+      "matched_rules": [
+        "pattern:Housing:\\bhouse\\b",
+        "pattern:Infrastructure:\\bconstruction\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Full Time PhD",
+      "normalized_tag": "full time phd",
+      "topics": [
+        "Education",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "exact:full time phd",
+        "pattern:Education:\\bphd\\b",
+        "pattern:Science & Research:\\bphd\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Girl Child",
+      "normalized_tag": "girl child",
+      "topics": [
+        "Women Welfare",
+        "Child Welfare"
+      ],
+      "matched_rules": [
+        "exact:girl child",
+        "pattern:Women Welfare:\\bgirl",
+        "pattern:Child Welfare:\\bchild"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Girl Education",
+      "normalized_tag": "girl education",
+      "topics": [
+        "Education",
+        "Women Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Education:\\beducat",
+        "pattern:Women Welfare:\\bgirl"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Girl Student",
+      "normalized_tag": "girl student",
+      "topics": [
+        "Education",
+        "Women Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Education:\\bstudent",
+        "pattern:Women Welfare:\\bgirl"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Girls Education",
+      "normalized_tag": "girls education",
+      "topics": [
+        "Education",
+        "Women Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Education:\\beducat",
+        "pattern:Women Welfare:\\bgirl"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Goat Farming Scheme",
+      "normalized_tag": "goat farming scheme",
+      "topics": [
+        "Agriculture",
+        "Animal Husbandry"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Animal Husbandry:\\bgoat\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Gramodyog",
+      "normalized_tag": "gramodyog",
+      "topics": [
+        "Rural Development",
+        "Entrepreneurship"
+      ],
+      "matched_rules": [
+        "exact:gramodyog",
+        "pattern:Rural Development:\\bgram",
+        "pattern:Entrepreneurship:\\bgramodyog\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Health Research",
+      "normalized_tag": "health research",
+      "topics": [
+        "Healthcare",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "pattern:Healthcare:(?<!soil )\\bhealth\\b",
+        "pattern:Science & Research:\\bresearch\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "House Construction",
+      "normalized_tag": "house construction",
+      "topics": [
+        "Housing",
+        "Infrastructure"
+      ],
+      "matched_rules": [
+        "pattern:Housing:\\bhouse\\b",
+        "pattern:Infrastructure:\\bconstruction\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Housing Assistance",
+      "normalized_tag": "housing assistance",
+      "topics": [
+        "Housing",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:housing assistance",
+        "pattern:Housing:\\bhousing\\b",
+        "pattern:Social Welfare:\\bassistance\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "ITI",
+      "normalized_tag": "iti",
+      "topics": [
+        "Education",
+        "Skill Development"
+      ],
+      "matched_rules": [
+        "exact:iti",
+        "pattern:Education:\\biti\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Khadi",
+      "normalized_tag": "khadi",
+      "topics": [
+        "Entrepreneurship",
+        "Culture"
+      ],
+      "matched_rules": [
+        "exact:khadi",
+        "pattern:Entrepreneurship:\\bkhadi\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Livelihood",
+      "normalized_tag": "livelihood",
+      "topics": [
+        "Employment",
+        "Entrepreneurship"
+      ],
+      "matched_rules": [
+        "exact:livelihood"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Livelihood Support",
+      "normalized_tag": "livelihood support",
+      "topics": [
+        "Employment",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:livelihood support",
+        "pattern:Social Welfare:\\bsupport\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Livestock Farmer",
+      "normalized_tag": "livestock farmer",
+      "topics": [
+        "Agriculture",
+        "Animal Husbandry"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Animal Husbandry:\\blivestock\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Makhana Seed Distribution",
+      "normalized_tag": "makhana seed distribution",
+      "topics": [
+        "Agriculture",
+        "Horticulture"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bseed",
+        "pattern:Horticulture:\\bmakhana\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Marriage Assistance",
+      "normalized_tag": "marriage assistance",
+      "topics": [
+        "Women Welfare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:marriage assistance",
+        "pattern:Women Welfare:\\bmarriage\\b",
+        "pattern:Social Welfare:\\bassistance\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Maternity Assistance",
+      "normalized_tag": "maternity assistance",
+      "topics": [
+        "Women Welfare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Women Welfare:\\bmaternity",
+        "pattern:Social Welfare:\\bassistance\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Medical Assistance",
+      "normalized_tag": "medical assistance",
+      "topics": [
+        "Healthcare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:medical assistance",
+        "pattern:Healthcare:\\bmedical",
+        "pattern:Social Welfare:\\bassistance\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Medical Course",
+      "normalized_tag": "medical course",
+      "topics": [
+        "Education",
+        "Healthcare"
+      ],
+      "matched_rules": [
+        "exact:medical course",
+        "pattern:Education:\\bcourse",
+        "pattern:Healthcare:\\bmedical"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Medical Student",
+      "normalized_tag": "medical student",
+      "topics": [
+        "Education",
+        "Healthcare"
+      ],
+      "matched_rules": [
+        "exact:medical student",
+        "pattern:Education:\\bstudent",
+        "pattern:Healthcare:\\bmedical"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Medical Support",
+      "normalized_tag": "medical support",
+      "topics": [
+        "Healthcare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:medical support",
+        "pattern:Healthcare:\\bmedical",
+        "pattern:Social Welfare:\\bsupport\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Organic Crop",
+      "normalized_tag": "organic crop",
+      "topics": [
+        "Agriculture",
+        "Environment"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bcrop\\b",
+        "pattern:Environment:\\borganic\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Organic Farming",
+      "normalized_tag": "organic farming",
+      "topics": [
+        "Agriculture",
+        "Environment"
+      ],
+      "matched_rules": [
+        "exact:organic farming",
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Environment:\\borganic\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Organic Manure",
+      "normalized_tag": "organic manure",
+      "topics": [
+        "Agriculture",
+        "Environment"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bmanure\\b",
+        "pattern:Environment:\\borganic\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Part Time PhD",
+      "normalized_tag": "part time phd",
+      "topics": [
+        "Education",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "exact:part time phd",
+        "pattern:Education:\\bphd\\b",
+        "pattern:Science & Research:\\bphd\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Pension Disability",
+      "normalized_tag": "pension disability",
+      "topics": [
+        "Social Welfare",
+        "Disability Support"
+      ],
+      "matched_rules": [
+        "exact:pension disability",
+        "pattern:Disability Support:\\bdisab"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Ph.D.",
+      "normalized_tag": "ph d",
+      "topics": [
+        "Education",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "exact:ph d"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "PhD",
+      "normalized_tag": "phd",
+      "topics": [
+        "Education",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "exact:phd",
+        "pattern:Education:\\bphd\\b",
+        "pattern:Science & Research:\\bphd\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Pig Farming",
+      "normalized_tag": "pig farming",
+      "topics": [
+        "Agriculture",
+        "Animal Husbandry"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Animal Husbandry:\\bpig farming\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Plantation Crop",
+      "normalized_tag": "plantation crop",
+      "topics": [
+        "Agriculture",
+        "Horticulture"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bcrop\\b",
+        "pattern:Horticulture:\\bplantation\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Polytechnic",
+      "normalized_tag": "polytechnic",
+      "topics": [
+        "Education",
+        "Skill Development"
+      ],
+      "matched_rules": [
+        "exact:polytechnic",
+        "pattern:Education:\\bpolytechnic"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Polytechnics",
+      "normalized_tag": "polytechnics",
+      "topics": [
+        "Education",
+        "Skill Development"
+      ],
+      "matched_rules": [
+        "exact:polytechnics",
+        "pattern:Education:\\bpolytechnic"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Polythene Mulch Technology",
+      "normalized_tag": "polythene mulch technology",
+      "topics": [
+        "Horticulture",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "pattern:Horticulture:\\bmulch\\b",
+        "pattern:Science & Research:\\btechnology\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Post Doctoral",
+      "normalized_tag": "post doctoral",
+      "topics": [
+        "Education",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "exact:post doctoral",
+        "pattern:Science & Research:\\bpost doctoral\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Post-Doctoral",
+      "normalized_tag": "post doctoral",
+      "topics": [
+        "Education",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "exact:post doctoral",
+        "pattern:Science & Research:\\bpost doctoral\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Poultry Farming",
+      "normalized_tag": "poultry farming",
+      "topics": [
+        "Agriculture",
+        "Animal Husbandry"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Animal Husbandry:\\bpoultry\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Pre-school",
+      "normalized_tag": "pre school",
+      "topics": [
+        "Education",
+        "Child Welfare"
+      ],
+      "matched_rules": [
+        "exact:pre school",
+        "pattern:Education:\\bschool\\b",
+        "pattern:Child Welfare:\\bpre school\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Pregnancy Care",
+      "normalized_tag": "pregnancy care",
+      "topics": [
+        "Healthcare",
+        "Women Welfare"
+      ],
+      "matched_rules": [
+        "exact:pregnancy care",
+        "pattern:Women Welfare:\\bpregnan"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Pregnant Cattle",
+      "normalized_tag": "pregnant cattle",
+      "topics": [
+        "Animal Husbandry",
+        "Women Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Animal Husbandry:\\bcattle\\b",
+        "pattern:Women Welfare:\\bpregnan"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Pregnant Women",
+      "normalized_tag": "pregnant women",
+      "topics": [
+        "Healthcare",
+        "Women Welfare"
+      ],
+      "matched_rules": [
+        "exact:pregnant women",
+        "pattern:Women Welfare:\\bwomen\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Research Scholar",
+      "normalized_tag": "research scholar",
+      "topics": [
+        "Education",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "exact:research scholar",
+        "pattern:Education:\\bscholar",
+        "pattern:Science & Research:\\bresearch\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Research Scholars",
+      "normalized_tag": "research scholars",
+      "topics": [
+        "Education",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "exact:research scholars",
+        "pattern:Education:\\bscholar",
+        "pattern:Science & Research:\\bresearch\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Rural Employment",
+      "normalized_tag": "rural employment",
+      "topics": [
+        "Rural Development",
+        "Employment"
+      ],
+      "matched_rules": [
+        "exact:rural employment",
+        "pattern:Rural Development:\\brural\\b",
+        "pattern:Employment:\\bemploy"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "SHG Farmers",
+      "normalized_tag": "shg farmers",
+      "topics": [
+        "Agriculture",
+        "Rural Development"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Rural Development:\\bshg\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Sanitary Napkin",
+      "normalized_tag": "sanitary napkin",
+      "topics": [
+        "Healthcare",
+        "Women Welfare"
+      ],
+      "matched_rules": [
+        "exact:sanitary napkin"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Sanitary Pad",
+      "normalized_tag": "sanitary pad",
+      "topics": [
+        "Healthcare",
+        "Women Welfare"
+      ],
+      "matched_rules": [
+        "exact:sanitary pad"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Sanskrit University",
+      "normalized_tag": "sanskrit university",
+      "topics": [
+        "Education",
+        "Culture"
+      ],
+      "matched_rules": [
+        "exact:sanskrit university",
+        "pattern:Education:\\buniversity\\b",
+        "pattern:Culture:\\bsanskrit\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Scientific Farming",
+      "normalized_tag": "scientific farming",
+      "topics": [
+        "Agriculture",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Science & Research:\\bscient"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Seedlings",
+      "normalized_tag": "seedlings",
+      "topics": [
+        "Agriculture",
+        "Horticulture"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bseed",
+        "pattern:Horticulture:\\bseedlings?\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Self Employment",
+      "normalized_tag": "self employment",
+      "topics": [
+        "Employment",
+        "Entrepreneurship"
+      ],
+      "matched_rules": [
+        "exact:self employment",
+        "pattern:Employment:\\bemploy",
+        "pattern:Entrepreneurship:\\bself employment\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Self-Employment",
+      "normalized_tag": "self employment",
+      "topics": [
+        "Employment",
+        "Entrepreneurship"
+      ],
+      "matched_rules": [
+        "exact:self employment",
+        "pattern:Employment:\\bemploy",
+        "pattern:Entrepreneurship:\\bself employment\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Self-employed",
+      "normalized_tag": "self employed",
+      "topics": [
+        "Employment",
+        "Entrepreneurship"
+      ],
+      "matched_rules": [
+        "pattern:Employment:\\bemploy",
+        "pattern:Entrepreneurship:\\bself employ"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Self-employement",
+      "normalized_tag": "self employement",
+      "topics": [
+        "Employment",
+        "Entrepreneurship"
+      ],
+      "matched_rules": [
+        "pattern:Employment:\\bemploy",
+        "pattern:Entrepreneurship:\\bself employ"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Self-employment",
+      "normalized_tag": "self employment",
+      "topics": [
+        "Employment",
+        "Entrepreneurship"
+      ],
+      "matched_rules": [
+        "exact:self employment",
+        "pattern:Employment:\\bemploy",
+        "pattern:Entrepreneurship:\\bself employment\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Senior Artisans And Weavers",
+      "normalized_tag": "senior artisans and weavers",
+      "topics": [
+        "Senior Citizens",
+        "Culture"
+      ],
+      "matched_rules": [
+        "pattern:Senior Citizens:\\bsenior\\b",
+        "pattern:Culture:\\bweavers\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Single Girl Child",
+      "normalized_tag": "single girl child",
+      "topics": [
+        "Women Welfare",
+        "Child Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Women Welfare:\\bgirl",
+        "pattern:Child Welfare:\\bchild"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Social Science Research",
+      "normalized_tag": "social science research",
+      "topics": [
+        "Social Welfare",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "pattern:Social Welfare:\\bsocial\\b",
+        "pattern:Science & Research:\\bresearch\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Social Worker",
+      "normalized_tag": "social worker",
+      "topics": [
+        "Employment",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Employment:\\bworker\\b",
+        "pattern:Social Welfare:\\bsocial\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Sports Coaching",
+      "normalized_tag": "sports coaching",
+      "topics": [
+        "Skill Development",
+        "Sports"
+      ],
+      "matched_rules": [
+        "pattern:Skill Development:\\bcoaching\\b",
+        "pattern:Sports:\\bsports\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Sports Training",
+      "normalized_tag": "sports training",
+      "topics": [
+        "Skill Development",
+        "Sports"
+      ],
+      "matched_rules": [
+        "pattern:Skill Development:\\btraining\\b",
+        "pattern:Sports:\\bsports\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Student Empowerment",
+      "normalized_tag": "student empowerment",
+      "topics": [
+        "Education",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Education:\\bstudent",
+        "pattern:Social Welfare:\\bempower"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Student Welfare",
+      "normalized_tag": "student welfare",
+      "topics": [
+        "Education",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Education:\\bstudent",
+        "pattern:Social Welfare:\\bwelfare\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Student With Disability",
+      "normalized_tag": "student with disability",
+      "topics": [
+        "Education",
+        "Disability Support"
+      ],
+      "matched_rules": [
+        "pattern:Education:\\bstudent",
+        "pattern:Disability Support:\\bdisab"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Technology Support",
+      "normalized_tag": "technology support",
+      "topics": [
+        "Social Welfare",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "pattern:Social Welfare:\\bsupport\\b",
+        "pattern:Science & Research:\\btechnology\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Teenage Girl",
+      "normalized_tag": "teenage girl",
+      "topics": [
+        "Women Welfare",
+        "Child Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Women Welfare:\\bgirl",
+        "pattern:Child Welfare:\\bteenage\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Teenage Girls",
+      "normalized_tag": "teenage girls",
+      "topics": [
+        "Women Welfare",
+        "Child Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Women Welfare:\\bgirl",
+        "pattern:Child Welfare:\\bteenage\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Transport Worker",
+      "normalized_tag": "transport worker",
+      "topics": [
+        "Infrastructure",
+        "Employment"
+      ],
+      "matched_rules": [
+        "pattern:Infrastructure:\\btransport",
+        "pattern:Employment:\\bworker\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Unemployed Youth Allowance",
+      "normalized_tag": "unemployed youth allowance",
+      "topics": [
+        "Employment",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:unemployed youth allowance",
+        "pattern:Employment:\\bunemploy"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Vegetable Cultivation",
+      "normalized_tag": "vegetable cultivation",
+      "topics": [
+        "Agriculture",
+        "Horticulture"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bcultivation\\b",
+        "pattern:Horticulture:\\bvegetable"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Vegetable Farming",
+      "normalized_tag": "vegetable farming",
+      "topics": [
+        "Agriculture",
+        "Horticulture"
+      ],
+      "matched_rules": [
+        "pattern:Agriculture:\\bfarm",
+        "pattern:Horticulture:\\bvegetable"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Vendor",
+      "normalized_tag": "vendor",
+      "topics": [
+        "Urban Development",
+        "Entrepreneurship"
+      ],
+      "matched_rules": [
+        "pattern:Urban Development:\\bvendor\\b",
+        "pattern:Entrepreneurship:\\bvendor\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Village Industries",
+      "normalized_tag": "village industries",
+      "topics": [
+        "Rural Development",
+        "Entrepreneurship"
+      ],
+      "matched_rules": [
+        "exact:village industries",
+        "pattern:Rural Development:\\bvillage\\b",
+        "pattern:Entrepreneurship:\\bvillage industries\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Visvesvaraya PhD",
+      "normalized_tag": "visvesvaraya phd",
+      "topics": [
+        "Education",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "exact:visvesvaraya phd",
+        "pattern:Education:\\bphd\\b",
+        "pattern:Science & Research:\\bphd\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Vocational Courses",
+      "normalized_tag": "vocational courses",
+      "topics": [
+        "Education",
+        "Skill Development"
+      ],
+      "matched_rules": [
+        "exact:vocational courses",
+        "pattern:Education:\\bcourse",
+        "pattern:Skill Development:\\bvocational\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Vocational Education",
+      "normalized_tag": "vocational education",
+      "topics": [
+        "Education",
+        "Skill Development"
+      ],
+      "matched_rules": [
+        "exact:vocational education",
+        "pattern:Education:\\beducat",
+        "pattern:Skill Development:\\bvocational\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Widow",
+      "normalized_tag": "widow",
+      "topics": [
+        "Women Welfare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:widow",
+        "pattern:Women Welfare:\\bwidow"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Widow Pension",
+      "normalized_tag": "widow pension",
+      "topics": [
+        "Women Welfare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:widow pension",
+        "pattern:Women Welfare:\\bwidow"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Widows",
+      "normalized_tag": "widows",
+      "topics": [
+        "Women Welfare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:widows",
+        "pattern:Women Welfare:\\bwidow"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Wild Animal",
+      "normalized_tag": "wild animal",
+      "topics": [
+        "Animal Husbandry",
+        "Environment"
+      ],
+      "matched_rules": [
+        "pattern:Animal Husbandry:\\banimal",
+        "pattern:Environment:\\bwild animal\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Woman Empowerment",
+      "normalized_tag": "woman empowerment",
+      "topics": [
+        "Women Welfare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Women Welfare:\\bwoman\\b",
+        "pattern:Social Welfare:\\bempower"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Woman Scientist",
+      "normalized_tag": "woman scientist",
+      "topics": [
+        "Women Welfare",
+        "Science & Research"
+      ],
+      "matched_rules": [
+        "exact:woman scientist",
+        "pattern:Women Welfare:\\bwoman\\b",
+        "pattern:Science & Research:\\bscient"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Woman Worker",
+      "normalized_tag": "woman worker",
+      "topics": [
+        "Employment",
+        "Women Welfare"
+      ],
+      "matched_rules": [
+        "pattern:Employment:\\bworker\\b",
+        "pattern:Women Welfare:\\bwoman\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Women Empowerment",
+      "normalized_tag": "women empowerment",
+      "topics": [
+        "Women Welfare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:women empowerment",
+        "pattern:Women Welfare:\\bwomen\\b",
+        "pattern:Social Welfare:\\bempower"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Women Entrepeneurship",
+      "normalized_tag": "women entrepeneurship",
+      "topics": [
+        "Entrepreneurship",
+        "Women Welfare"
+      ],
+      "matched_rules": [
+        "exact:women entrepeneurship",
+        "pattern:Women Welfare:\\bwomen\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Women Protection",
+      "normalized_tag": "women protection",
+      "topics": [
+        "Women Welfare",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:women protection",
+        "pattern:Women Welfare:\\bwomen\\b",
+        "pattern:Social Welfare:\\bprotection\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Women Student",
+      "normalized_tag": "women student",
+      "topics": [
+        "Education",
+        "Women Welfare"
+      ],
+      "matched_rules": [
+        "exact:women student",
+        "pattern:Education:\\bstudent",
+        "pattern:Women Welfare:\\bwomen\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Youth Empowerment",
+      "normalized_tag": "youth empowerment",
+      "topics": [
+        "Employment",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:youth empowerment",
+        "pattern:Employment:\\byouth\\b",
+        "pattern:Social Welfare:\\bempower"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    },
+    {
+      "tag": "Youth Welfare",
+      "normalized_tag": "youth welfare",
+      "topics": [
+        "Employment",
+        "Social Welfare"
+      ],
+      "matched_rules": [
+        "exact:youth welfare",
+        "pattern:Employment:\\byouth\\b",
+        "pattern:Social Welfare:\\bwelfare\\b"
+      ],
+      "status": "multi_topic",
+      "review_reason": null
+    }
+  ],
+  "unmapped_tags": [
+    {
+      "tag": "102",
+      "normalized_tag": "102",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "numeric_or_measurement"
+    },
+    {
+      "tag": "108",
+      "normalized_tag": "108",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "numeric_or_measurement"
+    },
+    {
+      "tag": "20 Tonne",
+      "normalized_tag": "20 tonne",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "numeric_or_measurement"
+    },
+    {
+      "tag": "APL",
+      "normalized_tag": "apl",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Abandoned",
+      "normalized_tag": "abandoned",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Abdul Kalam",
+      "normalized_tag": "abdul kalam",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Abroad",
+      "normalized_tag": "abroad",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Achievement",
+      "normalized_tag": "achievement",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Additional Pension",
+      "normalized_tag": "additional pension",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Adi Dravidar",
+      "normalized_tag": "adi dravidar",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Agitator",
+      "normalized_tag": "agitator",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Alcoholism",
+      "normalized_tag": "alcoholism",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Allowance",
+      "normalized_tag": "allowance",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Ambedkar",
+      "normalized_tag": "ambedkar",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "institution_or_brand_tag"
+    },
+    {
+      "tag": "Amit Gautam",
+      "normalized_tag": "amit gautam",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Anniversary",
+      "normalized_tag": "anniversary",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Anti Bird Net",
+      "normalized_tag": "anti bird net",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Appliance",
+      "normalized_tag": "appliance",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Appliances",
+      "normalized_tag": "appliances",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Aromatic",
+      "normalized_tag": "aromatic",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Ashok Vatika",
+      "normalized_tag": "ashok vatika",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Associations",
+      "normalized_tag": "associations",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Atal",
+      "normalized_tag": "atal",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "institution_or_brand_tag"
+    },
+    {
+      "tag": "Atal Sneh",
+      "normalized_tag": "atal sneh",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "institution_or_brand_tag"
+    },
+    {
+      "tag": "Auction",
+      "normalized_tag": "auction",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Author",
+      "normalized_tag": "author",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Award",
+      "normalized_tag": "award",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Awards",
+      "normalized_tag": "awards",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "BIG",
+      "normalized_tag": "big",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "BPL",
+      "normalized_tag": "bpl",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "BPSC",
+      "normalized_tag": "bpsc",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Backward Class",
+      "normalized_tag": "backward class",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Backward Classes",
+      "normalized_tag": "backward classes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Banglar Yuba Sathi",
+      "normalized_tag": "banglar yuba sathi",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Bauna",
+      "normalized_tag": "bauna",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Bedridden",
+      "normalized_tag": "bedridden",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Below Poverty Level",
+      "normalized_tag": "below poverty level",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Below Poverty Line",
+      "normalized_tag": "below poverty line",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Below The Poverty Line",
+      "normalized_tag": "below the poverty line",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Beti",
+      "normalized_tag": "beti",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Bhimrao Ambedkar",
+      "normalized_tag": "bhimrao ambedkar",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "institution_or_brand_tag"
+    },
+    {
+      "tag": "Bio Agent",
+      "normalized_tag": "bio agent",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Block Demonstration",
+      "normalized_tag": "block demonstration",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Boksa Tribe",
+      "normalized_tag": "boksa tribe",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Bose",
+      "normalized_tag": "bose",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Brahmin",
+      "normalized_tag": "brahmin",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Brahmin Community",
+      "normalized_tag": "brahmin community",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Bravery",
+      "normalized_tag": "bravery",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Breadwinner",
+      "normalized_tag": "breadwinner",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Breed",
+      "normalized_tag": "breed",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "CEPT",
+      "normalized_tag": "cept",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "CLSS",
+      "normalized_tag": "clss",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Cadet",
+      "normalized_tag": "cadet",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Cadets",
+      "normalized_tag": "cadets",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Capital",
+      "normalized_tag": "capital",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Capital Investment",
+      "normalized_tag": "capital investment",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Capital Subsidy",
+      "normalized_tag": "capital subsidy",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Card",
+      "normalized_tag": "card",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Cash",
+      "normalized_tag": "cash",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Cash Award",
+      "normalized_tag": "cash award",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Cash Prize",
+      "normalized_tag": "cash prize",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Castor Cake",
+      "normalized_tag": "castor cake",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Certification",
+      "normalized_tag": "certification",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Chaff Cutter",
+      "normalized_tag": "chaff cutter",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Chair",
+      "normalized_tag": "chair",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Charmakar",
+      "normalized_tag": "charmakar",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Chartered Accountancy",
+      "normalized_tag": "chartered accountancy",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Chartered Accountant",
+      "normalized_tag": "chartered accountant",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Chief Minister",
+      "normalized_tag": "chief minister",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Citation",
+      "normalized_tag": "citation",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Citizen Of India",
+      "normalized_tag": "citizen of india",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Citizens",
+      "normalized_tag": "citizens",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Clothes",
+      "normalized_tag": "clothes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Coache",
+      "normalized_tag": "coache",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Coffee",
+      "normalized_tag": "coffee",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Commercial Map",
+      "normalized_tag": "commercial map",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Communication",
+      "normalized_tag": "communication",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Community",
+      "normalized_tag": "community",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Community Canning",
+      "normalized_tag": "community canning",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Competition",
+      "normalized_tag": "competition",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Concentrate Feeds",
+      "normalized_tag": "concentrate feeds",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Concession",
+      "normalized_tag": "concession",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Contest",
+      "normalized_tag": "contest",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Costume",
+      "normalized_tag": "costume",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Cottage",
+      "normalized_tag": "cottage",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Couple",
+      "normalized_tag": "couple",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Court Cases",
+      "normalized_tag": "court cases",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Coverage",
+      "normalized_tag": "coverage",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Crime",
+      "normalized_tag": "crime",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Crops",
+      "normalized_tag": "crops",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Crops Damage",
+      "normalized_tag": "crops damage",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Cultural Groups",
+      "normalized_tag": "cultural groups",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Cultural Program",
+      "normalized_tag": "cultural program",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Cultural Programs",
+      "normalized_tag": "cultural programs",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "DAYALU-II",
+      "normalized_tag": "dayalu ii",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "DBT",
+      "normalized_tag": "dbt",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "DNT",
+      "normalized_tag": "dnt",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "DPIIT",
+      "normalized_tag": "dpiit",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Daily Allowance",
+      "normalized_tag": "daily allowance",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Data Intergration",
+      "normalized_tag": "data intergration",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Death",
+      "normalized_tag": "death",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Death Benefit",
+      "normalized_tag": "death benefit",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Death Benefits",
+      "normalized_tag": "death benefits",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Death Insurance",
+      "normalized_tag": "death insurance",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Defence",
+      "normalized_tag": "defence",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Defence Forces",
+      "normalized_tag": "defence forces",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Delhi",
+      "normalized_tag": "delhi",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Delivery",
+      "normalized_tag": "delivery",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Demonstration",
+      "normalized_tag": "demonstration",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Denotified",
+      "normalized_tag": "denotified",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Denotified Communities",
+      "normalized_tag": "denotified communities",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Denotified Tribes Caste",
+      "normalized_tag": "denotified tribes caste",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Dependent",
+      "normalized_tag": "dependent",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Dependents",
+      "normalized_tag": "dependents",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Deprived",
+      "normalized_tag": "deprived",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Development",
+      "normalized_tag": "development",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Different Abled Person",
+      "normalized_tag": "different abled person",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Digitisation",
+      "normalized_tag": "digitisation",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Direct Benefit Transfer",
+      "normalized_tag": "direct benefit transfer",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Dissertation",
+      "normalized_tag": "dissertation",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Distress",
+      "normalized_tag": "distress",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Documentation",
+      "normalized_tag": "documentation",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Domestic Consumers",
+      "normalized_tag": "domestic consumers",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Dwarf",
+      "normalized_tag": "dwarf",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "E-bidding",
+      "normalized_tag": "e bidding",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "E-payment",
+      "normalized_tag": "e payment",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "EBC",
+      "normalized_tag": "ebc",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "EWS",
+      "normalized_tag": "ews",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Economically Backward Class",
+      "normalized_tag": "economically backward class",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Economically Weaker Section",
+      "normalized_tag": "economically weaker section",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Economically Weaker Sections",
+      "normalized_tag": "economically weaker sections",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Economics",
+      "normalized_tag": "economics",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Edible Oil",
+      "normalized_tag": "edible oil",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Electronic Trading",
+      "normalized_tag": "electronic trading",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Emeritus",
+      "normalized_tag": "emeritus",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Eminent",
+      "normalized_tag": "eminent",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Encourage",
+      "normalized_tag": "encourage",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Equipment",
+      "normalized_tag": "equipment",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Eunuchs",
+      "normalized_tag": "eunuchs",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Ex-Serviceman",
+      "normalized_tag": "ex serviceman",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Ex-Servicemen",
+      "normalized_tag": "ex servicemen",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Ex-serviceman",
+      "normalized_tag": "ex serviceman",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Ex-servicemen",
+      "normalized_tag": "ex servicemen",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Exhibition",
+      "normalized_tag": "exhibition",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Expansion",
+      "normalized_tag": "expansion",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Expenditure",
+      "normalized_tag": "expenditure",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Expenses",
+      "normalized_tag": "expenses",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Experiential Learning",
+      "normalized_tag": "experiential learning",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Export",
+      "normalized_tag": "export",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Exposure Visit",
+      "normalized_tag": "exposure visit",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Extremely Backward Class",
+      "normalized_tag": "extremely backward class",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Extremely Backward Classes",
+      "normalized_tag": "extremely backward classes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Eyes",
+      "normalized_tag": "eyes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Famers",
+      "normalized_tag": "famers",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Family",
+      "normalized_tag": "family",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Fatherless",
+      "normalized_tag": "fatherless",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Feeders",
+      "normalized_tag": "feeders",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Fertilizer",
+      "normalized_tag": "fertilizer",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Festival",
+      "normalized_tag": "festival",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Finance",
+      "normalized_tag": "finance",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Financial",
+      "normalized_tag": "financial",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Financial Aid",
+      "normalized_tag": "financial aid",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Financial Asisstance",
+      "normalized_tag": "financial asisstance",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Financial Assistane",
+      "normalized_tag": "financial assistane",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Financial Assitance",
+      "normalized_tag": "financial assitance",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Financial Benefit",
+      "normalized_tag": "financial benefit",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Financial Benefits",
+      "normalized_tag": "financial benefits",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Fishing Activities",
+      "normalized_tag": "fishing activities",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Flats",
+      "normalized_tag": "flats",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Flood",
+      "normalized_tag": "flood",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Flower",
+      "normalized_tag": "flower",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Flower Development",
+      "normalized_tag": "flower development",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Foreign",
+      "normalized_tag": "foreign",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Foreign Study",
+      "normalized_tag": "foreign study",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Foreign Trade",
+      "normalized_tag": "foreign trade",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Forest",
+      "normalized_tag": "forest",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Forestry",
+      "normalized_tag": "forestry",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Foster Care",
+      "normalized_tag": "foster care",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Free Bicycles",
+      "normalized_tag": "free bicycles",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Free Distribution Of Inputs",
+      "normalized_tag": "free distribution of inputs",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Free Medicines Distribution",
+      "normalized_tag": "free medicines distribution",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Free Tests",
+      "normalized_tag": "free tests",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Free Textbook",
+      "normalized_tag": "free textbook",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Free Uniform",
+      "normalized_tag": "free uniform",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Free Vaccination",
+      "normalized_tag": "free vaccination",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Freedom Fighter",
+      "normalized_tag": "freedom fighter",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Freight",
+      "normalized_tag": "freight",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Fresh Water",
+      "normalized_tag": "fresh water",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Fruits",
+      "normalized_tag": "fruits",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "GATE",
+      "normalized_tag": "gate",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "GIS Application",
+      "normalized_tag": "gis application",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "GPAT",
+      "normalized_tag": "gpat",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "GUJCET",
+      "normalized_tag": "gujcet",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Garden",
+      "normalized_tag": "garden",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Garo",
+      "normalized_tag": "garo",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Gear",
+      "normalized_tag": "gear",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Ghar",
+      "normalized_tag": "ghar",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Gloves",
+      "normalized_tag": "gloves",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Goa",
+      "normalized_tag": "goa",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Godown",
+      "normalized_tag": "godown",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Gold",
+      "normalized_tag": "gold",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Good Citizens",
+      "normalized_tag": "good citizens",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Goods Vehicles",
+      "normalized_tag": "goods vehicles",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Government",
+      "normalized_tag": "government",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Government Personnel",
+      "normalized_tag": "government personnel",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Government Scheme For Minorities",
+      "normalized_tag": "government scheme for minorities",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Govt Scheme",
+      "normalized_tag": "govt scheme",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Grant",
+      "normalized_tag": "grant",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Group Home",
+      "normalized_tag": "group home",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Guardians",
+      "normalized_tag": "guardians",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Guide",
+      "normalized_tag": "guide",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Gujarat",
+      "normalized_tag": "gujarat",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "HSC",
+      "normalized_tag": "hsc",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "HSFDC",
+      "normalized_tag": "hsfdc",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "institution_or_brand_tag"
+    },
+    {
+      "tag": "Hajong",
+      "normalized_tag": "hajong",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Harrassment",
+      "normalized_tag": "harrassment",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Haryana Scheme",
+      "normalized_tag": "haryana scheme",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Heath",
+      "normalized_tag": "heath",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Hi-Tech",
+      "normalized_tag": "hi tech",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Higher Production",
+      "normalized_tag": "higher production",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Hindi",
+      "normalized_tag": "hindi",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Holiday",
+      "normalized_tag": "holiday",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Home",
+      "normalized_tag": "home",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Honorarium",
+      "normalized_tag": "honorarium",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Hotel",
+      "normalized_tag": "hotel",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "IBA",
+      "normalized_tag": "iba",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "IBM Engine",
+      "normalized_tag": "ibm engine",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "ICDS",
+      "normalized_tag": "icds",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "IIM",
+      "normalized_tag": "iim",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "IPM",
+      "normalized_tag": "ipm",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "IPS",
+      "normalized_tag": "ips",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "ISSS",
+      "normalized_tag": "isss",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "ITEAMS",
+      "normalized_tag": "iteams",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Ignition Grant",
+      "normalized_tag": "ignition grant",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Imported Plant",
+      "normalized_tag": "imported plant",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Incentive",
+      "normalized_tag": "incentive",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Incentives",
+      "normalized_tag": "incentives",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Income Generation",
+      "normalized_tag": "income generation",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Income Tax",
+      "normalized_tag": "income tax",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Indigenous",
+      "normalized_tag": "indigenous",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Indigent",
+      "normalized_tag": "indigent",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Indira Gandhi",
+      "normalized_tag": "indira gandhi",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Individual",
+      "normalized_tag": "individual",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Industries",
+      "normalized_tag": "industries",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Industry",
+      "normalized_tag": "industry",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Infant",
+      "normalized_tag": "infant",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Infants",
+      "normalized_tag": "infants",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Injury",
+      "normalized_tag": "injury",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Institution",
+      "normalized_tag": "institution",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Instrument",
+      "normalized_tag": "instrument",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Insurance",
+      "normalized_tag": "insurance",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Insurance Coverage",
+      "normalized_tag": "insurance coverage",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Insured Person",
+      "normalized_tag": "insured person",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Inter-caste",
+      "normalized_tag": "inter caste",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Interest",
+      "normalized_tag": "interest",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Interest Free Loan",
+      "normalized_tag": "interest free loan",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Interest Subvention",
+      "normalized_tag": "interest subvention",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "International",
+      "normalized_tag": "international",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Internship",
+      "normalized_tag": "internship",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Internship Programme",
+      "normalized_tag": "internship programme",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Interview",
+      "normalized_tag": "interview",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Investigator",
+      "normalized_tag": "investigator",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Investment",
+      "normalized_tag": "investment",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "JEE",
+      "normalized_tag": "jee",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "JSFSS",
+      "normalized_tag": "jsfss",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Jail",
+      "normalized_tag": "jail",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Jaintia",
+      "normalized_tag": "jaintia",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Jayantis",
+      "normalized_tag": "jayantis",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Jeevan Jyoti",
+      "normalized_tag": "jeevan jyoti",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Jewel Loan",
+      "normalized_tag": "jewel loan",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Journalism",
+      "normalized_tag": "journalism",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Journalist",
+      "normalized_tag": "journalist",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Journey",
+      "normalized_tag": "journey",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Junior Fellows",
+      "normalized_tag": "junior fellows",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Jute",
+      "normalized_tag": "jute",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "KIRAN",
+      "normalized_tag": "kiran",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Kadaknath",
+      "normalized_tag": "kadaknath",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Kanya",
+      "normalized_tag": "kanya",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Kanyadaan",
+      "normalized_tag": "kanyadaan",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Karigara Sahayata",
+      "normalized_tag": "karigara sahayata",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Karnataka",
+      "normalized_tag": "karnataka",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Kaushal",
+      "normalized_tag": "kaushal",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Khasi",
+      "normalized_tag": "khasi",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Kishori",
+      "normalized_tag": "kishori",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Knowledge",
+      "normalized_tag": "knowledge",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Koch",
+      "normalized_tag": "koch",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Koli Caste",
+      "normalized_tag": "koli caste",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Kuni Calendar",
+      "normalized_tag": "kuni calendar",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "LIC",
+      "normalized_tag": "lic",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Lactating Mother",
+      "normalized_tag": "lactating mother",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Ladakh",
+      "normalized_tag": "ladakh",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Lakshmir Bhandar",
+      "normalized_tag": "lakshmir bhandar",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Land Purchase",
+      "normalized_tag": "land purchase",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Laon",
+      "normalized_tag": "laon",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Laptop",
+      "normalized_tag": "laptop",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Law",
+      "normalized_tag": "law",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Learn Skills",
+      "normalized_tag": "learn skills",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Learning",
+      "normalized_tag": "learning",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Lecturer",
+      "normalized_tag": "lecturer",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Legal Aid",
+      "normalized_tag": "legal aid",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Leprosy",
+      "normalized_tag": "leprosy",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Leprosy Persons",
+      "normalized_tag": "leprosy persons",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Lifetime Achievement",
+      "normalized_tag": "lifetime achievement",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Literacy",
+      "normalized_tag": "literacy",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Loan",
+      "normalized_tag": "loan",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Long Term",
+      "normalized_tag": "long term",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Low Altitude",
+      "normalized_tag": "low altitude",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Machine",
+      "normalized_tag": "machine",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Machinery",
+      "normalized_tag": "machinery",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Maintenance",
+      "normalized_tag": "maintenance",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Manipur",
+      "normalized_tag": "manipur",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Map",
+      "normalized_tag": "map",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Map Simplification",
+      "normalized_tag": "map simplification",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Marks",
+      "normalized_tag": "marks",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Married",
+      "normalized_tag": "married",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Mathematics",
+      "normalized_tag": "mathematics",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Maulana Azad",
+      "normalized_tag": "maulana azad",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "institution_or_brand_tag"
+    },
+    {
+      "tag": "Medhavi",
+      "normalized_tag": "medhavi",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Media",
+      "normalized_tag": "media",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Mediation",
+      "normalized_tag": "mediation",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Medicine",
+      "normalized_tag": "medicine",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Mega Projects",
+      "normalized_tag": "mega projects",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Meghalaya",
+      "normalized_tag": "meghalaya",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Merit",
+      "normalized_tag": "merit",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Merit Cum Means",
+      "normalized_tag": "merit cum means",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Merit Grant",
+      "normalized_tag": "merit grant",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Meritorious",
+      "normalized_tag": "meritorious",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Migrant",
+      "normalized_tag": "migrant",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Military",
+      "normalized_tag": "military",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Milk",
+      "normalized_tag": "milk",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Milk Production",
+      "normalized_tag": "milk production",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Mini Sprinkler Sanyantr",
+      "normalized_tag": "mini sprinkler sanyantr",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Minikits",
+      "normalized_tag": "minikits",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Mining",
+      "normalized_tag": "mining",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Minorities",
+      "normalized_tag": "minorities",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Minority",
+      "normalized_tag": "minority",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Minority Community",
+      "normalized_tag": "minority community",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Miscarriage",
+      "normalized_tag": "miscarriage",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Mobile",
+      "normalized_tag": "mobile",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Model Map",
+      "normalized_tag": "model map",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Modernization",
+      "normalized_tag": "modernization",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Monthly Allowance",
+      "normalized_tag": "monthly allowance",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Most Backward Classes",
+      "normalized_tag": "most backward classes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Mother",
+      "normalized_tag": "mother",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Motivaction",
+      "normalized_tag": "motivaction",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Motor",
+      "normalized_tag": "motor",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Motorcycle",
+      "normalized_tag": "motorcycle",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Mukhyamantri",
+      "normalized_tag": "mukhyamantri",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Multimedia",
+      "normalized_tag": "multimedia",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Murrah",
+      "normalized_tag": "murrah",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Muscular Dystrophy",
+      "normalized_tag": "muscular dystrophy",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "NACO",
+      "normalized_tag": "naco",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "NCESS",
+      "normalized_tag": "ncess",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "NDA",
+      "normalized_tag": "nda",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "NEET",
+      "normalized_tag": "neet",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "NFSA",
+      "normalized_tag": "nfsa",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "NGO",
+      "normalized_tag": "ngo",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "NIFT",
+      "normalized_tag": "nift",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "NRI",
+      "normalized_tag": "nri",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "NSKFDC",
+      "normalized_tag": "nskfdc",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "NSNIS",
+      "normalized_tag": "nsnis",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Nagaland",
+      "normalized_tag": "nagaland",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Nagaland State",
+      "normalized_tag": "nagaland state",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Nari Adalat",
+      "normalized_tag": "nari adalat",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "National",
+      "normalized_tag": "national",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "National Events",
+      "normalized_tag": "national events",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Natural Calamities",
+      "normalized_tag": "natural calamities",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Natural Death",
+      "normalized_tag": "natural death",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Net",
+      "normalized_tag": "net",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Newborn",
+      "normalized_tag": "newborn",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Newspaper",
+      "normalized_tag": "newspaper",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Nirman Shramik",
+      "normalized_tag": "nirman shramik",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Nomadic",
+      "normalized_tag": "nomadic",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Nomadic Tribe",
+      "normalized_tag": "nomadic tribe",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Nomadic Tribes",
+      "normalized_tag": "nomadic tribes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Nominated Heir",
+      "normalized_tag": "nominated heir",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Nominee",
+      "normalized_tag": "nominee",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Non BPL",
+      "normalized_tag": "non bpl",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Notified Tribes",
+      "normalized_tag": "notified tribes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Nurse",
+      "normalized_tag": "nurse",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Nursery",
+      "normalized_tag": "nursery",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Nutri Cereals",
+      "normalized_tag": "nutri cereals",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Nyaya Sakhi",
+      "normalized_tag": "nyaya sakhi",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "OBC",
+      "normalized_tag": "obc",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "OCI",
+      "normalized_tag": "oci",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "OEBC",
+      "normalized_tag": "oebc",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "OEC",
+      "normalized_tag": "oec",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Odisha",
+      "normalized_tag": "odisha",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Official Language",
+      "normalized_tag": "official language",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Oil Palm",
+      "normalized_tag": "oil palm",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Oilseeds",
+      "normalized_tag": "oilseeds",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "One-day Seminar",
+      "normalized_tag": "one day seminar",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Operation",
+      "normalized_tag": "operation",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Opportunities",
+      "normalized_tag": "opportunities",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Opportunity",
+      "normalized_tag": "opportunity",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Organized Sector",
+      "normalized_tag": "organized sector",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Orphan",
+      "normalized_tag": "orphan",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Other Backward Class",
+      "normalized_tag": "other backward class",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Other Backward Classes",
+      "normalized_tag": "other backward classes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Other Equivalent Communities",
+      "normalized_tag": "other equivalent communities",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Overseas",
+      "normalized_tag": "overseas",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "PDF",
+      "normalized_tag": "pdf",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "PM-YASASVI",
+      "normalized_tag": "pm yasasvi",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "POWER",
+      "normalized_tag": "power",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Paddy",
+      "normalized_tag": "paddy",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Palm",
+      "normalized_tag": "palm",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Panchayat",
+      "normalized_tag": "panchayat",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Pandemic",
+      "normalized_tag": "pandemic",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Parent",
+      "normalized_tag": "parent",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Parents",
+      "normalized_tag": "parents",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Participation",
+      "normalized_tag": "participation",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Performance",
+      "normalized_tag": "performance",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Pest Management",
+      "normalized_tag": "pest management",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Petty Personal Expenses",
+      "normalized_tag": "petty personal expenses",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Plant",
+      "normalized_tag": "plant",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Plant Supply",
+      "normalized_tag": "plant supply",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Policy",
+      "normalized_tag": "policy",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Poly Houses",
+      "normalized_tag": "poly houses",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Pond",
+      "normalized_tag": "pond",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Poor",
+      "normalized_tag": "poor",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Postgraduation",
+      "normalized_tag": "postgraduation",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Posthumously",
+      "normalized_tag": "posthumously",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Pottery",
+      "normalized_tag": "pottery",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Poverty Line Family",
+      "normalized_tag": "poverty line family",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Pratibha",
+      "normalized_tag": "pratibha",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Preparation",
+      "normalized_tag": "preparation",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Press",
+      "normalized_tag": "press",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Priyank Pathak",
+      "normalized_tag": "priyank pathak",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Prize",
+      "normalized_tag": "prize",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Procurement",
+      "normalized_tag": "procurement",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Productivity",
+      "normalized_tag": "productivity",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Professional",
+      "normalized_tag": "professional",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Professional Programmes",
+      "normalized_tag": "professional programmes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Professor",
+      "normalized_tag": "professor",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Professors",
+      "normalized_tag": "professors",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Promoting Registration",
+      "normalized_tag": "promoting registration",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Property",
+      "normalized_tag": "property",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Prosthetic",
+      "normalized_tag": "prosthetic",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Protective Gear",
+      "normalized_tag": "protective gear",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Provident Fund",
+      "normalized_tag": "provident fund",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Public Policy",
+      "normalized_tag": "public policy",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Publication",
+      "normalized_tag": "publication",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Pucca",
+      "normalized_tag": "pucca",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Pucca Ghar",
+      "normalized_tag": "pucca ghar",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Pudecherry",
+      "normalized_tag": "pudecherry",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Puducherry",
+      "normalized_tag": "puducherry",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Pulses",
+      "normalized_tag": "pulses",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Pulses Production",
+      "normalized_tag": "pulses production",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Pump",
+      "normalized_tag": "pump",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Purashkar",
+      "normalized_tag": "purashkar",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Puraskar",
+      "normalized_tag": "puraskar",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Purchase",
+      "normalized_tag": "purchase",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Purchase Of Land",
+      "normalized_tag": "purchase of land",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Purchase Of Tools",
+      "normalized_tag": "purchase of tools",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "R&D Organization",
+      "normalized_tag": "r d organization",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "RTI",
+      "normalized_tag": "rti",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Rain Coat",
+      "normalized_tag": "rain coat",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Rajasthan Scheme",
+      "normalized_tag": "rajasthan scheme",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Rajbhasha",
+      "normalized_tag": "rajbhasha",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Raw And Ripe Mandap",
+      "normalized_tag": "raw and ripe mandap",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Readers Allowance",
+      "normalized_tag": "readers allowance",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Rebate",
+      "normalized_tag": "rebate",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Rehabilitation",
+      "normalized_tag": "rehabilitation",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Reimbursement",
+      "normalized_tag": "reimbursement",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Reimbursement Of Fees",
+      "normalized_tag": "reimbursement of fees",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Religion",
+      "normalized_tag": "religion",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Remote Sensing",
+      "normalized_tag": "remote sensing",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Remuneration",
+      "normalized_tag": "remuneration",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Renovation",
+      "normalized_tag": "renovation",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Repair",
+      "normalized_tag": "repair",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Repair Extension",
+      "normalized_tag": "repair extension",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Repatriation",
+      "normalized_tag": "repatriation",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Researcher",
+      "normalized_tag": "researcher",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Residential Map",
+      "normalized_tag": "residential map",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Residential Schools",
+      "normalized_tag": "residential schools",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Respite And Residential Care",
+      "normalized_tag": "respite and residential care",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Retention",
+      "normalized_tag": "retention",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Retired",
+      "normalized_tag": "retired",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Retirement",
+      "normalized_tag": "retirement",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Rewards",
+      "normalized_tag": "rewards",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Rhizobium",
+      "normalized_tag": "rhizobium",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Rhode Island Red (RIR)",
+      "normalized_tag": "rhode island red rir",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Rice",
+      "normalized_tag": "rice",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Road",
+      "normalized_tag": "road",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "SAI",
+      "normalized_tag": "sai",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "SBC",
+      "normalized_tag": "sbc",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "SC",
+      "normalized_tag": "sc",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "SERB",
+      "normalized_tag": "serb",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "SHGs",
+      "normalized_tag": "shgs",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "SIRE",
+      "normalized_tag": "sire",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "SSC",
+      "normalized_tag": "ssc",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "ST",
+      "normalized_tag": "st",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "STEM",
+      "normalized_tag": "stem",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Safai Karamcharis",
+      "normalized_tag": "safai karamcharis",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Safely Equipment",
+      "normalized_tag": "safely equipment",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Sainik",
+      "normalized_tag": "sainik",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Saksham",
+      "normalized_tag": "saksham",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Salt",
+      "normalized_tag": "salt",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Salt Industry",
+      "normalized_tag": "salt industry",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Samagra",
+      "normalized_tag": "samagra",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Samagra Shiksha",
+      "normalized_tag": "samagra shiksha",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Samarthy",
+      "normalized_tag": "samarthy",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Samriddhi",
+      "normalized_tag": "samriddhi",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Sanedo Equipment",
+      "normalized_tag": "sanedo equipment",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Sardar Patel",
+      "normalized_tag": "sardar patel",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "institution_or_brand_tag"
+    },
+    {
+      "tag": "Sashaktikaran",
+      "normalized_tag": "sashaktikaran",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Save Lives",
+      "normalized_tag": "save lives",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Saving",
+      "normalized_tag": "saving",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Scavenger",
+      "normalized_tag": "scavenger",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Scavengers",
+      "normalized_tag": "scavengers",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Schedule Caste",
+      "normalized_tag": "schedule caste",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Schedule Tribe",
+      "normalized_tag": "schedule tribe",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Scheduled Caste",
+      "normalized_tag": "scheduled caste",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Scheduled Castes",
+      "normalized_tag": "scheduled castes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Scheduled Tribe",
+      "normalized_tag": "scheduled tribe",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Scheduled Tribes",
+      "normalized_tag": "scheduled tribes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Science Communication",
+      "normalized_tag": "science communication",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Scroll",
+      "normalized_tag": "scroll",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Security",
+      "normalized_tag": "security",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Selfemployed",
+      "normalized_tag": "selfemployed",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Sericulture",
+      "normalized_tag": "sericulture",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Setting Up",
+      "normalized_tag": "setting up",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Sewing Machine",
+      "normalized_tag": "sewing machine",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Shagun",
+      "normalized_tag": "shagun",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Shoes",
+      "normalized_tag": "shoes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Short Term",
+      "normalized_tag": "short term",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Silage",
+      "normalized_tag": "silage",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Silicosis",
+      "normalized_tag": "silicosis",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Silk",
+      "normalized_tag": "silk",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Sindhu",
+      "normalized_tag": "sindhu",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Sindhu Darshan",
+      "normalized_tag": "sindhu darshan",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Skilled Technocrats",
+      "normalized_tag": "skilled technocrats",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Smart Phone",
+      "normalized_tag": "smart phone",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Smartphone",
+      "normalized_tag": "smartphone",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Son",
+      "normalized_tag": "son",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Song",
+      "normalized_tag": "song",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Special Backward Classes",
+      "normalized_tag": "special backward classes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Special Care",
+      "normalized_tag": "special care",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Spectacle",
+      "normalized_tag": "spectacle",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Spectacle Purchase",
+      "normalized_tag": "spectacle purchase",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Spectacles",
+      "normalized_tag": "spectacles",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Spice",
+      "normalized_tag": "spice",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Spinner",
+      "normalized_tag": "spinner",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Spoken English",
+      "normalized_tag": "spoken english",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Sponsorship",
+      "normalized_tag": "sponsorship",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Sportsperson",
+      "normalized_tag": "sportsperson",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Spouse",
+      "normalized_tag": "spouse",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Sri Lanka",
+      "normalized_tag": "sri lanka",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Sridev Suman",
+      "normalized_tag": "sridev suman",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Stage",
+      "normalized_tag": "stage",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Stage III",
+      "normalized_tag": "stage iii",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Stage IV",
+      "normalized_tag": "stage iv",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Stall",
+      "normalized_tag": "stall",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Stamp Duty",
+      "normalized_tag": "stamp duty",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Start-up",
+      "normalized_tag": "start up",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "StartUp",
+      "normalized_tag": "startup",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Startup",
+      "normalized_tag": "startup",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Statistics",
+      "normalized_tag": "statistics",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Storage",
+      "normalized_tag": "storage",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Study",
+      "normalized_tag": "study",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Study Loan",
+      "normalized_tag": "study loan",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Study Material",
+      "normalized_tag": "study material",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Subsidies",
+      "normalized_tag": "subsidies",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Subsidized Rate",
+      "normalized_tag": "subsidized rate",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Subsidy",
+      "normalized_tag": "subsidy",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Subsidy On Inputs",
+      "normalized_tag": "subsidy on inputs",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Sugar Mill",
+      "normalized_tag": "sugar mill",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Sugarcane",
+      "normalized_tag": "sugarcane",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Super Ultra Mega Projects",
+      "normalized_tag": "super ultra mega projects",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Superannuated",
+      "normalized_tag": "superannuated",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Surgery",
+      "normalized_tag": "surgery",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Survey",
+      "normalized_tag": "survey",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Survivor",
+      "normalized_tag": "survivor",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Sustainability",
+      "normalized_tag": "sustainability",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Swami Vivekananda",
+      "normalized_tag": "swami vivekananda",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Swarnajayanti",
+      "normalized_tag": "swarnajayanti",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Swavalamban",
+      "normalized_tag": "swavalamban",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Sweekruti",
+      "normalized_tag": "sweekruti",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Symposium",
+      "normalized_tag": "symposium",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "TB",
+      "normalized_tag": "tb",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "TETRA",
+      "normalized_tag": "tetra",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Tablet",
+      "normalized_tag": "tablet",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Talent",
+      "normalized_tag": "talent",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Talent Award",
+      "normalized_tag": "talent award",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Talent Search",
+      "normalized_tag": "talent search",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Tamil Nadu",
+      "normalized_tag": "tamil nadu",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Tarpaulin",
+      "normalized_tag": "tarpaulin",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Tax",
+      "normalized_tag": "tax",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Tea",
+      "normalized_tag": "tea",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Tea Development",
+      "normalized_tag": "tea development",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Tea Development Board",
+      "normalized_tag": "tea development board",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Tea Factory",
+      "normalized_tag": "tea factory",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Tea Garden",
+      "normalized_tag": "tea garden",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Tea Industry",
+      "normalized_tag": "tea industry",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Teacher",
+      "normalized_tag": "teacher",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Teachers",
+      "normalized_tag": "teachers",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Technical Programmes",
+      "normalized_tag": "technical programmes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Technologies",
+      "normalized_tag": "technologies",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Telecommunication",
+      "normalized_tag": "telecommunication",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Telephone Advice",
+      "normalized_tag": "telephone advice",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Term Loan",
+      "normalized_tag": "term loan",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Term Loan Scheme Of NMDFC",
+      "normalized_tag": "term loan scheme of nmdfc",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Testing",
+      "normalized_tag": "testing",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Thakor Caste",
+      "normalized_tag": "thakor caste",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Tharu Tribe",
+      "normalized_tag": "tharu tribe",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "The Scheme Of Masses",
+      "normalized_tag": "the scheme of masses",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Three Wheelers",
+      "normalized_tag": "three wheelers",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Thrust Sectors",
+      "normalized_tag": "thrust sectors",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Tool Kits",
+      "normalized_tag": "tool kits",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Tool Purchase",
+      "normalized_tag": "tool purchase",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Toolkit Incentive",
+      "normalized_tag": "toolkit incentive",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Tools",
+      "normalized_tag": "tools",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Top Rank",
+      "normalized_tag": "top rank",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Topper",
+      "normalized_tag": "topper",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Toy Kit",
+      "normalized_tag": "toy kit",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Trained Professionals",
+      "normalized_tag": "trained professionals",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Transgender",
+      "normalized_tag": "transgender",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Travel",
+      "normalized_tag": "travel",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Travelling Allowance",
+      "normalized_tag": "travelling allowance",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "benefit_or_support_only_tag"
+    },
+    {
+      "tag": "Trellis Mandap",
+      "normalized_tag": "trellis mandap",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Tribal",
+      "normalized_tag": "tribal",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "UGC",
+      "normalized_tag": "ugc",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "UPSC",
+      "normalized_tag": "upsc",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "UREDA",
+      "normalized_tag": "ureda",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "institution_or_brand_tag"
+    },
+    {
+      "tag": "Ultrasound Service",
+      "normalized_tag": "ultrasound service",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Uniform",
+      "normalized_tag": "uniform",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Unmarried",
+      "normalized_tag": "unmarried",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Unnatural Death",
+      "normalized_tag": "unnatural death",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Unnayan",
+      "normalized_tag": "unnayan",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Upper Primary",
+      "normalized_tag": "upper primary",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Utkarsh Yojana",
+      "normalized_tag": "utkarsh yojana",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Uttarakhand State Movement",
+      "normalized_tag": "uttarakhand state movement",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "VISA",
+      "normalized_tag": "visa",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "VJNT",
+      "normalized_tag": "vjnt",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Vedic Mathematics",
+      "normalized_tag": "vedic mathematics",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Vigilance",
+      "normalized_tag": "vigilance",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Vikas",
+      "normalized_tag": "vikas",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Vimukat Jatis",
+      "normalized_tag": "vimukat jatis",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Vimukta Jati",
+      "normalized_tag": "vimukta jati",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Vimukta Jati And Nomadic Tribes",
+      "normalized_tag": "vimukta jati and nomadic tribes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Vimukta Jatis",
+      "normalized_tag": "vimukta jatis",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Vimukta Jatis & Nomadic Tribes",
+      "normalized_tag": "vimukta jatis nomadic tribes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Vimukta Jatis And Nomadic Tribes",
+      "normalized_tag": "vimukta jatis and nomadic tribes",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Vision",
+      "normalized_tag": "vision",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Visiting",
+      "normalized_tag": "visiting",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Visually",
+      "normalized_tag": "visually",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Volunteer",
+      "normalized_tag": "volunteer",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "War",
+      "normalized_tag": "war",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Ward",
+      "normalized_tag": "ward",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Water",
+      "normalized_tag": "water",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Water Drinkers",
+      "normalized_tag": "water drinkers",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Waters",
+      "normalized_tag": "waters",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Weaker Section",
+      "normalized_tag": "weaker section",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "beneficiary_only_tag"
+    },
+    {
+      "tag": "Wheat",
+      "normalized_tag": "wheat",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Work Tool",
+      "normalized_tag": "work tool",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "World War-II",
+      "normalized_tag": "world war ii",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Young",
+      "normalized_tag": "young",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Young Professional",
+      "normalized_tag": "young professional",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Young Statistician",
+      "normalized_tag": "young statistician",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Youths",
+      "normalized_tag": "youths",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    },
+    {
+      "tag": "Zero Ticket",
+      "normalized_tag": "zero ticket",
+      "topics": [],
+      "matched_rules": [],
+      "status": "unmapped",
+      "review_reason": "needs_manual_review"
+    }
+  ]
+}
