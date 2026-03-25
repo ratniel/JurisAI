@@ -1,0 +1,4176 @@
+{
+  "input_file": "/Users/ratniel/JurisAI/unique_tags.json",
+  "run_dir": "/Users/ratniel/JurisAI/bertopic_runs/20260310T172451Z_unique-tags-english-minilm-zeroshot-pass",
+  "document_count": 1596,
+  "topic_count_including_outliers": 84,
+  "outlier_count": 232,
+  "config": {
+    "run_name": "unique-tags-english-minilm-zeroshot-pass",
+    "language": "english",
+    "embedding_model_name": "all-MiniLM-L6-v2",
+    "top_n_words": 10,
+    "ngram_range": [
+      1,
+      2
+    ],
+    "min_topic_size": 12,
+    "nr_topics": null,
+    "calculate_probabilities": false,
+    "low_memory": false,
+    "random_state": 42,
+    "umap_n_neighbors": 15,
+    "umap_n_components": 5,
+    "umap_min_dist": 0.0,
+    "umap_metric": "cosine",
+    "hdbscan_min_cluster_size": 12,
+    "hdbscan_min_samples": 2,
+    "hdbscan_metric": "euclidean",
+    "cluster_selection_method": "eom",
+    "min_df": 1,
+    "max_df": 1.0,
+    "stop_words": "english",
+    "representation_model_name": "keybert",
+    "seed_topic_file": null,
+    "zeroshot_topic_file": "/Users/ratniel/JurisAI/bertopic_zeroshot_topics.json",
+    "zeroshot_min_similarity": 0.7,
+    "max_topic_label_words": 2,
+    "preferred_topic_keywords": [
+      "accident",
+      "accommodation",
+      "agriculture"
+    ]
+  },
+  "artifacts": {
+    "config": "/Users/ratniel/JurisAI/bertopic_runs/20260310T172451Z_unique-tags-english-minilm-zeroshot-pass/stats/config.json",
+    "topic_info_csv": "/Users/ratniel/JurisAI/bertopic_runs/20260310T172451Z_unique-tags-english-minilm-zeroshot-pass/stats/topic_info.csv",
+    "document_info_csv": "/Users/ratniel/JurisAI/bertopic_runs/20260310T172451Z_unique-tags-english-minilm-zeroshot-pass/stats/document_info.csv",
+    "visualizations": {
+      "topics": "/Users/ratniel/JurisAI/bertopic_runs/20260310T172451Z_unique-tags-english-minilm-zeroshot-pass/visualizations/topics.html",
+      "barchart": "/Users/ratniel/JurisAI/bertopic_runs/20260310T172451Z_unique-tags-english-minilm-zeroshot-pass/visualizations/barchart.html",
+      "hierarchy": "/Users/ratniel/JurisAI/bertopic_runs/20260310T172451Z_unique-tags-english-minilm-zeroshot-pass/visualizations/hierarchy.html",
+      "heatmap": "/Users/ratniel/JurisAI/bertopic_runs/20260310T172451Z_unique-tags-english-minilm-zeroshot-pass/visualizations/heatmap.html"
+    },
+    "log_file": "/Users/ratniel/JurisAI/bertopic_runs/20260310T172451Z_unique-tags-english-minilm-zeroshot-pass/logs/run.log",
+    "model_dir": "/Users/ratniel/JurisAI/bertopic_runs/20260310T172451Z_unique-tags-english-minilm-zeroshot-pass/model"
+  },
+  "topic_labels": {
+    "-1": "outlier",
+    "0": "accident",
+    "1": "topic 1",
+    "2": "accommodation",
+    "3": "house",
+    "4": "topic 4",
+    "5": "agriculture",
+    "6": "production",
+    "7": "requisites",
+    "8": "animal husbandry",
+    "9": "farmer",
+    "10": "irrigation",
+    "11": "plantation crop",
+    "12": "wellness",
+    "13": "healthcare",
+    "14": "ambulance",
+    "15": "relief",
+    "16": "topic 16",
+    "17": "worker",
+    "18": "food",
+    "19": "mothers",
+    "20": "topic 20",
+    "21": "student",
+    "22": "youth",
+    "23": "topic 23",
+    "24": "school",
+    "25": "agriculture",
+    "26": "topic 26",
+    "27": "researcher",
+    "28": "topic 28",
+    "29": "job",
+    "30": "employment",
+    "31": "development",
+    "32": "financial",
+    "33": "assistance",
+    "34": "agriculture",
+    "35": "topic 35",
+    "36": "widow",
+    "37": "topic 37",
+    "38": "topic 38",
+    "39": "economic",
+    "40": "welfare",
+    "41": "class",
+    "42": "minority",
+    "43": "topic 43",
+    "44": "legal",
+    "45": "art",
+    "46": "training",
+    "47": "service",
+    "48": "topic 48",
+    "49": "supply",
+    "50": "war",
+    "51": "state",
+    "52": "topic 52",
+    "53": "labor",
+    "54": "agriculture",
+    "55": "higher",
+    "56": "drinking",
+    "57": "production",
+    "58": "victim violence",
+    "59": "family",
+    "60": "youth",
+    "61": "services",
+    "62": "student",
+    "63": "topic 63",
+    "64": "students",
+    "65": "topic 65",
+    "66": "training",
+    "67": "preparation",
+    "68": "researcher",
+    "69": "school",
+    "70": "accident",
+    "71": "school",
+    "72": "diploma",
+    "73": "accident",
+    "74": "accident",
+    "75": "accident",
+    "76": "road",
+    "77": "cash",
+    "78": "spinner",
+    "79": "art",
+    "80": "arts",
+    "81": "topic 81",
+    "82": "information"
+  },
+  "topics": [
+    {
+      "topic_id": -1,
+      "count": 232,
+      "name": "-1_102_rate_rate super_rank",
+      "short_label": "outlier",
+      "representative_terms": [
+        [
+          "102",
+          0.794623076915741
+        ],
+        [
+          "rate",
+          0.526277482509613
+        ],
+        [
+          "rate super",
+          0.4543328583240509
+        ],
+        [
+          "rank",
+          0.4455740451812744
+        ],
+        [
+          "purchase",
+          0.42221570014953613
+        ],
+        [
+          "mega",
+          0.4191897511482239
+        ],
+        [
+          "fee",
+          0.4030277729034424
+        ],
+        [
+          "national",
+          0.35700803995132446
+        ],
+        [
+          "business",
+          0.3566036820411682
+        ],
+        [
+          "post",
+          0.34783199429512024
+        ]
+      ]
+    },
+    {
+      "topic_id": 0,
+      "count": 1,
+      "name": "accident",
+      "short_label": "accident",
+      "representative_terms": [
+        [
+          "accident",
+          0.3639448285102844
+        ],
+        [
+          "",
+          0.3392757177352905
+        ],
+        [
+          "",
+          0.3392757177352905
+        ],
+        [
+          "",
+          0.3392757177352905
+        ],
+        [
+          "",
+          0.3392757177352905
+        ],
+        [
+          "",
+          0.3392757177352905
+        ],
+        [
+          "",
+          0.3392757177352905
+        ],
+        [
+          "",
+          0.3392757177352905
+        ],
+        [
+          "",
+          0.3392757177352905
+        ],
+        [
+          "",
+          0.3392757177352905
+        ]
+      ]
+    },
+    {
+      "topic_id": 1,
+      "count": 2,
+      "name": "disaster relief",
+      "short_label": "topic 1",
+      "representative_terms": [
+        [
+          "",
+          0.335313081741333
+        ],
+        [
+          "",
+          0.335313081741333
+        ],
+        [
+          "",
+          0.335313081741333
+        ],
+        [
+          "",
+          0.335313081741333
+        ],
+        [
+          "",
+          0.335313081741333
+        ],
+        [
+          "",
+          0.335313081741333
+        ],
+        [
+          "",
+          0.335313081741333
+        ],
+        [
+          "",
+          0.335313081741333
+        ],
+        [
+          "",
+          0.335313081741333
+        ],
+        [
+          "",
+          0.335313081741333
+        ]
+      ]
+    },
+    {
+      "topic_id": 2,
+      "count": 6,
+      "name": "accommodation",
+      "short_label": "accommodation",
+      "representative_terms": [
+        [
+          "hotel",
+          0.42250949144363403
+        ],
+        [
+          "facility",
+          0.4115969240665436
+        ],
+        [
+          "accommodation",
+          0.40782713890075684
+        ],
+        [
+          "accomodation",
+          0.4028136730194092
+        ],
+        [
+          "lodging",
+          0.39490771293640137
+        ],
+        [
+          "",
+          0.3882671892642975
+        ],
+        [
+          "",
+          0.3882671892642975
+        ],
+        [
+          "",
+          0.3882671892642975
+        ],
+        [
+          "",
+          0.3882671892642975
+        ],
+        [
+          "",
+          0.3882671892642975
+        ]
+      ]
+    },
+    {
+      "topic_id": 3,
+      "count": 3,
+      "name": "housing",
+      "short_label": "house",
+      "representative_terms": [
+        [
+          "house",
+          0.40295812487602234
+        ],
+        [
+          "assistance",
+          0.38105398416519165
+        ],
+        [
+          "housing",
+          0.34300094842910767
+        ],
+        [
+          "",
+          0.30235984921455383
+        ],
+        [
+          "",
+          0.30235984921455383
+        ],
+        [
+          "",
+          0.30235984921455383
+        ],
+        [
+          "",
+          0.30235984921455383
+        ],
+        [
+          "",
+          0.30235984921455383
+        ],
+        [
+          "",
+          0.30235984921455383
+        ],
+        [
+          "",
+          0.30235984921455383
+        ]
+      ]
+    },
+    {
+      "topic_id": 4,
+      "count": 4,
+      "name": "construction",
+      "short_label": "topic 4",
+      "representative_terms": [
+        [
+          "",
+          0.2818291485309601
+        ],
+        [
+          "",
+          0.2818291485309601
+        ],
+        [
+          "",
+          0.2818291485309601
+        ],
+        [
+          "",
+          0.2818291485309601
+        ],
+        [
+          "",
+          0.2818291485309601
+        ],
+        [
+          "",
+          0.2818291485309601
+        ],
+        [
+          "",
+          0.2818291485309601
+        ],
+        [
+          "",
+          0.2818291485309601
+        ],
+        [
+          "",
+          0.2818291485309601
+        ],
+        [
+          "",
+          0.2818291485309601
+        ]
+      ]
+    },
+    {
+      "topic_id": 5,
+      "count": 18,
+      "name": "agriculture",
+      "short_label": "agriculture",
+      "representative_terms": [
+        [
+          "activities",
+          0.4587346315383911
+        ],
+        [
+          "education",
+          0.4166002869606018
+        ],
+        [
+          "management",
+          0.40154895186424255
+        ],
+        [
+          "infrastructure",
+          0.360442191362381
+        ],
+        [
+          "integrated",
+          0.35758039355278015
+        ],
+        [
+          "",
+          0.3207612931728363
+        ],
+        [
+          "",
+          0.3207612931728363
+        ],
+        [
+          "",
+          0.3207612931728363
+        ],
+        [
+          "",
+          0.3207612931728363
+        ],
+        [
+          "",
+          0.3207612931728363
+        ]
+      ]
+    },
+    {
+      "topic_id": 6,
+      "count": 5,
+      "name": "crop support",
+      "short_label": "production",
+      "representative_terms": [
+        [
+          "production",
+          0.3801839053630829
+        ],
+        [
+          "assistance",
+          0.31889334321022034
+        ],
+        [
+          "",
+          0.3067060112953186
+        ],
+        [
+          "",
+          0.3067060112953186
+        ],
+        [
+          "",
+          0.3067060112953186
+        ],
+        [
+          "",
+          0.3067060112953186
+        ],
+        [
+          "",
+          0.3067060112953186
+        ],
+        [
+          "",
+          0.3067060112953186
+        ],
+        [
+          "",
+          0.3067060112953186
+        ],
+        [
+          "",
+          0.3067060112953186
+        ]
+      ]
+    },
+    {
+      "topic_id": 7,
+      "count": 4,
+      "name": "fisheries",
+      "short_label": "requisites",
+      "representative_terms": [
+        [
+          "requisites",
+          0.35944297909736633
+        ],
+        [
+          "",
+          0.30969545245170593
+        ],
+        [
+          "",
+          0.30969545245170593
+        ],
+        [
+          "",
+          0.30969545245170593
+        ],
+        [
+          "",
+          0.30969545245170593
+        ],
+        [
+          "",
+          0.30969545245170593
+        ],
+        [
+          "",
+          0.30969545245170593
+        ],
+        [
+          "",
+          0.30969545245170593
+        ],
+        [
+          "",
+          0.30969545245170593
+        ],
+        [
+          "",
+          0.30969545245170593
+        ]
+      ]
+    },
+    {
+      "topic_id": 8,
+      "count": 1,
+      "name": "animal husbandry",
+      "short_label": "animal husbandry",
+      "representative_terms": [
+        [
+          "animal husbandry",
+          0.2864926755428314
+        ],
+        [
+          "husbandry",
+          0.250356525182724
+        ],
+        [
+          "animal",
+          0.23918485641479492
+        ],
+        [
+          "",
+          0.17357121407985687
+        ],
+        [
+          "",
+          0.17357121407985687
+        ],
+        [
+          "",
+          0.17357121407985687
+        ],
+        [
+          "",
+          0.17357121407985687
+        ],
+        [
+          "",
+          0.17357121407985687
+        ],
+        [
+          "",
+          0.17357121407985687
+        ],
+        [
+          "",
+          0.17357121407985687
+        ]
+      ]
+    },
+    {
+      "topic_id": 9,
+      "count": 12,
+      "name": "livestock",
+      "short_label": "farmer",
+      "representative_terms": [
+        [
+          "farmer",
+          0.4958890378475189
+        ],
+        [
+          "farming",
+          0.4916672706604004
+        ],
+        [
+          "farm",
+          0.47922542691230774
+        ],
+        [
+          "animal farm",
+          0.47822630405426025
+        ],
+        [
+          "farm cattle",
+          0.4504026472568512
+        ],
+        [
+          "cattle",
+          0.44714412093162537
+        ],
+        [
+          "cattle farming",
+          0.4464413523674011
+        ],
+        [
+          "livestock farmer",
+          0.4382999837398529
+        ],
+        [
+          "livestock",
+          0.4232857823371887
+        ],
+        [
+          "animal",
+          0.4124539792537689
+        ]
+      ]
+    },
+    {
+      "topic_id": 10,
+      "count": 2,
+      "name": "irrigation",
+      "short_label": "irrigation",
+      "representative_terms": [
+        [
+          "irrigation",
+          0.5250650644302368
+        ],
+        [
+          "irrigation irrigation",
+          0.49295783042907715
+        ],
+        [
+          "drip irrigation",
+          0.31264808773994446
+        ],
+        [
+          "",
+          0.13905370235443115
+        ],
+        [
+          "",
+          0.13905370235443115
+        ],
+        [
+          "",
+          0.13905370235443115
+        ],
+        [
+          "",
+          0.13905370235443115
+        ],
+        [
+          "",
+          0.13905370235443115
+        ],
+        [
+          "",
+          0.13905370235443115
+        ],
+        [
+          "",
+          0.13905370235443115
+        ]
+      ]
+    },
+    {
+      "topic_id": 11,
+      "count": 5,
+      "name": "plantation",
+      "short_label": "plantation crop",
+      "representative_terms": [
+        [
+          "plantation crop",
+          0.6394398212432861
+        ],
+        [
+          "crop",
+          0.5564521551132202
+        ],
+        [
+          "crop tea",
+          0.46623310446739197
+        ],
+        [
+          "commercial plantation",
+          0.3908906579017639
+        ],
+        [
+          "plantation",
+          0.3607442080974579
+        ],
+        [
+          "plantation plantation",
+          0.3595598638057709
+        ],
+        [
+          "apple plantation",
+          0.35879606008529663
+        ],
+        [
+          "plantation commercial",
+          0.3044976592063904
+        ],
+        [
+          "tea plantation",
+          0.2999681532382965
+        ],
+        [
+          "tea",
+          0.2267516851425171
+        ]
+      ]
+    },
+    {
+      "topic_id": 12,
+      "count": 8,
+      "name": "health",
+      "short_label": "wellness",
+      "representative_terms": [
+        [
+          "wellness",
+          0.3155389726161957
+        ],
+        [
+          "wellness health",
+          0.26201140880584717
+        ],
+        [
+          "health wellness",
+          0.24860554933547974
+        ],
+        [
+          "health",
+          0.21432270109653473
+        ],
+        [
+          "health treatment",
+          0.20303253829479218
+        ],
+        [
+          "illnesses wellness",
+          0.1940770000219345
+        ],
+        [
+          "family health",
+          0.19380256533622742
+        ],
+        [
+          "health health",
+          0.18834668397903442
+        ],
+        [
+          "illnesses",
+          0.18149538338184357
+        ],
+        [
+          "family",
+          0.17059504985809326
+        ]
+      ]
+    },
+    {
+      "topic_id": 13,
+      "count": 7,
+      "name": "medical",
+      "short_label": "healthcare",
+      "representative_terms": [
+        [
+          "healthcare",
+          0.5424894690513611
+        ],
+        [
+          "medicine",
+          0.5182268023490906
+        ],
+        [
+          "medical",
+          0.5088109374046326
+        ],
+        [
+          "patients",
+          0.4779893755912781
+        ],
+        [
+          "doctor",
+          0.4627119302749634
+        ],
+        [
+          "medical treatment",
+          0.45590975880622864
+        ],
+        [
+          "treatment",
+          0.43746325373649597
+        ],
+        [
+          "healthcare medical",
+          0.424862265586853
+        ],
+        [
+          "doctor healthcare",
+          0.4093998372554779
+        ],
+        [
+          "course medical",
+          0.4071643054485321
+        ]
+      ]
+    },
+    {
+      "topic_id": 14,
+      "count": 1,
+      "name": "ambulance",
+      "short_label": "ambulance",
+      "representative_terms": [
+        [
+          "ambulance service",
+          1.0
+        ],
+        [
+          "ambulance",
+          0.8942285180091858
+        ],
+        [
+          "service",
+          0.6541499495506287
+        ],
+        [
+          "",
+          0.20200273394584656
+        ],
+        [
+          "",
+          0.20200273394584656
+        ],
+        [
+          "",
+          0.20200273394584656
+        ],
+        [
+          "",
+          0.20200273394584656
+        ],
+        [
+          "",
+          0.20200273394584656
+        ],
+        [
+          "",
+          0.20200273394584656
+        ],
+        [
+          "",
+          0.20200273394584656
+        ]
+      ]
+    },
+    {
+      "topic_id": 15,
+      "count": 14,
+      "name": "disability",
+      "short_label": "relief",
+      "representative_terms": [
+        [
+          "relief",
+          0.3284919857978821
+        ],
+        [
+          "student",
+          0.3226749897003174
+        ],
+        [
+          "person",
+          0.3191714286804199
+        ],
+        [
+          "disabilities",
+          0.2968199849128723
+        ],
+        [
+          "",
+          0.2964036464691162
+        ],
+        [
+          "",
+          0.2964036464691162
+        ],
+        [
+          "",
+          0.2964036464691162
+        ],
+        [
+          "",
+          0.2964036464691162
+        ],
+        [
+          "",
+          0.2964036464691162
+        ],
+        [
+          "",
+          0.2964036464691162
+        ]
+      ]
+    },
+    {
+      "topic_id": 16,
+      "count": 1,
+      "name": "assistive devices",
+      "short_label": "topic 16",
+      "representative_terms": [
+        [
+          "",
+          0.1241210550069809
+        ],
+        [
+          "",
+          0.1241210550069809
+        ],
+        [
+          "",
+          0.1241210550069809
+        ],
+        [
+          "",
+          0.1241210550069809
+        ],
+        [
+          "",
+          0.1241210550069809
+        ],
+        [
+          "",
+          0.1241210550069809
+        ],
+        [
+          "",
+          0.1241210550069809
+        ],
+        [
+          "",
+          0.1241210550069809
+        ],
+        [
+          "",
+          0.1241210550069809
+        ],
+        [
+          "",
+          0.1241210550069809
+        ]
+      ]
+    },
+    {
+      "topic_id": 17,
+      "count": 1,
+      "name": "sanitation",
+      "short_label": "worker",
+      "representative_terms": [
+        [
+          "worker",
+          0.33491745591163635
+        ],
+        [
+          "",
+          0.3242051899433136
+        ],
+        [
+          "",
+          0.3242051899433136
+        ],
+        [
+          "",
+          0.3242051899433136
+        ],
+        [
+          "",
+          0.3242051899433136
+        ],
+        [
+          "",
+          0.3242051899433136
+        ],
+        [
+          "",
+          0.3242051899433136
+        ],
+        [
+          "",
+          0.3242051899433136
+        ],
+        [
+          "",
+          0.3242051899433136
+        ],
+        [
+          "",
+          0.3242051899433136
+        ]
+      ]
+    },
+    {
+      "topic_id": 18,
+      "count": 6,
+      "name": "nutrition",
+      "short_label": "food",
+      "representative_terms": [
+        [
+          "food",
+          0.4737703502178192
+        ],
+        [
+          "rich food",
+          0.37485775351524353
+        ],
+        [
+          "nutrient",
+          0.3394075036048889
+        ],
+        [
+          "nutrient rich",
+          0.3248293101787567
+        ],
+        [
+          "food nutrition",
+          0.31265589594841003
+        ],
+        [
+          "nutrition",
+          0.31233105063438416
+        ],
+        [
+          "nutritional support",
+          0.27687665820121765
+        ],
+        [
+          "awareness nutrition",
+          0.2738324701786041
+        ],
+        [
+          "support",
+          0.257592111825943
+        ],
+        [
+          "",
+          0.25474321842193604
+        ]
+      ]
+    },
+    {
+      "topic_id": 19,
+      "count": 8,
+      "name": "maternity",
+      "short_label": "mothers",
+      "representative_terms": [
+        [
+          "mothers",
+          0.3999423384666443
+        ],
+        [
+          "assistance",
+          0.37098073959350586
+        ],
+        [
+          "maternity",
+          0.3165021538734436
+        ],
+        [
+          "",
+          0.3061479330062866
+        ],
+        [
+          "",
+          0.3061479330062866
+        ],
+        [
+          "",
+          0.3061479330062866
+        ],
+        [
+          "",
+          0.3061479330062866
+        ],
+        [
+          "",
+          0.3061479330062866
+        ],
+        [
+          "",
+          0.3061479330062866
+        ],
+        [
+          "",
+          0.3061479330062866
+        ]
+      ]
+    },
+    {
+      "topic_id": 20,
+      "count": 3,
+      "name": "women",
+      "short_label": "topic 20",
+      "representative_terms": [
+        [
+          "",
+          0.2885879874229431
+        ],
+        [
+          "",
+          0.2885879874229431
+        ],
+        [
+          "",
+          0.2885879874229431
+        ],
+        [
+          "",
+          0.2885879874229431
+        ],
+        [
+          "",
+          0.2885879874229431
+        ],
+        [
+          "",
+          0.2885879874229431
+        ],
+        [
+          "",
+          0.2885879874229431
+        ],
+        [
+          "",
+          0.2885879874229431
+        ],
+        [
+          "",
+          0.2885879874229431
+        ],
+        [
+          "",
+          0.2885879874229431
+        ]
+      ]
+    },
+    {
+      "topic_id": 21,
+      "count": 6,
+      "name": "girl child",
+      "short_label": "student",
+      "representative_terms": [
+        [
+          "student",
+          0.3315815031528473
+        ],
+        [
+          "child",
+          0.3216613233089447
+        ],
+        [
+          "daughter",
+          0.31665948033332825
+        ],
+        [
+          "girl",
+          0.3015057444572449
+        ],
+        [
+          "child girl",
+          0.273115336894989
+        ],
+        [
+          "",
+          0.26295995712280273
+        ],
+        [
+          "",
+          0.26295995712280273
+        ],
+        [
+          "",
+          0.26295995712280273
+        ],
+        [
+          "",
+          0.26295995712280273
+        ],
+        [
+          "",
+          0.26295995712280273
+        ]
+      ]
+    },
+    {
+      "topic_id": 22,
+      "count": 4,
+      "name": "child welfare",
+      "short_label": "youth",
+      "representative_terms": [
+        [
+          "youth",
+          0.2584594488143921
+        ],
+        [
+          "welfare",
+          0.24208571016788483
+        ],
+        [
+          "social",
+          0.23695054650306702
+        ],
+        [
+          "student",
+          0.22766749560832977
+        ],
+        [
+          "",
+          0.22629058361053467
+        ],
+        [
+          "",
+          0.22629058361053467
+        ],
+        [
+          "",
+          0.22629058361053467
+        ],
+        [
+          "",
+          0.22629058361053467
+        ],
+        [
+          "",
+          0.22629058361053467
+        ],
+        [
+          "",
+          0.22629058361053467
+        ]
+      ]
+    },
+    {
+      "topic_id": 23,
+      "count": 3,
+      "name": "anganwadi",
+      "short_label": "topic 23",
+      "representative_terms": [
+        [
+          "",
+          0.25248104333877563
+        ],
+        [
+          "",
+          0.25248104333877563
+        ],
+        [
+          "",
+          0.25248104333877563
+        ],
+        [
+          "",
+          0.25248104333877563
+        ],
+        [
+          "",
+          0.25248104333877563
+        ],
+        [
+          "",
+          0.25248104333877563
+        ],
+        [
+          "",
+          0.25248104333877563
+        ],
+        [
+          "",
+          0.25248104333877563
+        ],
+        [
+          "",
+          0.25248104333877563
+        ],
+        [
+          "",
+          0.25248104333877563
+        ]
+      ]
+    },
+    {
+      "topic_id": 24,
+      "count": 12,
+      "name": "education",
+      "short_label": "school",
+      "representative_terms": [
+        [
+          "school",
+          0.6436746716499329
+        ],
+        [
+          "education",
+          0.6270593404769897
+        ],
+        [
+          "education school",
+          0.625562310218811
+        ],
+        [
+          "educational",
+          0.6087063550949097
+        ],
+        [
+          "educaction",
+          0.5859980583190918
+        ],
+        [
+          "student",
+          0.5519278049468994
+        ],
+        [
+          "education student",
+          0.5485398173332214
+        ],
+        [
+          "school secondary",
+          0.5421878695487976
+        ],
+        [
+          "education higher",
+          0.52607262134552
+        ],
+        [
+          "education educational",
+          0.5254486203193665
+        ]
+      ]
+    },
+    {
+      "topic_id": 25,
+      "count": 6,
+      "name": "scholarship",
+      "short_label": "agriculture",
+      "representative_terms": [
+        [
+          "merit",
+          0.4107174277305603
+        ],
+        [
+          "",
+          0.389694482088089
+        ],
+        [
+          "",
+          0.389694482088089
+        ],
+        [
+          "",
+          0.389694482088089
+        ],
+        [
+          "",
+          0.389694482088089
+        ],
+        [
+          "",
+          0.389694482088089
+        ],
+        [
+          "",
+          0.389694482088089
+        ],
+        [
+          "",
+          0.389694482088089
+        ],
+        [
+          "",
+          0.389694482088089
+        ],
+        [
+          "",
+          0.389694482088089
+        ]
+      ]
+    },
+    {
+      "topic_id": 26,
+      "count": 1,
+      "name": "student support",
+      "short_label": "topic 26",
+      "representative_terms": [
+        [
+          "",
+          0.3573288917541504
+        ],
+        [
+          "",
+          0.3573288917541504
+        ],
+        [
+          "",
+          0.3573288917541504
+        ],
+        [
+          "",
+          0.3573288917541504
+        ],
+        [
+          "",
+          0.3573288917541504
+        ],
+        [
+          "",
+          0.3573288917541504
+        ],
+        [
+          "",
+          0.3573288917541504
+        ],
+        [
+          "",
+          0.3573288917541504
+        ],
+        [
+          "",
+          0.3573288917541504
+        ],
+        [
+          "",
+          0.3573288917541504
+        ]
+      ]
+    },
+    {
+      "topic_id": 27,
+      "count": 3,
+      "name": "research",
+      "short_label": "researcher",
+      "representative_terms": [
+        [
+          "researcher",
+          0.41919368505477905
+        ],
+        [
+          "research",
+          0.3862021267414093
+        ],
+        [
+          "research scholars",
+          0.2949983775615692
+        ],
+        [
+          "",
+          0.28611645102500916
+        ],
+        [
+          "",
+          0.28611645102500916
+        ],
+        [
+          "",
+          0.28611645102500916
+        ],
+        [
+          "",
+          0.28611645102500916
+        ],
+        [
+          "",
+          0.28611645102500916
+        ],
+        [
+          "",
+          0.28611645102500916
+        ],
+        [
+          "",
+          0.28611645102500916
+        ]
+      ]
+    },
+    {
+      "topic_id": 28,
+      "count": 9,
+      "name": "skill training",
+      "short_label": "topic 28",
+      "representative_terms": [
+        [
+          "",
+          0.3742556869983673
+        ],
+        [
+          "",
+          0.3742556869983673
+        ],
+        [
+          "",
+          0.3742556869983673
+        ],
+        [
+          "",
+          0.3742556869983673
+        ],
+        [
+          "",
+          0.3742556869983673
+        ],
+        [
+          "",
+          0.3742556869983673
+        ],
+        [
+          "",
+          0.3742556869983673
+        ],
+        [
+          "",
+          0.3742556869983673
+        ],
+        [
+          "",
+          0.3742556869983673
+        ],
+        [
+          "",
+          0.3742556869983673
+        ]
+      ]
+    },
+    {
+      "topic_id": 29,
+      "count": 5,
+      "name": "employment",
+      "short_label": "job",
+      "representative_terms": [
+        [
+          "job",
+          0.4050160348415375
+        ],
+        [
+          "",
+          0.39634940028190613
+        ],
+        [
+          "",
+          0.39634940028190613
+        ],
+        [
+          "",
+          0.39634940028190613
+        ],
+        [
+          "",
+          0.39634940028190613
+        ],
+        [
+          "",
+          0.39634940028190613
+        ],
+        [
+          "",
+          0.39634940028190613
+        ],
+        [
+          "",
+          0.39634940028190613
+        ],
+        [
+          "",
+          0.39634940028190613
+        ],
+        [
+          "",
+          0.39634940028190613
+        ]
+      ]
+    },
+    {
+      "topic_id": 30,
+      "count": 5,
+      "name": "self employment",
+      "short_label": "employment",
+      "representative_terms": [
+        [
+          "employment",
+          0.3048674464225769
+        ],
+        [
+          "employed",
+          0.2694079875946045
+        ],
+        [
+          "self",
+          0.2579135000705719
+        ],
+        [
+          "self employment",
+          0.2358543872833252
+        ],
+        [
+          "self employement",
+          0.23248758912086487
+        ],
+        [
+          "employement",
+          0.220170259475708
+        ],
+        [
+          "self employed",
+          0.21557320654392242
+        ],
+        [
+          "employment self",
+          0.21302416920661926
+        ],
+        [
+          "employement self",
+          0.21038353443145752
+        ],
+        [
+          "",
+          0.19697009027004242
+        ]
+      ]
+    },
+    {
+      "topic_id": 31,
+      "count": 4,
+      "name": "entrepreneurship",
+      "short_label": "development",
+      "representative_terms": [
+        [
+          "development",
+          0.42858967185020447
+        ],
+        [
+          "entrepreneur",
+          0.311726450920105
+        ],
+        [
+          "entrepreneurs",
+          0.30201706290245056
+        ],
+        [
+          "entrepreneurship",
+          0.2957896292209625
+        ],
+        [
+          "",
+          0.26974308490753174
+        ],
+        [
+          "",
+          0.26974308490753174
+        ],
+        [
+          "",
+          0.26974308490753174
+        ],
+        [
+          "",
+          0.26974308490753174
+        ],
+        [
+          "",
+          0.26974308490753174
+        ],
+        [
+          "",
+          0.26974308490753174
+        ]
+      ]
+    },
+    {
+      "topic_id": 32,
+      "count": 11,
+      "name": "financial assistance",
+      "short_label": "financial",
+      "representative_terms": [
+        [
+          "financial",
+          0.6986311078071594
+        ],
+        [
+          "cash",
+          0.6074013113975525
+        ],
+        [
+          "financial assistane",
+          0.570619523525238
+        ],
+        [
+          "financial support",
+          0.5237572193145752
+        ],
+        [
+          "cash assistance",
+          0.5177087187767029
+        ],
+        [
+          "financial assistance",
+          0.5083447098731995
+        ],
+        [
+          "linked financial",
+          0.49664047360420227
+        ],
+        [
+          "assistane financial",
+          0.4894241392612457
+        ],
+        [
+          "assistance financial",
+          0.479145884513855
+        ],
+        [
+          "relief financial",
+          0.46113458275794983
+        ]
+      ]
+    },
+    {
+      "topic_id": 33,
+      "count": 7,
+      "name": "loan",
+      "short_label": "assistance",
+      "representative_terms": [
+        [
+          "assistance",
+          0.39166560769081116
+        ],
+        [
+          "bank",
+          0.36266806721687317
+        ],
+        [
+          "consumer",
+          0.36074337363243103
+        ],
+        [
+          "",
+          0.3365758955478668
+        ],
+        [
+          "",
+          0.3365758955478668
+        ],
+        [
+          "",
+          0.3365758955478668
+        ],
+        [
+          "",
+          0.3365758955478668
+        ],
+        [
+          "",
+          0.3365758955478668
+        ],
+        [
+          "",
+          0.3365758955478668
+        ],
+        [
+          "",
+          0.3365758955478668
+        ]
+      ]
+    },
+    {
+      "topic_id": 34,
+      "count": 7,
+      "name": "subsidy",
+      "short_label": "agriculture",
+      "representative_terms": [
+        [
+          "subsidy",
+          0.41061341762542725
+        ],
+        [
+          "subsidies",
+          0.4046139419078827
+        ],
+        [
+          "agriculture",
+          0.3963205814361572
+        ],
+        [
+          "subsidy subsidies",
+          0.34935563802719116
+        ],
+        [
+          "subsidies subsidy",
+          0.34261611104011536
+        ],
+        [
+          "subsidy subsidy",
+          0.3255038857460022
+        ],
+        [
+          "agriculture subsidy",
+          0.3225439488887787
+        ],
+        [
+          "",
+          0.321956992149353
+        ],
+        [
+          "",
+          0.321956992149353
+        ],
+        [
+          "",
+          0.321956992149353
+        ]
+      ]
+    },
+    {
+      "topic_id": 35,
+      "count": 5,
+      "name": "pension",
+      "short_label": "topic 35",
+      "representative_terms": [
+        [
+          "",
+          0.36525583267211914
+        ],
+        [
+          "",
+          0.36525583267211914
+        ],
+        [
+          "",
+          0.36525583267211914
+        ],
+        [
+          "",
+          0.36525583267211914
+        ],
+        [
+          "",
+          0.36525583267211914
+        ],
+        [
+          "",
+          0.36525583267211914
+        ],
+        [
+          "",
+          0.36525583267211914
+        ],
+        [
+          "",
+          0.36525583267211914
+        ],
+        [
+          "",
+          0.36525583267211914
+        ],
+        [
+          "",
+          0.36525583267211914
+        ]
+      ]
+    },
+    {
+      "topic_id": 36,
+      "count": 2,
+      "name": "widow support",
+      "short_label": "widow",
+      "representative_terms": [
+        [
+          "widow",
+          0.17416861653327942
+        ],
+        [
+          "widow widow",
+          0.1660412698984146
+        ],
+        [
+          "marriage",
+          0.11577501893043518
+        ],
+        [
+          "widow marriage",
+          0.10729736089706421
+        ],
+        [
+          "",
+          0.09128676354885101
+        ],
+        [
+          "",
+          0.09128676354885101
+        ],
+        [
+          "",
+          0.09128676354885101
+        ],
+        [
+          "",
+          0.09128676354885101
+        ],
+        [
+          "",
+          0.09128676354885101
+        ],
+        [
+          "",
+          0.09128676354885101
+        ]
+      ]
+    },
+    {
+      "topic_id": 37,
+      "count": 3,
+      "name": "senior citizen",
+      "short_label": "topic 37",
+      "representative_terms": [
+        [
+          "",
+          0.2667427062988281
+        ],
+        [
+          "",
+          0.2667427062988281
+        ],
+        [
+          "",
+          0.2667427062988281
+        ],
+        [
+          "",
+          0.2667427062988281
+        ],
+        [
+          "",
+          0.2667427062988281
+        ],
+        [
+          "",
+          0.2667427062988281
+        ],
+        [
+          "",
+          0.2667427062988281
+        ],
+        [
+          "",
+          0.2667427062988281
+        ],
+        [
+          "",
+          0.2667427062988281
+        ],
+        [
+          "",
+          0.2667427062988281
+        ]
+      ]
+    },
+    {
+      "topic_id": 38,
+      "count": 4,
+      "name": "ex servicemen",
+      "short_label": "topic 38",
+      "representative_terms": [
+        [
+          "",
+          0.3470694422721863
+        ],
+        [
+          "",
+          0.3470694422721863
+        ],
+        [
+          "",
+          0.3470694422721863
+        ],
+        [
+          "",
+          0.3470694422721863
+        ],
+        [
+          "",
+          0.3470694422721863
+        ],
+        [
+          "",
+          0.3470694422721863
+        ],
+        [
+          "",
+          0.3470694422721863
+        ],
+        [
+          "",
+          0.3470694422721863
+        ],
+        [
+          "",
+          0.3470694422721863
+        ],
+        [
+          "",
+          0.3470694422721863
+        ]
+      ]
+    },
+    {
+      "topic_id": 39,
+      "count": 2,
+      "name": "labor welfare",
+      "short_label": "economic",
+      "representative_terms": [
+        [
+          "economic",
+          0.3354819416999817
+        ],
+        [
+          "welfare",
+          0.31815171241760254
+        ],
+        [
+          "",
+          0.27819710969924927
+        ],
+        [
+          "",
+          0.27819710969924927
+        ],
+        [
+          "",
+          0.27819710969924927
+        ],
+        [
+          "",
+          0.27819710969924927
+        ],
+        [
+          "",
+          0.27819710969924927
+        ],
+        [
+          "",
+          0.27819710969924927
+        ],
+        [
+          "",
+          0.27819710969924927
+        ],
+        [
+          "",
+          0.27819710969924927
+        ]
+      ]
+    },
+    {
+      "topic_id": 40,
+      "count": 3,
+      "name": "tribal welfare",
+      "short_label": "welfare",
+      "representative_terms": [
+        [
+          "welfare",
+          0.2699579894542694
+        ],
+        [
+          "",
+          0.21339595317840576
+        ],
+        [
+          "",
+          0.21339595317840576
+        ],
+        [
+          "",
+          0.21339595317840576
+        ],
+        [
+          "",
+          0.21339595317840576
+        ],
+        [
+          "",
+          0.21339595317840576
+        ],
+        [
+          "",
+          0.21339595317840576
+        ],
+        [
+          "",
+          0.21339595317840576
+        ],
+        [
+          "",
+          0.21339595317840576
+        ],
+        [
+          "",
+          0.21339595317840576
+        ]
+      ]
+    },
+    {
+      "topic_id": 41,
+      "count": 9,
+      "name": "backward class",
+      "short_label": "class",
+      "representative_terms": [
+        [
+          "class",
+          0.4314950108528137
+        ],
+        [
+          "",
+          0.4043876528739929
+        ],
+        [
+          "",
+          0.4043876528739929
+        ],
+        [
+          "",
+          0.4043876528739929
+        ],
+        [
+          "",
+          0.4043876528739929
+        ],
+        [
+          "",
+          0.4043876528739929
+        ],
+        [
+          "",
+          0.4043876528739929
+        ],
+        [
+          "",
+          0.4043876528739929
+        ],
+        [
+          "",
+          0.4043876528739929
+        ],
+        [
+          "",
+          0.4043876528739929
+        ]
+      ]
+    },
+    {
+      "topic_id": 42,
+      "count": 1,
+      "name": "minority welfare",
+      "short_label": "minority",
+      "representative_terms": [
+        [
+          "minority",
+          0.3220025897026062
+        ],
+        [
+          "",
+          0.29691848158836365
+        ],
+        [
+          "",
+          0.29691848158836365
+        ],
+        [
+          "",
+          0.29691848158836365
+        ],
+        [
+          "",
+          0.29691848158836365
+        ],
+        [
+          "",
+          0.29691848158836365
+        ],
+        [
+          "",
+          0.29691848158836365
+        ],
+        [
+          "",
+          0.29691848158836365
+        ],
+        [
+          "",
+          0.29691848158836365
+        ],
+        [
+          "",
+          0.29691848158836365
+        ]
+      ]
+    },
+    {
+      "topic_id": 43,
+      "count": 1,
+      "name": "social justice",
+      "short_label": "topic 43",
+      "representative_terms": [
+        [
+          "",
+          0.2689993381500244
+        ],
+        [
+          "",
+          0.2689993381500244
+        ],
+        [
+          "",
+          0.2689993381500244
+        ],
+        [
+          "",
+          0.2689993381500244
+        ],
+        [
+          "",
+          0.2689993381500244
+        ],
+        [
+          "",
+          0.2689993381500244
+        ],
+        [
+          "",
+          0.2689993381500244
+        ],
+        [
+          "",
+          0.2689993381500244
+        ],
+        [
+          "",
+          0.2689993381500244
+        ],
+        [
+          "",
+          0.2689993381500244
+        ]
+      ]
+    },
+    {
+      "topic_id": 44,
+      "count": 1,
+      "name": "legal aid",
+      "short_label": "legal",
+      "representative_terms": [
+        [
+          "legal",
+          0.24894604086875916
+        ],
+        [
+          "legal aid",
+          0.1916554570198059
+        ],
+        [
+          "",
+          0.18634258210659027
+        ],
+        [
+          "",
+          0.18634258210659027
+        ],
+        [
+          "",
+          0.18634258210659027
+        ],
+        [
+          "",
+          0.18634258210659027
+        ],
+        [
+          "",
+          0.18634258210659027
+        ],
+        [
+          "",
+          0.18634258210659027
+        ],
+        [
+          "",
+          0.18634258210659027
+        ],
+        [
+          "",
+          0.18634258210659027
+        ]
+      ]
+    },
+    {
+      "topic_id": 45,
+      "count": 3,
+      "name": "art culture",
+      "short_label": "art",
+      "representative_terms": [
+        [
+          "art",
+          0.3688707947731018
+        ],
+        [
+          "arts",
+          0.3606679439544678
+        ],
+        [
+          "",
+          0.35672715306282043
+        ],
+        [
+          "",
+          0.35672715306282043
+        ],
+        [
+          "",
+          0.35672715306282043
+        ],
+        [
+          "",
+          0.35672715306282043
+        ],
+        [
+          "",
+          0.35672715306282043
+        ],
+        [
+          "",
+          0.35672715306282043
+        ],
+        [
+          "",
+          0.35672715306282043
+        ],
+        [
+          "",
+          0.35672715306282043
+        ]
+      ]
+    },
+    {
+      "topic_id": 46,
+      "count": 5,
+      "name": "sports",
+      "short_label": "training",
+      "representative_terms": [
+        [
+          "training",
+          0.4424123764038086
+        ],
+        [
+          "sports",
+          0.3476462662220001
+        ],
+        [
+          "athletes",
+          0.32308530807495117
+        ],
+        [
+          "sports training",
+          0.31470540165901184
+        ],
+        [
+          "international",
+          0.3081454932689667
+        ],
+        [
+          "",
+          0.30259883403778076
+        ],
+        [
+          "",
+          0.30259883403778076
+        ],
+        [
+          "",
+          0.30259883403778076
+        ],
+        [
+          "",
+          0.30259883403778076
+        ],
+        [
+          "",
+          0.30259883403778076
+        ]
+      ]
+    },
+    {
+      "topic_id": 47,
+      "count": 3,
+      "name": "transport",
+      "short_label": "service",
+      "representative_terms": [
+        [
+          "service",
+          0.40985774993896484
+        ],
+        [
+          "transportation",
+          0.32329657673835754
+        ],
+        [
+          "transport service",
+          0.301858127117157
+        ],
+        [
+          "service transportation",
+          0.2963259816169739
+        ],
+        [
+          "",
+          0.2845506966114044
+        ],
+        [
+          "",
+          0.2845506966114044
+        ],
+        [
+          "",
+          0.2845506966114044
+        ],
+        [
+          "",
+          0.2845506966114044
+        ],
+        [
+          "",
+          0.2845506966114044
+        ],
+        [
+          "",
+          0.2845506966114044
+        ]
+      ]
+    },
+    {
+      "topic_id": 48,
+      "count": 1,
+      "name": "electric vehicle",
+      "short_label": "topic 48",
+      "representative_terms": [
+        [
+          "",
+          0.2731628715991974
+        ],
+        [
+          "",
+          0.2731628715991974
+        ],
+        [
+          "",
+          0.2731628715991974
+        ],
+        [
+          "",
+          0.2731628715991974
+        ],
+        [
+          "",
+          0.2731628715991974
+        ],
+        [
+          "",
+          0.2731628715991974
+        ],
+        [
+          "",
+          0.2731628715991974
+        ],
+        [
+          "",
+          0.2731628715991974
+        ],
+        [
+          "",
+          0.2731628715991974
+        ],
+        [
+          "",
+          0.2731628715991974
+        ]
+      ]
+    },
+    {
+      "topic_id": 49,
+      "count": 2,
+      "name": "water supply",
+      "short_label": "supply",
+      "representative_terms": [
+        [
+          "supply",
+          0.33761000633239746
+        ],
+        [
+          "",
+          0.32872095704078674
+        ],
+        [
+          "",
+          0.32872095704078674
+        ],
+        [
+          "",
+          0.32872095704078674
+        ],
+        [
+          "",
+          0.32872095704078674
+        ],
+        [
+          "",
+          0.32872095704078674
+        ],
+        [
+          "",
+          0.32872095704078674
+        ],
+        [
+          "",
+          0.32872095704078674
+        ],
+        [
+          "",
+          0.32872095704078674
+        ],
+        [
+          "",
+          0.32872095704078674
+        ]
+      ]
+    },
+    {
+      "topic_id": 50,
+      "count": 27,
+      "name": "50_war_student_rehabilitation war_person",
+      "short_label": "war",
+      "representative_terms": [
+        [
+          "war",
+          0.4944256544113159
+        ],
+        [
+          "student",
+          0.4402332007884979
+        ],
+        [
+          "rehabilitation war",
+          0.40587371587753296
+        ],
+        [
+          "person",
+          0.39320752024650574
+        ],
+        [
+          "persons",
+          0.3823730945587158
+        ],
+        [
+          "handicap",
+          0.37535417079925537
+        ],
+        [
+          "abled student",
+          0.37298208475112915
+        ],
+        [
+          "handicapped",
+          0.3672597408294678
+        ],
+        [
+          "physically",
+          0.35584914684295654
+        ],
+        [
+          "children",
+          0.35218197107315063
+        ]
+      ]
+    },
+    {
+      "topic_id": 51,
+      "count": 202,
+      "name": "51_state_yojana_panchayat_sahayata",
+      "short_label": "state",
+      "representative_terms": [
+        [
+          "state",
+          0.3842366933822632
+        ],
+        [
+          "yojana",
+          0.36853739619255066
+        ],
+        [
+          "panchayat",
+          0.35415324568748474
+        ],
+        [
+          "sahayata",
+          0.33700811862945557
+        ],
+        [
+          "oec",
+          0.3323303759098053
+        ],
+        [
+          "nfsa",
+          0.33208566904067993
+        ],
+        [
+          "temple",
+          0.3251495659351349
+        ],
+        [
+          "bpl",
+          0.32488223910331726
+        ],
+        [
+          "safai",
+          0.32265621423721313
+        ],
+        [
+          "nari",
+          0.31595635414123535
+        ]
+      ]
+    },
+    {
+      "topic_id": 52,
+      "count": 27,
+      "name": "52____",
+      "short_label": "topic 52",
+      "representative_terms": [
+        [
+          "",
+          0.33975812792778015
+        ],
+        [
+          "",
+          0.33975812792778015
+        ],
+        [
+          "",
+          0.33975812792778015
+        ],
+        [
+          "",
+          0.33975812792778015
+        ],
+        [
+          "",
+          0.33975812792778015
+        ],
+        [
+          "",
+          0.33975812792778015
+        ],
+        [
+          "",
+          0.33975812792778015
+        ],
+        [
+          "",
+          0.33975812792778015
+        ],
+        [
+          "",
+          0.33975812792778015
+        ],
+        [
+          "",
+          0.33975812792778015
+        ]
+      ]
+    },
+    {
+      "topic_id": 53,
+      "count": 36,
+      "name": "53_labor_labour_laborer_labourers",
+      "short_label": "labor",
+      "representative_terms": [
+        [
+          "labor",
+          0.3948115408420563
+        ],
+        [
+          "labour",
+          0.3717184066772461
+        ],
+        [
+          "laborer",
+          0.36927539110183716
+        ],
+        [
+          "labourers",
+          0.35960033535957336
+        ],
+        [
+          "employment",
+          0.3429349660873413
+        ],
+        [
+          "industrial",
+          0.341897577047348
+        ],
+        [
+          "government",
+          0.3378956913948059
+        ],
+        [
+          "worker",
+          0.3281874358654022
+        ],
+        [
+          "workers",
+          0.3249469995498657
+        ],
+        [
+          "worker labor",
+          0.3235231935977936
+        ]
+      ]
+    },
+    {
+      "topic_id": 54,
+      "count": 166,
+      "name": "54_cattle_cow_farmer_farm",
+      "short_label": "agriculture",
+      "representative_terms": [
+        [
+          "cattle",
+          0.7918853759765625
+        ],
+        [
+          "cow",
+          0.6705599427223206
+        ],
+        [
+          "farmer",
+          0.5941237211227417
+        ],
+        [
+          "farm",
+          0.5900508761405945
+        ],
+        [
+          "farmers",
+          0.5610036849975586
+        ],
+        [
+          "sheep",
+          0.5575287342071533
+        ],
+        [
+          "agriculture",
+          0.5491506457328796
+        ],
+        [
+          "farming",
+          0.5435488820075989
+        ],
+        [
+          "marginal farmer",
+          0.5162124633789062
+        ],
+        [
+          "pig farming",
+          0.5005433559417725
+        ]
+      ]
+    },
+    {
+      "topic_id": 55,
+      "count": 12,
+      "name": "55_higher_book_sponsorship_marriage",
+      "short_label": "higher",
+      "representative_terms": [
+        [
+          "higher",
+          0.47976773977279663
+        ],
+        [
+          "book",
+          0.4635137915611267
+        ],
+        [
+          "sponsorship",
+          0.4115619659423828
+        ],
+        [
+          "marriage",
+          0.4094352722167969
+        ],
+        [
+          "education",
+          0.3949108421802521
+        ],
+        [
+          "",
+          0.38385501503944397
+        ],
+        [
+          "",
+          0.38385501503944397
+        ],
+        [
+          "",
+          0.38385501503944397
+        ],
+        [
+          "",
+          0.38385501503944397
+        ],
+        [
+          "",
+          0.38385501503944397
+        ]
+      ]
+    },
+    {
+      "topic_id": 56,
+      "count": 12,
+      "name": "56_drinking_aquarium_marine_water",
+      "short_label": "drinking",
+      "representative_terms": [
+        [
+          "drinking",
+          0.37828660011291504
+        ],
+        [
+          "aquarium",
+          0.3753752112388611
+        ],
+        [
+          "marine",
+          0.3643861413002014
+        ],
+        [
+          "water",
+          0.35973095893859863
+        ],
+        [
+          "waters",
+          0.3563076853752136
+        ],
+        [
+          "tank",
+          0.3467869758605957
+        ],
+        [
+          "drinkers",
+          0.3434751629829407
+        ],
+        [
+          "pump",
+          0.330979585647583
+        ],
+        [
+          "",
+          0.3294442296028137
+        ],
+        [
+          "",
+          0.3294442296028137
+        ]
+      ]
+    },
+    {
+      "topic_id": 57,
+      "count": 16,
+      "name": "57_production_activities_culture_farmer",
+      "short_label": "production",
+      "representative_terms": [
+        [
+          "production",
+          0.38705140352249146
+        ],
+        [
+          "activities",
+          0.38446006178855896
+        ],
+        [
+          "culture",
+          0.36417970061302185
+        ],
+        [
+          "farmer",
+          0.35122525691986084
+        ],
+        [
+          "farming",
+          0.3407849967479706
+        ],
+        [
+          "unit",
+          0.340114951133728
+        ],
+        [
+          "seed farm",
+          0.32880064845085144
+        ],
+        [
+          "deep",
+          0.32560303807258606
+        ],
+        [
+          "support",
+          0.3239518105983734
+        ],
+        [
+          "farm",
+          0.3203747570514679
+        ]
+      ]
+    },
+    {
+      "topic_id": 58,
+      "count": 33,
+      "name": "58_victim violence_victim_sexual abuse_physical abuse",
+      "short_label": "victim violence",
+      "representative_terms": [
+        [
+          "victim violence",
+          0.5235528945922852
+        ],
+        [
+          "victim",
+          0.49099552631378174
+        ],
+        [
+          "sexual abuse",
+          0.48928603529930115
+        ],
+        [
+          "physical abuse",
+          0.44858232140541077
+        ],
+        [
+          "domestic violence",
+          0.44696030020713806
+        ],
+        [
+          "violence",
+          0.4347321391105652
+        ],
+        [
+          "mental abuse",
+          0.4197855293750763
+        ],
+        [
+          "counseling",
+          0.3907828629016876
+        ],
+        [
+          "social defence",
+          0.3904222249984741
+        ],
+        [
+          "crime",
+          0.38456764817237854
+        ]
+      ]
+    },
+    {
+      "topic_id": 59,
+      "count": 17,
+      "name": "59_family_service_family social_social service",
+      "short_label": "family",
+      "representative_terms": [
+        [
+          "family",
+          0.5347445607185364
+        ],
+        [
+          "service",
+          0.4438666105270386
+        ],
+        [
+          "family social",
+          0.43395325541496277
+        ],
+        [
+          "social service",
+          0.4171997010707855
+        ],
+        [
+          "poverty",
+          0.41378313302993774
+        ],
+        [
+          "support",
+          0.3754875063896179
+        ],
+        [
+          "livelihood",
+          0.3662547767162323
+        ],
+        [
+          "service social",
+          0.3660028576850891
+        ],
+        [
+          "livelihood support",
+          0.3656843602657318
+        ],
+        [
+          "poor poverty",
+          0.36445072293281555
+        ]
+      ]
+    },
+    {
+      "topic_id": 60,
+      "count": 12,
+      "name": "60_youth_young youth_youth youth_adolescent",
+      "short_label": "youth",
+      "representative_terms": [
+        [
+          "youth",
+          0.4648074209690094
+        ],
+        [
+          "young youth",
+          0.4006224572658539
+        ],
+        [
+          "youth youth",
+          0.39664268493652344
+        ],
+        [
+          "adolescent",
+          0.39378228783607483
+        ],
+        [
+          "adolescent adolescent",
+          0.36608827114105225
+        ],
+        [
+          "young",
+          0.3501454293727875
+        ],
+        [
+          "teenage",
+          0.3355831205844879
+        ],
+        [
+          "transgender",
+          0.334919273853302
+        ],
+        [
+          "girl",
+          0.3325037360191345
+        ],
+        [
+          "chicks",
+          0.329700767993927
+        ]
+      ]
+    },
+    {
+      "topic_id": 61,
+      "count": 25,
+      "name": "61_services_labour_family_daughters family",
+      "short_label": "services",
+      "representative_terms": [
+        [
+          "services",
+          0.47071534395217896
+        ],
+        [
+          "labour",
+          0.44332319498062134
+        ],
+        [
+          "family",
+          0.41172099113464355
+        ],
+        [
+          "daughters family",
+          0.41081902384757996
+        ],
+        [
+          "daughters",
+          0.3997611701488495
+        ],
+        [
+          "childcare",
+          0.399416983127594
+        ],
+        [
+          "victims",
+          0.38825616240501404
+        ],
+        [
+          "parent",
+          0.38440069556236267
+        ],
+        [
+          "parents",
+          0.37450891733169556
+        ],
+        [
+          "services mother",
+          0.36355364322662354
+        ]
+      ]
+    },
+    {
+      "topic_id": 62,
+      "count": 15,
+      "name": "62_student_empowerment student_female_empowerment female",
+      "short_label": "student",
+      "representative_terms": [
+        [
+          "student",
+          0.3702402710914612
+        ],
+        [
+          "empowerment student",
+          0.3435662090778351
+        ],
+        [
+          "female",
+          0.3408757746219635
+        ],
+        [
+          "empowerment female",
+          0.34072503447532654
+        ],
+        [
+          "empowerment",
+          0.3382095694541931
+        ],
+        [
+          "youth",
+          0.3258536458015442
+        ],
+        [
+          "empowerment woman",
+          0.32391881942749023
+        ],
+        [
+          "woman",
+          0.30438587069511414
+        ],
+        [
+          "female empowerment",
+          0.30223923921585083
+        ],
+        [
+          "",
+          0.30178526043891907
+        ]
+      ]
+    },
+    {
+      "topic_id": 63,
+      "count": 24,
+      "name": "63____",
+      "short_label": "topic 63",
+      "representative_terms": [
+        [
+          "",
+          0.302642822265625
+        ],
+        [
+          "",
+          0.302642822265625
+        ],
+        [
+          "",
+          0.302642822265625
+        ],
+        [
+          "",
+          0.302642822265625
+        ],
+        [
+          "",
+          0.302642822265625
+        ],
+        [
+          "",
+          0.302642822265625
+        ],
+        [
+          "",
+          0.302642822265625
+        ],
+        [
+          "",
+          0.302642822265625
+        ],
+        [
+          "",
+          0.302642822265625
+        ],
+        [
+          "",
+          0.302642822265625
+        ]
+      ]
+    },
+    {
+      "topic_id": 64,
+      "count": 17,
+      "name": "64_students_communities_community_government",
+      "short_label": "students",
+      "representative_terms": [
+        [
+          "students",
+          0.4795741140842438
+        ],
+        [
+          "communities",
+          0.47310739755630493
+        ],
+        [
+          "community",
+          0.46896570920944214
+        ],
+        [
+          "government",
+          0.4660498797893524
+        ],
+        [
+          "students equivalent",
+          0.4124857187271118
+        ],
+        [
+          "policy",
+          0.4024471640586853
+        ],
+        [
+          "minority students",
+          0.4011451303958893
+        ],
+        [
+          "govt",
+          0.4004703760147095
+        ],
+        [
+          "public",
+          0.3974567949771881
+        ],
+        [
+          "scheme",
+          0.39307621121406555
+        ]
+      ]
+    },
+    {
+      "topic_id": 65,
+      "count": 15,
+      "name": "65____",
+      "short_label": "topic 65",
+      "representative_terms": [
+        [
+          "",
+          0.4313606023788452
+        ],
+        [
+          "",
+          0.4313606023788452
+        ],
+        [
+          "",
+          0.4313606023788452
+        ],
+        [
+          "",
+          0.4313606023788452
+        ],
+        [
+          "",
+          0.4313606023788452
+        ],
+        [
+          "",
+          0.4313606023788452
+        ],
+        [
+          "",
+          0.4313606023788452
+        ],
+        [
+          "",
+          0.4313606023788452
+        ],
+        [
+          "",
+          0.4313606023788452
+        ],
+        [
+          "",
+          0.4313606023788452
+        ]
+      ]
+    },
+    {
+      "topic_id": 66,
+      "count": 36,
+      "name": "66_training_certification_education_courses",
+      "short_label": "training",
+      "representative_terms": [
+        [
+          "training",
+          0.5021370649337769
+        ],
+        [
+          "certification",
+          0.4759259819984436
+        ],
+        [
+          "education",
+          0.45099717378616333
+        ],
+        [
+          "courses",
+          0.44767820835113525
+        ],
+        [
+          "training technical",
+          0.43967896699905396
+        ],
+        [
+          "industrial training",
+          0.43860822916030884
+        ],
+        [
+          "training industrial",
+          0.4330158829689026
+        ],
+        [
+          "professional course",
+          0.4308406114578247
+        ],
+        [
+          "training skill",
+          0.42569029331207275
+        ],
+        [
+          "trainee training",
+          0.42282724380493164
+        ]
+      ]
+    },
+    {
+      "topic_id": 67,
+      "count": 12,
+      "name": "67_preparation_government_preliminary_examination",
+      "short_label": "preparation",
+      "representative_terms": [
+        [
+          "preparation",
+          0.5067824721336365
+        ],
+        [
+          "government",
+          0.502635657787323
+        ],
+        [
+          "preliminary",
+          0.4337500035762787
+        ],
+        [
+          "examination",
+          0.42057621479034424
+        ],
+        [
+          "exam",
+          0.4200029671192169
+        ],
+        [
+          "survey",
+          0.4021989107131958
+        ],
+        [
+          "",
+          0.4019733965396881
+        ],
+        [
+          "",
+          0.4019733965396881
+        ],
+        [
+          "",
+          0.4019733965396881
+        ],
+        [
+          "",
+          0.4019733965396881
+        ]
+      ]
+    },
+    {
+      "topic_id": 68,
+      "count": 30,
+      "name": "68_researcher_investigator_material_scientist",
+      "short_label": "researcher",
+      "representative_terms": [
+        [
+          "researcher",
+          0.4784597158432007
+        ],
+        [
+          "investigator",
+          0.44418737292289734
+        ],
+        [
+          "material",
+          0.43903130292892456
+        ],
+        [
+          "scientist",
+          0.42863306403160095
+        ],
+        [
+          "scientists",
+          0.40696051716804504
+        ],
+        [
+          "woman",
+          0.40317481756210327
+        ],
+        [
+          "research investigator",
+          0.4015805125236511
+        ],
+        [
+          "research scientist",
+          0.3983266353607178
+        ],
+        [
+          "researcher woman",
+          0.36740046739578247
+        ],
+        [
+          "science",
+          0.36657240986824036
+        ]
+      ]
+    },
+    {
+      "topic_id": 69,
+      "count": 27,
+      "name": "69_school_class_residential_education",
+      "short_label": "school",
+      "representative_terms": [
+        [
+          "school",
+          0.502581775188446
+        ],
+        [
+          "class",
+          0.47300779819488525
+        ],
+        [
+          "residential",
+          0.4685540795326233
+        ],
+        [
+          "education",
+          0.4630586504936218
+        ],
+        [
+          "law",
+          0.437045156955719
+        ],
+        [
+          "schools",
+          0.4211466610431671
+        ],
+        [
+          "class school",
+          0.41561922430992126
+        ],
+        [
+          "program",
+          0.4146975874900818
+        ],
+        [
+          "needy",
+          0.4145491421222687
+        ],
+        [
+          "programs",
+          0.41414982080459595
+        ]
+      ]
+    },
+    {
+      "topic_id": 70,
+      "count": 14,
+      "name": "70_research___",
+      "short_label": "accident",
+      "representative_terms": [
+        [
+          "research",
+          0.422851026058197
+        ],
+        [
+          "",
+          0.41812366247177124
+        ],
+        [
+          "",
+          0.41812366247177124
+        ],
+        [
+          "",
+          0.41812366247177124
+        ],
+        [
+          "",
+          0.41812366247177124
+        ],
+        [
+          "",
+          0.41812366247177124
+        ],
+        [
+          "",
+          0.41812366247177124
+        ],
+        [
+          "",
+          0.41812366247177124
+        ],
+        [
+          "",
+          0.41812366247177124
+        ],
+        [
+          "",
+          0.41812366247177124
+        ]
+      ]
+    },
+    {
+      "topic_id": 71,
+      "count": 20,
+      "name": "71_school_teacher_teachers_programme",
+      "short_label": "school",
+      "representative_terms": [
+        [
+          "school",
+          0.4743667244911194
+        ],
+        [
+          "teacher",
+          0.41672706604003906
+        ],
+        [
+          "teachers",
+          0.41666078567504883
+        ],
+        [
+          "programme",
+          0.4058600664138794
+        ],
+        [
+          "",
+          0.3878144919872284
+        ],
+        [
+          "",
+          0.3878144919872284
+        ],
+        [
+          "",
+          0.3878144919872284
+        ],
+        [
+          "",
+          0.3878144919872284
+        ],
+        [
+          "",
+          0.3878144919872284
+        ],
+        [
+          "",
+          0.3878144919872284
+        ]
+      ]
+    },
+    {
+      "topic_id": 72,
+      "count": 21,
+      "name": "72_diploma_graduate post_post graduate_graduation post",
+      "short_label": "diploma",
+      "representative_terms": [
+        [
+          "diploma",
+          0.39873161911964417
+        ],
+        [
+          "graduate post",
+          0.33566814661026
+        ],
+        [
+          "post graduate",
+          0.3071402907371521
+        ],
+        [
+          "graduation post",
+          0.30630356073379517
+        ],
+        [
+          "post",
+          0.30616137385368347
+        ],
+        [
+          "doctoral post",
+          0.29881417751312256
+        ],
+        [
+          "law",
+          0.29455599188804626
+        ],
+        [
+          "degree diploma",
+          0.2869075834751129
+        ],
+        [
+          "graduate",
+          0.2853104770183563
+        ],
+        [
+          "post graduation",
+          0.2816692888736725
+        ]
+      ]
+    },
+    {
+      "topic_id": 73,
+      "count": 18,
+      "name": "73_assistance_insurance_death_ground",
+      "short_label": "accident",
+      "representative_terms": [
+        [
+          "assistance",
+          0.4544452726840973
+        ],
+        [
+          "insurance",
+          0.43431800603866577
+        ],
+        [
+          "death",
+          0.3953448534011841
+        ],
+        [
+          "ground",
+          0.38437092304229736
+        ],
+        [
+          "",
+          0.3462218642234802
+        ],
+        [
+          "",
+          0.3462218642234802
+        ],
+        [
+          "",
+          0.3462218642234802
+        ],
+        [
+          "",
+          0.3462218642234802
+        ],
+        [
+          "",
+          0.3462218642234802
+        ],
+        [
+          "",
+          0.3462218642234802
+        ]
+      ]
+    },
+    {
+      "topic_id": 74,
+      "count": 42,
+      "name": "74_diseases relief_life threatening_threatening_repair",
+      "short_label": "accident",
+      "representative_terms": [
+        [
+          "diseases relief",
+          0.20056527853012085
+        ],
+        [
+          "life threatening",
+          0.20033405721187592
+        ],
+        [
+          "threatening",
+          0.19620893895626068
+        ],
+        [
+          "repair",
+          0.19220967590808868
+        ],
+        [
+          "vaccination",
+          0.18912887573242188
+        ],
+        [
+          "distribution",
+          0.18887636065483093
+        ],
+        [
+          "diseases",
+          0.18410323560237885
+        ],
+        [
+          "extension",
+          0.1810949593782425
+        ],
+        [
+          "life",
+          0.17161844670772552
+        ],
+        [
+          "aids",
+          0.16636164486408234
+        ]
+      ]
+    },
+    {
+      "topic_id": 75,
+      "count": 52,
+      "name": "75_educational_assistance educational_remuneration_assitance",
+      "short_label": "accident",
+      "representative_terms": [
+        [
+          "educational",
+          0.5490805506706238
+        ],
+        [
+          "assistance educational",
+          0.3654875159263611
+        ],
+        [
+          "remuneration",
+          0.349857360124588
+        ],
+        [
+          "assitance",
+          0.33093979954719543
+        ],
+        [
+          "benefit",
+          0.31398141384124756
+        ],
+        [
+          "chartered",
+          0.31138846278190613
+        ],
+        [
+          "benefits",
+          0.31068021059036255
+        ],
+        [
+          "loan educational",
+          0.30061888694763184
+        ],
+        [
+          "financial",
+          0.28280022740364075
+        ],
+        [
+          "micro",
+          0.2827736735343933
+        ]
+      ]
+    },
+    {
+      "topic_id": 76,
+      "count": 43,
+      "name": "76_road_road road_model_poly",
+      "short_label": "road",
+      "representative_terms": [
+        [
+          "road",
+          0.4424978792667389
+        ],
+        [
+          "road road",
+          0.4088912606239319
+        ],
+        [
+          "model",
+          0.40161001682281494
+        ],
+        [
+          "poly",
+          0.4009708762168884
+        ],
+        [
+          "holiday",
+          0.4007565379142761
+        ],
+        [
+          "gate",
+          0.39549195766448975
+        ],
+        [
+          "map",
+          0.3890264630317688
+        ],
+        [
+          "trekking",
+          0.38669708371162415
+        ],
+        [
+          "placement",
+          0.3853014409542084
+        ],
+        [
+          "delivery",
+          0.38448628783226013
+        ]
+      ]
+    },
+    {
+      "topic_id": 77,
+      "count": 27,
+      "name": "77_cash_training_marketing_gold incentive",
+      "short_label": "cash",
+      "representative_terms": [
+        [
+          "cash",
+          0.3648565709590912
+        ],
+        [
+          "training",
+          0.3597492277622223
+        ],
+        [
+          "marketing",
+          0.35473155975341797
+        ],
+        [
+          "gold incentive",
+          0.3232131600379944
+        ],
+        [
+          "incentives",
+          0.3220953345298767
+        ],
+        [
+          "incentive cash",
+          0.3216998279094696
+        ],
+        [
+          "cash incentive",
+          0.32061782479286194
+        ],
+        [
+          "incentive",
+          0.31026366353034973
+        ],
+        [
+          "rewards",
+          0.3091171085834503
+        ],
+        [
+          "incentive training",
+          0.3038824498653412
+        ]
+      ]
+    },
+    {
+      "topic_id": 78,
+      "count": 17,
+      "name": "78_spinner_air_vehicle_auto",
+      "short_label": "spinner",
+      "representative_terms": [
+        [
+          "spinner",
+          0.37772276997566223
+        ],
+        [
+          "air",
+          0.3600356876850128
+        ],
+        [
+          "vehicle",
+          0.358496755361557
+        ],
+        [
+          "auto",
+          0.35824254155158997
+        ],
+        [
+          "goods",
+          0.3561943471431732
+        ],
+        [
+          "response",
+          0.3496098518371582
+        ],
+        [
+          "cycle",
+          0.349544882774353
+        ],
+        [
+          "bicycle",
+          0.33168160915374756
+        ],
+        [
+          "",
+          0.32962900400161743
+        ],
+        [
+          "",
+          0.32962900400161743
+        ]
+      ]
+    },
+    {
+      "topic_id": 79,
+      "count": 26,
+      "name": "79_art___",
+      "short_label": "art",
+      "representative_terms": [
+        [
+          "art",
+          0.3743869364261627
+        ],
+        [
+          "",
+          0.32709234952926636
+        ],
+        [
+          "",
+          0.32709234952926636
+        ],
+        [
+          "",
+          0.32709234952926636
+        ],
+        [
+          "",
+          0.32709234952926636
+        ],
+        [
+          "",
+          0.32709234952926636
+        ],
+        [
+          "",
+          0.32709234952926636
+        ],
+        [
+          "",
+          0.32709234952926636
+        ],
+        [
+          "",
+          0.32709234952926636
+        ],
+        [
+          "",
+          0.32709234952926636
+        ]
+      ]
+    },
+    {
+      "topic_id": 80,
+      "count": 20,
+      "name": "80_arts_comedy_iii_competition",
+      "short_label": "arts",
+      "representative_terms": [
+        [
+          "arts",
+          0.4606586992740631
+        ],
+        [
+          "comedy",
+          0.42523449659347534
+        ],
+        [
+          "iii",
+          0.4241907000541687
+        ],
+        [
+          "competition",
+          0.42402827739715576
+        ],
+        [
+          "music",
+          0.4150734543800354
+        ],
+        [
+          "iv",
+          0.38982954621315
+        ],
+        [
+          "acting",
+          0.37863489985466003
+        ],
+        [
+          "",
+          0.3769127130508423
+        ],
+        [
+          "",
+          0.3769127130508423
+        ],
+        [
+          "",
+          0.3769127130508423
+        ]
+      ]
+    },
+    {
+      "topic_id": 81,
+      "count": 19,
+      "name": "81____",
+      "short_label": "topic 81",
+      "representative_terms": [
+        [
+          "",
+          0.4498586058616638
+        ],
+        [
+          "",
+          0.4498586058616638
+        ],
+        [
+          "",
+          0.4498586058616638
+        ],
+        [
+          "",
+          0.4498586058616638
+        ],
+        [
+          "",
+          0.4498586058616638
+        ],
+        [
+          "",
+          0.4498586058616638
+        ],
+        [
+          "",
+          0.4498586058616638
+        ],
+        [
+          "",
+          0.4498586058616638
+        ],
+        [
+          "",
+          0.4498586058616638
+        ],
+        [
+          "",
+          0.4498586058616638
+        ]
+      ]
+    },
+    {
+      "topic_id": 82,
+      "count": 44,
+      "name": "82_information_organized sector_sector_technology",
+      "short_label": "information",
+      "representative_terms": [
+        [
+          "information",
+          0.3294360339641571
+        ],
+        [
+          "organized sector",
+          0.3229144811630249
+        ],
+        [
+          "sector",
+          0.319588840007782
+        ],
+        [
+          "technology",
+          0.3180506229400635
+        ],
+        [
+          "sectors",
+          0.31161385774612427
+        ],
+        [
+          "translation",
+          0.2951408326625824
+        ],
+        [
+          "data",
+          0.2847721576690674
+        ],
+        [
+          "smart",
+          0.281364768743515
+        ],
+        [
+          "modernization",
+          0.26972949504852295
+        ],
+        [
+          "manufacture",
+          0.26966091990470886
+        ]
+      ]
+    }
+  ]
+}

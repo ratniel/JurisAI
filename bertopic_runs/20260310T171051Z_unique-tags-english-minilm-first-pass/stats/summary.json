@@ -1,0 +1,2308 @@
+{
+  "input_file": "/Users/ratniel/JurisAI/unique_tags.json",
+  "run_dir": "/Users/ratniel/JurisAI/bertopic_runs/20260310T171051Z_unique-tags-english-minilm-first-pass",
+  "document_count": 1596,
+  "topic_count_including_outliers": 48,
+  "outlier_count": 221,
+  "config": {
+    "run_name": "unique-tags-english-minilm-first-pass",
+    "language": "english",
+    "embedding_model_name": "all-MiniLM-L6-v2",
+    "top_n_words": 10,
+    "ngram_range": [
+      1,
+      2
+    ],
+    "min_topic_size": 12,
+    "nr_topics": null,
+    "calculate_probabilities": false,
+    "low_memory": false,
+    "random_state": 42,
+    "umap_n_neighbors": 15,
+    "umap_n_components": 5,
+    "umap_min_dist": 0.0,
+    "umap_metric": "cosine",
+    "hdbscan_min_cluster_size": 12,
+    "hdbscan_min_samples": 2,
+    "hdbscan_metric": "euclidean",
+    "cluster_selection_method": "eom",
+    "min_df": 1,
+    "max_df": 1.0,
+    "stop_words": "english",
+    "representation_model_name": "keybert",
+    "seed_topic_file": null,
+    "zeroshot_topic_file": null,
+    "zeroshot_min_similarity": 0.7
+  },
+  "artifacts": {
+    "config": "/Users/ratniel/JurisAI/bertopic_runs/20260310T171051Z_unique-tags-english-minilm-first-pass/stats/config.json",
+    "topic_info_csv": "/Users/ratniel/JurisAI/bertopic_runs/20260310T171051Z_unique-tags-english-minilm-first-pass/stats/topic_info.csv",
+    "document_info_csv": "/Users/ratniel/JurisAI/bertopic_runs/20260310T171051Z_unique-tags-english-minilm-first-pass/stats/document_info.csv",
+    "visualizations": {
+      "topics": "/Users/ratniel/JurisAI/bertopic_runs/20260310T171051Z_unique-tags-english-minilm-first-pass/visualizations/topics.html",
+      "barchart": "/Users/ratniel/JurisAI/bertopic_runs/20260310T171051Z_unique-tags-english-minilm-first-pass/visualizations/barchart.html",
+      "hierarchy": "/Users/ratniel/JurisAI/bertopic_runs/20260310T171051Z_unique-tags-english-minilm-first-pass/visualizations/hierarchy.html",
+      "heatmap": "/Users/ratniel/JurisAI/bertopic_runs/20260310T171051Z_unique-tags-english-minilm-first-pass/visualizations/heatmap.html"
+    },
+    "log_file": "/Users/ratniel/JurisAI/bertopic_runs/20260310T171051Z_unique-tags-english-minilm-first-pass/logs/run.log",
+    "model_dir": "/Users/ratniel/JurisAI/bertopic_runs/20260310T171051Z_unique-tags-english-minilm-first-pass/model"
+  },
+  "topics": [
+    {
+      "topic_id": -1,
+      "count": 221,
+      "name": "-1_level_international_purchase_mega",
+      "representative_terms": [
+        [
+          "level",
+          0.5236316919326782
+        ],
+        [
+          "international",
+          0.4345417022705078
+        ],
+        [
+          "purchase",
+          0.42221570014953613
+        ],
+        [
+          "mega",
+          0.4191897511482239
+        ],
+        [
+          "senior",
+          0.4083205759525299
+        ],
+        [
+          "class",
+          0.40370073914527893
+        ],
+        [
+          "fee",
+          0.4030277729034424
+        ],
+        [
+          "net",
+          0.3952179551124573
+        ],
+        [
+          "student",
+          0.39084592461586
+        ],
+        [
+          "section",
+          0.3859439790248871
+        ]
+      ]
+    },
+    {
+      "topic_id": 0,
+      "count": 205,
+      "name": "0_anganwadi_atal_khadi_bpl",
+      "representative_terms": [
+        [
+          "anganwadi",
+          0.4829675853252411
+        ],
+        [
+          "atal",
+          0.4524702727794647
+        ],
+        [
+          "khadi",
+          0.4200429320335388
+        ],
+        [
+          "bpl",
+          0.4134441316127777
+        ],
+        [
+          "sahay",
+          0.4046403765678406
+        ],
+        [
+          "abdul",
+          0.3970365524291992
+        ],
+        [
+          "production",
+          0.3946245312690735
+        ],
+        [
+          "sahayata",
+          0.3940575420856476
+        ],
+        [
+          "puraskar",
+          0.39383506774902344
+        ],
+        [
+          "purashkar",
+          0.39317837357521057
+        ]
+      ]
+    },
+    {
+      "topic_id": 1,
+      "count": 132,
+      "name": "1_land_management_activities_production",
+      "representative_terms": [
+        [
+          "land",
+          0.4809274673461914
+        ],
+        [
+          "management",
+          0.47084975242614746
+        ],
+        [
+          "activities",
+          0.44078031182289124
+        ],
+        [
+          "production",
+          0.4356955885887146
+        ],
+        [
+          "plant",
+          0.42657607793807983
+        ],
+        [
+          "garden",
+          0.42546790838241577
+        ],
+        [
+          "rural",
+          0.41924774646759033
+        ],
+        [
+          "plantation",
+          0.41860872507095337
+        ],
+        [
+          "development",
+          0.41190779209136963
+        ],
+        [
+          "cultivation",
+          0.4069938063621521
+        ]
+      ]
+    },
+    {
+      "topic_id": 2,
+      "count": 56,
+      "name": "2_ambulance_life threatening_surgery_ambulance service",
+      "representative_terms": [
+        [
+          "ambulance",
+          0.4900950789451599
+        ],
+        [
+          "life threatening",
+          0.4515511095523834
+        ],
+        [
+          "surgery",
+          0.4371180236339569
+        ],
+        [
+          "ambulance service",
+          0.4009789228439331
+        ],
+        [
+          "hospitalization",
+          0.39972925186157227
+        ],
+        [
+          "medical assistance",
+          0.3968171775341034
+        ],
+        [
+          "medical",
+          0.3779393136501312
+        ],
+        [
+          "ailments ambulance",
+          0.37718498706817627
+        ],
+        [
+          "patient",
+          0.37134888768196106
+        ],
+        [
+          "medical support",
+          0.36936286091804504
+        ]
+      ]
+    },
+    {
+      "topic_id": 3,
+      "count": 56,
+      "name": "3_pad_equipment assistance_telephone_appliances",
+      "representative_terms": [
+        [
+          "pad",
+          0.374876469373703
+        ],
+        [
+          "equipment assistance",
+          0.36595651507377625
+        ],
+        [
+          "telephone",
+          0.365858256816864
+        ],
+        [
+          "appliances",
+          0.36091071367263794
+        ],
+        [
+          "principal",
+          0.35647818446159363
+        ],
+        [
+          "equipment",
+          0.35188642144203186
+        ],
+        [
+          "sanitary pad",
+          0.35074305534362793
+        ],
+        [
+          "support technology",
+          0.3499334752559662
+        ],
+        [
+          "mobile",
+          0.34739798307418823
+        ],
+        [
+          "appliance",
+          0.33663538098335266
+        ]
+      ]
+    },
+    {
+      "topic_id": 4,
+      "count": 46,
+      "name": "4_parent_foster_mother_labour child",
+      "representative_terms": [
+        [
+          "parent",
+          0.4236321747303009
+        ],
+        [
+          "foster",
+          0.41720691323280334
+        ],
+        [
+          "mother",
+          0.3973136842250824
+        ],
+        [
+          "labour child",
+          0.3790895640850067
+        ],
+        [
+          "youth",
+          0.37187448143959045
+        ],
+        [
+          "parent parents",
+          0.37161511182785034
+        ],
+        [
+          "female foster",
+          0.37105345726013184
+        ],
+        [
+          "orphan",
+          0.3685472011566162
+        ],
+        [
+          "foster care",
+          0.3647366464138031
+        ],
+        [
+          "adolescent",
+          0.3643453121185303
+        ]
+      ]
+    },
+    {
+      "topic_id": 5,
+      "count": 41,
+      "name": "5_student_parents_children_rehabilitation student",
+      "representative_terms": [
+        [
+          "student",
+          0.5193010568618774
+        ],
+        [
+          "parents",
+          0.5027452111244202
+        ],
+        [
+          "children",
+          0.4866200089454651
+        ],
+        [
+          "rehabilitation student",
+          0.44636794924736023
+        ],
+        [
+          "rehabilitation",
+          0.40811651945114136
+        ],
+        [
+          "abled parents",
+          0.4038815498352051
+        ],
+        [
+          "handicap",
+          0.3968423902988434
+        ],
+        [
+          "disabilities",
+          0.3903295397758484
+        ],
+        [
+          "abled student",
+          0.38019853830337524
+        ],
+        [
+          "student handicap",
+          0.3776571750640869
+        ]
+      ]
+    },
+    {
+      "topic_id": 6,
+      "count": 38,
+      "name": "6_assistance_housing assistance_shelter_housing",
+      "representative_terms": [
+        [
+          "assistance",
+          0.40635809302330017
+        ],
+        [
+          "housing assistance",
+          0.3835265338420868
+        ],
+        [
+          "shelter",
+          0.38129886984825134
+        ],
+        [
+          "housing",
+          0.36764541268348694
+        ],
+        [
+          "residential care",
+          0.36426249146461487
+        ],
+        [
+          "care",
+          0.3358873128890991
+        ],
+        [
+          "accomodation",
+          0.33294302225112915
+        ],
+        [
+          "residential",
+          0.32959333062171936
+        ],
+        [
+          "houses",
+          0.32951560616493225
+        ],
+        [
+          "house",
+          0.3228338360786438
+        ]
+      ]
+    },
+    {
+      "topic_id": 7,
+      "count": 34,
+      "name": "7_social studies_teaching_science_studies",
+      "representative_terms": [
+        [
+          "social studies",
+          0.4227081537246704
+        ],
+        [
+          "teaching",
+          0.41736504435539246
+        ],
+        [
+          "science",
+          0.3957522511482239
+        ],
+        [
+          "studies",
+          0.3785731792449951
+        ],
+        [
+          "science science",
+          0.3725544214248657
+        ],
+        [
+          "science research",
+          0.3564603626728058
+        ],
+        [
+          "researcher",
+          0.3552354872226715
+        ],
+        [
+          "laboratories",
+          0.35470542311668396
+        ],
+        [
+          "study",
+          0.3512677550315857
+        ],
+        [
+          "social science",
+          0.3379671573638916
+        ]
+      ]
+    },
+    {
+      "topic_id": 8,
+      "count": 32,
+      "name": "8_defence forces_forces domestic_military_affordable",
+      "representative_terms": [
+        [
+          "defence forces",
+          0.24645711481571198
+        ],
+        [
+          "forces domestic",
+          0.1929854452610016
+        ],
+        [
+          "military",
+          0.18247635662555695
+        ],
+        [
+          "affordable",
+          0.18116140365600586
+        ],
+        [
+          "defence",
+          0.18045282363891602
+        ],
+        [
+          "domestic",
+          0.1796150654554367
+        ],
+        [
+          "war",
+          0.16719651222229004
+        ],
+        [
+          "crime defence",
+          0.16622193157672882
+        ],
+        [
+          "forces",
+          0.16573463380336761
+        ],
+        [
+          "defence defence",
+          0.1602986454963684
+        ]
+      ]
+    },
+    {
+      "topic_id": 9,
+      "count": 32,
+      "name": "9_medical_education_educaction_educational",
+      "representative_terms": [
+        [
+          "medical",
+          0.48906296491622925
+        ],
+        [
+          "education",
+          0.46045759320259094
+        ],
+        [
+          "educaction",
+          0.4513004422187805
+        ],
+        [
+          "educational",
+          0.4466783106327057
+        ],
+        [
+          "education students",
+          0.4033985733985901
+        ],
+        [
+          "school",
+          0.40088263154029846
+        ],
+        [
+          "student education",
+          0.39364272356033325
+        ],
+        [
+          "student",
+          0.3911289572715759
+        ],
+        [
+          "schools",
+          0.3904799222946167
+        ],
+        [
+          "education educaction",
+          0.38925689458847046
+        ]
+      ]
+    },
+    {
+      "topic_id": 10,
+      "count": 31,
+      "name": "10_assistance_serviceman_support_semen",
+      "representative_terms": [
+        [
+          "assistance",
+          0.47832190990448
+        ],
+        [
+          "serviceman",
+          0.43070515990257263
+        ],
+        [
+          "support",
+          0.43053463101387024
+        ],
+        [
+          "semen",
+          0.4176287055015564
+        ],
+        [
+          "servicemen",
+          0.4078163504600525
+        ],
+        [
+          "divorcee",
+          0.4070991575717926
+        ],
+        [
+          "pension",
+          0.38091766834259033
+        ],
+        [
+          "widows",
+          0.37993961572647095
+        ],
+        [
+          "",
+          0.3778435289859772
+        ],
+        [
+          "",
+          0.3778435289859772
+        ]
+      ]
+    },
+    {
+      "topic_id": 11,
+      "count": 27,
+      "name": "11_thakor_thakor caste_tribes thakor_jati",
+      "representative_terms": [
+        [
+          "thakor",
+          0.568034291267395
+        ],
+        [
+          "thakor caste",
+          0.5569656491279602
+        ],
+        [
+          "tribes thakor",
+          0.5098465085029602
+        ],
+        [
+          "jati",
+          0.47450610995292664
+        ],
+        [
+          "koli",
+          0.4590339660644531
+        ],
+        [
+          "caste",
+          0.45281505584716797
+        ],
+        [
+          "jati nomadic",
+          0.42737630009651184
+        ],
+        [
+          "castes",
+          0.4270767569541931
+        ],
+        [
+          "koli caste",
+          0.4175528585910797
+        ],
+        [
+          "inter caste",
+          0.4155196249485016
+        ]
+      ]
+    },
+    {
+      "topic_id": 12,
+      "count": 27,
+      "name": "12_labor_labour_industry_worker",
+      "representative_terms": [
+        [
+          "labor",
+          0.32849815487861633
+        ],
+        [
+          "labour",
+          0.28633809089660645
+        ],
+        [
+          "industry",
+          0.28290098905563354
+        ],
+        [
+          "worker",
+          0.28072071075439453
+        ],
+        [
+          "government",
+          0.27707991003990173
+        ],
+        [
+          "worker labor",
+          0.2704753875732422
+        ],
+        [
+          "workers",
+          0.26332348585128784
+        ],
+        [
+          "labourers",
+          0.2625853419303894
+        ],
+        [
+          "sanitation",
+          0.2583356201648712
+        ],
+        [
+          "laborer",
+          0.25807085633277893
+        ]
+      ]
+    },
+    {
+      "topic_id": 13,
+      "count": 26,
+      "name": "13_electronic_consumers_business_service",
+      "representative_terms": [
+        [
+          "electronic",
+          0.4647892415523529
+        ],
+        [
+          "consumers",
+          0.4619360566139221
+        ],
+        [
+          "business",
+          0.44086652994155884
+        ],
+        [
+          "service",
+          0.43749934434890747
+        ],
+        [
+          "commerce",
+          0.4278514087200165
+        ],
+        [
+          "industries",
+          0.4274900257587433
+        ],
+        [
+          "micro",
+          0.4248157739639282
+        ],
+        [
+          "consumers electronic",
+          0.4103441536426544
+        ],
+        [
+          "enterprises",
+          0.4014965295791626
+        ],
+        [
+          "entrepreneur",
+          0.3930816352367401
+        ]
+      ]
+    },
+    {
+      "topic_id": 14,
+      "count": 25,
+      "name": "14_art_arts_exhibition_troupes",
+      "representative_terms": [
+        [
+          "art",
+          0.4524998366832733
+        ],
+        [
+          "arts",
+          0.432221919298172
+        ],
+        [
+          "exhibition",
+          0.4315899610519409
+        ],
+        [
+          "troupes",
+          0.4230526089668274
+        ],
+        [
+          "comedy",
+          0.41179707646369934
+        ],
+        [
+          "iii",
+          0.4031212627887726
+        ],
+        [
+          "art exhibition",
+          0.39315879344940186
+        ],
+        [
+          "state",
+          0.38976094126701355
+        ],
+        [
+          "fine arts",
+          0.388602614402771
+        ],
+        [
+          "music",
+          0.3868434429168701
+        ]
+      ]
+    },
+    {
+      "topic_id": 15,
+      "count": 25,
+      "name": "15_women_female_woman_entrepeneurship women",
+      "representative_terms": [
+        [
+          "women",
+          0.3551824390888214
+        ],
+        [
+          "female",
+          0.32974666357040405
+        ],
+        [
+          "woman",
+          0.3243495225906372
+        ],
+        [
+          "entrepeneurship women",
+          0.3219815194606781
+        ],
+        [
+          "economic",
+          0.29574596881866455
+        ],
+        [
+          "social",
+          0.29247236251831055
+        ],
+        [
+          "entrepeneurship",
+          0.28385835886001587
+        ],
+        [
+          "empowered",
+          0.2821207046508789
+        ],
+        [
+          "women women",
+          0.28192949295043945
+        ],
+        [
+          "women entrepeneurship",
+          0.27987024188041687
+        ]
+      ]
+    },
+    {
+      "topic_id": 16,
+      "count": 25,
+      "name": "16_journey_kuni_journey kuni_tourist",
+      "representative_terms": [
+        [
+          "journey",
+          0.3910669982433319
+        ],
+        [
+          "kuni",
+          0.383903831243515
+        ],
+        [
+          "journey kuni",
+          0.3755219280719757
+        ],
+        [
+          "tourist",
+          0.3744451701641083
+        ],
+        [
+          "festival",
+          0.35953256487846375
+        ],
+        [
+          "tourism",
+          0.33839333057403564
+        ],
+        [
+          "service",
+          0.3379928469657898
+        ],
+        [
+          "road",
+          0.31130701303482056
+        ],
+        [
+          "guide",
+          0.3091883957386017
+        ],
+        [
+          "freight",
+          0.30298933386802673
+        ]
+      ]
+    },
+    {
+      "topic_id": 17,
+      "count": 24,
+      "name": "17_senior_exhibition_pottery_workshop",
+      "representative_terms": [
+        [
+          "senior",
+          0.5113422870635986
+        ],
+        [
+          "exhibition",
+          0.4917930066585541
+        ],
+        [
+          "pottery",
+          0.4619602859020233
+        ],
+        [
+          "workshop",
+          0.4483124911785126
+        ],
+        [
+          "artisans",
+          0.44544854760169983
+        ],
+        [
+          "craft",
+          0.4440549314022064
+        ],
+        [
+          "machine",
+          0.43984055519104004
+        ],
+        [
+          "senior artisans",
+          0.4102841019630432
+        ],
+        [
+          "craftsmen",
+          0.40115904808044434
+        ],
+        [
+          "embroidery",
+          0.3852521777153015
+        ]
+      ]
+    },
+    {
+      "topic_id": 18,
+      "count": 24,
+      "name": "18_skills_skill_sports_professionals",
+      "representative_terms": [
+        [
+          "skills",
+          0.510377049446106
+        ],
+        [
+          "skill",
+          0.5037193298339844
+        ],
+        [
+          "sports",
+          0.49884602427482605
+        ],
+        [
+          "professionals",
+          0.4859126806259155
+        ],
+        [
+          "advanced",
+          0.4790520668029785
+        ],
+        [
+          "trained",
+          0.47182121872901917
+        ],
+        [
+          "itis",
+          0.4677220284938812
+        ],
+        [
+          "skill training",
+          0.4449218511581421
+        ],
+        [
+          "training",
+          0.4441242516040802
+        ],
+        [
+          "trained professionals",
+          0.44217896461486816
+        ]
+      ]
+    },
+    {
+      "topic_id": 19,
+      "count": 23,
+      "name": "19_animal_goat__",
+      "representative_terms": [
+        [
+          "animal",
+          0.4637450575828552
+        ],
+        [
+          "goat",
+          0.46306610107421875
+        ],
+        [
+          "",
+          0.45358002185821533
+        ],
+        [
+          "",
+          0.45358002185821533
+        ],
+        [
+          "",
+          0.45358002185821533
+        ],
+        [
+          "",
+          0.45358002185821533
+        ],
+        [
+          "",
+          0.45358002185821533
+        ],
+        [
+          "",
+          0.45358002185821533
+        ],
+        [
+          "",
+          0.45358002185821533
+        ],
+        [
+          "",
+          0.45358002185821533
+        ]
+      ]
+    },
+    {
+      "topic_id": 20,
+      "count": 23,
+      "name": "20_education_programme_education institution_institution",
+      "representative_terms": [
+        [
+          "education",
+          0.43181735277175903
+        ],
+        [
+          "programme",
+          0.40499982237815857
+        ],
+        [
+          "education institution",
+          0.38953593373298645
+        ],
+        [
+          "institution",
+          0.34831562638282776
+        ],
+        [
+          "programme junior",
+          0.3306145668029785
+        ],
+        [
+          "admission",
+          0.32193616032600403
+        ],
+        [
+          "",
+          0.3173310160636902
+        ],
+        [
+          "",
+          0.3173310160636902
+        ],
+        [
+          "",
+          0.3173310160636902
+        ],
+        [
+          "",
+          0.3173310160636902
+        ]
+      ]
+    },
+    {
+      "topic_id": 21,
+      "count": 22,
+      "name": "21_ph_post__",
+      "representative_terms": [
+        [
+          "ph",
+          0.4323500990867615
+        ],
+        [
+          "post",
+          0.4064404368400574
+        ],
+        [
+          "",
+          0.39720967411994934
+        ],
+        [
+          "",
+          0.39720967411994934
+        ],
+        [
+          "",
+          0.39720967411994934
+        ],
+        [
+          "",
+          0.39720967411994934
+        ],
+        [
+          "",
+          0.39720967411994934
+        ],
+        [
+          "",
+          0.39720967411994934
+        ],
+        [
+          "",
+          0.39720967411994934
+        ],
+        [
+          "",
+          0.39720967411994934
+        ]
+      ]
+    },
+    {
+      "topic_id": 22,
+      "count": 21,
+      "name": "22_educational_financial aid_transfer educational_medical",
+      "representative_terms": [
+        [
+          "educational",
+          0.46622857451438904
+        ],
+        [
+          "financial aid",
+          0.39781051874160767
+        ],
+        [
+          "transfer educational",
+          0.3797036111354828
+        ],
+        [
+          "medical",
+          0.3571535646915436
+        ],
+        [
+          "aid financial",
+          0.3524574339389801
+        ],
+        [
+          "financial",
+          0.3371920883655548
+        ],
+        [
+          "educational assistance",
+          0.32132744789123535
+        ],
+        [
+          "financial assistance",
+          0.29052025079727173
+        ],
+        [
+          "direct",
+          0.28027045726776123
+        ],
+        [
+          "transfer",
+          0.26212751865386963
+        ]
+      ]
+    },
+    {
+      "topic_id": 23,
+      "count": 21,
+      "name": "23_farm_farmer_farming_seed farm",
+      "representative_terms": [
+        [
+          "farm",
+          0.4882953464984894
+        ],
+        [
+          "farmer",
+          0.4725632965564728
+        ],
+        [
+          "farming",
+          0.4254896342754364
+        ],
+        [
+          "seed farm",
+          0.4153789281845093
+        ],
+        [
+          "production",
+          0.4041057527065277
+        ],
+        [
+          "fish farmer",
+          0.3695642948150635
+        ],
+        [
+          "culture",
+          0.36932075023651123
+        ],
+        [
+          "acquisition",
+          0.36493995785713196
+        ],
+        [
+          "farm fish",
+          0.3647911548614502
+        ],
+        [
+          "products",
+          0.3540510833263397
+        ]
+      ]
+    },
+    {
+      "topic_id": 24,
+      "count": 21,
+      "name": "24_vehicle_electric vehicle_electric_battery electric",
+      "representative_terms": [
+        [
+          "vehicle",
+          0.464992493391037
+        ],
+        [
+          "electric vehicle",
+          0.45472702383995056
+        ],
+        [
+          "electric",
+          0.439241886138916
+        ],
+        [
+          "battery electric",
+          0.4314553737640381
+        ],
+        [
+          "commercial vehicle",
+          0.4278286397457123
+        ],
+        [
+          "bicycle",
+          0.40556830167770386
+        ],
+        [
+          "motor",
+          0.3937602937221527
+        ],
+        [
+          "motorcycle",
+          0.3925168812274933
+        ],
+        [
+          "battery",
+          0.3921493589878082
+        ],
+        [
+          "vehicles",
+          0.39193254709243774
+        ]
+      ]
+    },
+    {
+      "topic_id": 25,
+      "count": 20,
+      "name": "25_unemployed_opportunities_opportunity_employed",
+      "representative_terms": [
+        [
+          "unemployed",
+          0.374850869178772
+        ],
+        [
+          "opportunities",
+          0.3539959192276001
+        ],
+        [
+          "opportunity",
+          0.34741559624671936
+        ],
+        [
+          "employed",
+          0.31346163153648376
+        ],
+        [
+          "home",
+          0.3124382197856903
+        ],
+        [
+          "opportunities opportunity",
+          0.3095967173576355
+        ],
+        [
+          "employment",
+          0.30568066239356995
+        ],
+        [
+          "unemployment",
+          0.29612860083580017
+        ],
+        [
+          "opportunity job",
+          0.2831297218799591
+        ],
+        [
+          "short",
+          0.2809982895851135
+        ]
+      ]
+    },
+    {
+      "topic_id": 26,
+      "count": 19,
+      "name": "26____",
+      "representative_terms": [
+        [
+          "",
+          0.3707873523235321
+        ],
+        [
+          "",
+          0.3707873523235321
+        ],
+        [
+          "",
+          0.3707873523235321
+        ],
+        [
+          "",
+          0.3707873523235321
+        ],
+        [
+          "",
+          0.3707873523235321
+        ],
+        [
+          "",
+          0.3707873523235321
+        ],
+        [
+          "",
+          0.3707873523235321
+        ],
+        [
+          "",
+          0.3707873523235321
+        ],
+        [
+          "",
+          0.3707873523235321
+        ],
+        [
+          "",
+          0.3707873523235321
+        ]
+      ]
+    },
+    {
+      "topic_id": 27,
+      "count": 19,
+      "name": "27_competition_cash_prize_contest",
+      "representative_terms": [
+        [
+          "competition",
+          0.3116215169429779
+        ],
+        [
+          "cash",
+          0.29968777298927307
+        ],
+        [
+          "prize",
+          0.2925856113433838
+        ],
+        [
+          "contest",
+          0.28951171040534973
+        ],
+        [
+          "award",
+          0.28856852650642395
+        ],
+        [
+          "music",
+          0.27928972244262695
+        ],
+        [
+          "championship",
+          0.27828913927078247
+        ],
+        [
+          "cash award",
+          0.273470401763916
+        ],
+        [
+          "award nominated",
+          0.2587065100669861
+        ],
+        [
+          "",
+          0.2530161440372467
+        ]
+      ]
+    },
+    {
+      "topic_id": 28,
+      "count": 18,
+      "name": "28_government_scheme_govt_",
+      "representative_terms": [
+        [
+          "government",
+          0.3711903691291809
+        ],
+        [
+          "scheme",
+          0.3495693504810333
+        ],
+        [
+          "govt",
+          0.3467840850353241
+        ],
+        [
+          "",
+          0.3447180688381195
+        ],
+        [
+          "",
+          0.3447180688381195
+        ],
+        [
+          "",
+          0.3447180688381195
+        ],
+        [
+          "",
+          0.3447180688381195
+        ],
+        [
+          "",
+          0.3447180688381195
+        ],
+        [
+          "",
+          0.3447180688381195
+        ],
+        [
+          "",
+          0.3447180688381195
+        ]
+      ]
+    },
+    {
+      "topic_id": 29,
+      "count": 18,
+      "name": "29_book_book grant_scholarship book_grant",
+      "representative_terms": [
+        [
+          "book",
+          0.8586506247520447
+        ],
+        [
+          "book grant",
+          0.6978819966316223
+        ],
+        [
+          "scholarship book",
+          0.5611947774887085
+        ],
+        [
+          "grant",
+          0.5184757113456726
+        ],
+        [
+          "education",
+          0.4850715100765228
+        ],
+        [
+          "grant grant",
+          0.4800069034099579
+        ],
+        [
+          "research grant",
+          0.47195711731910706
+        ],
+        [
+          "grants",
+          0.45575612783432007
+        ],
+        [
+          "artist",
+          0.4149995744228363
+        ],
+        [
+          "grant grants",
+          0.4091987907886505
+        ]
+      ]
+    },
+    {
+      "topic_id": 30,
+      "count": 18,
+      "name": "30_assistance_death__",
+      "representative_terms": [
+        [
+          "assistance",
+          0.3616904020309448
+        ],
+        [
+          "death",
+          0.3592637777328491
+        ],
+        [
+          "",
+          0.35918450355529785
+        ],
+        [
+          "",
+          0.35918450355529785
+        ],
+        [
+          "",
+          0.35918450355529785
+        ],
+        [
+          "",
+          0.35918450355529785
+        ],
+        [
+          "",
+          0.35918450355529785
+        ],
+        [
+          "",
+          0.35918450355529785
+        ],
+        [
+          "",
+          0.35918450355529785
+        ],
+        [
+          "",
+          0.35918450355529785
+        ]
+      ]
+    },
+    {
+      "topic_id": 31,
+      "count": 17,
+      "name": "31_education_training_medical_course",
+      "representative_terms": [
+        [
+          "education",
+          0.40639981627464294
+        ],
+        [
+          "training",
+          0.3738178014755249
+        ],
+        [
+          "medical",
+          0.3574327230453491
+        ],
+        [
+          "course",
+          0.3461740016937256
+        ],
+        [
+          "",
+          0.34199804067611694
+        ],
+        [
+          "",
+          0.34199804067611694
+        ],
+        [
+          "",
+          0.34199804067611694
+        ],
+        [
+          "",
+          0.34199804067611694
+        ],
+        [
+          "",
+          0.34199804067611694
+        ],
+        [
+          "",
+          0.34199804067611694
+        ]
+      ]
+    },
+    {
+      "topic_id": 32,
+      "count": 17,
+      "name": "32_worker_worker student_farmer_welfare farmer",
+      "representative_terms": [
+        [
+          "worker",
+          0.6186898350715637
+        ],
+        [
+          "worker student",
+          0.47675251960754395
+        ],
+        [
+          "farmer",
+          0.4702845513820648
+        ],
+        [
+          "welfare farmer",
+          0.4466993510723114
+        ],
+        [
+          "social worker",
+          0.4030343294143677
+        ],
+        [
+          "farmer welfare",
+          0.39982473850250244
+        ],
+        [
+          "student",
+          0.36567726731300354
+        ],
+        [
+          "youth",
+          0.3299919366836548
+        ],
+        [
+          "welfare",
+          0.32748132944107056
+        ],
+        [
+          "livelihood",
+          0.3260674774646759
+        ]
+      ]
+    },
+    {
+      "topic_id": 33,
+      "count": 16,
+      "name": "33_medical_income_duty_expenses",
+      "representative_terms": [
+        [
+          "medical",
+          0.42018094658851624
+        ],
+        [
+          "income",
+          0.40328407287597656
+        ],
+        [
+          "duty",
+          0.4030161499977112
+        ],
+        [
+          "expenses",
+          0.3856261372566223
+        ],
+        [
+          "tax",
+          0.34643831849098206
+        ],
+        [
+          "expenditure",
+          0.3426920473575592
+        ],
+        [
+          "",
+          0.3394579589366913
+        ],
+        [
+          "",
+          0.3394579589366913
+        ],
+        [
+          "",
+          0.3394579589366913
+        ],
+        [
+          "",
+          0.3394579589366913
+        ]
+      ]
+    },
+    {
+      "topic_id": 34,
+      "count": 15,
+      "name": "34_child___",
+      "representative_terms": [
+        [
+          "child",
+          0.3727036118507385
+        ],
+        [
+          "",
+          0.36241278052330017
+        ],
+        [
+          "",
+          0.36241278052330017
+        ],
+        [
+          "",
+          0.36241278052330017
+        ],
+        [
+          "",
+          0.36241278052330017
+        ],
+        [
+          "",
+          0.36241278052330017
+        ],
+        [
+          "",
+          0.36241278052330017
+        ],
+        [
+          "",
+          0.36241278052330017
+        ],
+        [
+          "",
+          0.36241278052330017
+        ],
+        [
+          "",
+          0.36241278052330017
+        ]
+      ]
+    },
+    {
+      "topic_id": 35,
+      "count": 15,
+      "name": "35_calamity_calamities_crisis_calamity crisis",
+      "representative_terms": [
+        [
+          "calamity",
+          0.6318683624267578
+        ],
+        [
+          "calamities",
+          0.5804504156112671
+        ],
+        [
+          "crisis",
+          0.578941822052002
+        ],
+        [
+          "calamity crisis",
+          0.5786750316619873
+        ],
+        [
+          "crisis disaster",
+          0.5413113832473755
+        ],
+        [
+          "support calamity",
+          0.537907600402832
+        ],
+        [
+          "disaster",
+          0.5367828607559204
+        ],
+        [
+          "disaster disaster",
+          0.49918514490127563
+        ],
+        [
+          "disaster affected",
+          0.4691982865333557
+        ],
+        [
+          "calamity natural",
+          0.4556161165237427
+        ]
+      ]
+    },
+    {
+      "topic_id": 36,
+      "count": 15,
+      "name": "36_cash_card cash_cash incentive_cash cash",
+      "representative_terms": [
+        [
+          "cash",
+          0.7583086490631104
+        ],
+        [
+          "card cash",
+          0.674586832523346
+        ],
+        [
+          "cash incentive",
+          0.6357091069221497
+        ],
+        [
+          "cash cash",
+          0.6255831718444824
+        ],
+        [
+          "card",
+          0.6099369525909424
+        ],
+        [
+          "marketing",
+          0.606505811214447
+        ],
+        [
+          "rewards",
+          0.5667471885681152
+        ],
+        [
+          "promotion",
+          0.5641234517097473
+        ],
+        [
+          "incentives",
+          0.5584332942962646
+        ],
+        [
+          "incentive",
+          0.5379431247711182
+        ]
+      ]
+    },
+    {
+      "topic_id": 37,
+      "count": 14,
+      "name": "37____",
+      "representative_terms": [
+        [
+          "",
+          0.3365768790245056
+        ],
+        [
+          "",
+          0.3365768790245056
+        ],
+        [
+          "",
+          0.3365768790245056
+        ],
+        [
+          "",
+          0.3365768790245056
+        ],
+        [
+          "",
+          0.3365768790245056
+        ],
+        [
+          "",
+          0.3365768790245056
+        ],
+        [
+          "",
+          0.3365768790245056
+        ],
+        [
+          "",
+          0.3365768790245056
+        ],
+        [
+          "",
+          0.3365768790245056
+        ],
+        [
+          "",
+          0.3365768790245056
+        ]
+      ]
+    },
+    {
+      "topic_id": 38,
+      "count": 14,
+      "name": "38_book_books__",
+      "representative_terms": [
+        [
+          "book",
+          0.27038297057151794
+        ],
+        [
+          "books",
+          0.2612207531929016
+        ],
+        [
+          "",
+          0.24581283330917358
+        ],
+        [
+          "",
+          0.24581283330917358
+        ],
+        [
+          "",
+          0.24581283330917358
+        ],
+        [
+          "",
+          0.24581283330917358
+        ],
+        [
+          "",
+          0.24581283330917358
+        ],
+        [
+          "",
+          0.24581283330917358
+        ],
+        [
+          "",
+          0.24581283330917358
+        ],
+        [
+          "",
+          0.24581283330917358
+        ]
+      ]
+    },
+    {
+      "topic_id": 39,
+      "count": 14,
+      "name": "39_assistance_maternity_maternity assistance_new",
+      "representative_terms": [
+        [
+          "assistance",
+          0.32142552733421326
+        ],
+        [
+          "maternity",
+          0.31239286065101624
+        ],
+        [
+          "maternity assistance",
+          0.28250718116760254
+        ],
+        [
+          "new",
+          0.27565816044807434
+        ],
+        [
+          "mothers",
+          0.2748507857322693
+        ],
+        [
+          "insemination",
+          0.27213621139526367
+        ],
+        [
+          "care",
+          0.2718012034893036
+        ],
+        [
+          "assistance maternity",
+          0.2708538770675659
+        ],
+        [
+          "childbirth",
+          0.26846519112586975
+        ],
+        [
+          "benefit",
+          0.2594764232635498
+        ]
+      ]
+    },
+    {
+      "topic_id": 40,
+      "count": 14,
+      "name": "40_foreign_english_national_language",
+      "representative_terms": [
+        [
+          "foreign",
+          0.41277483105659485
+        ],
+        [
+          "english",
+          0.41097337007522583
+        ],
+        [
+          "national",
+          0.40361183881759644
+        ],
+        [
+          "language",
+          0.3969063460826874
+        ],
+        [
+          "groups",
+          0.3963060677051544
+        ],
+        [
+          "religion",
+          0.3889976143836975
+        ],
+        [
+          "international",
+          0.3874357044696808
+        ],
+        [
+          "culture",
+          0.385378897190094
+        ],
+        [
+          "official",
+          0.384945273399353
+        ],
+        [
+          "overseas",
+          0.38224998116493225
+        ]
+      ]
+    },
+    {
+      "topic_id": 41,
+      "count": 13,
+      "name": "41_government_exam_examination_survey",
+      "representative_terms": [
+        [
+          "government",
+          0.5338157415390015
+        ],
+        [
+          "exam",
+          0.47228673100471497
+        ],
+        [
+          "examination",
+          0.45104601979255676
+        ],
+        [
+          "survey",
+          0.43830111622810364
+        ],
+        [
+          "exams",
+          0.42742419242858887
+        ],
+        [
+          "tests",
+          0.41165992617607117
+        ],
+        [
+          "interview",
+          0.3953765034675598
+        ],
+        [
+          "",
+          0.38802826404571533
+        ],
+        [
+          "",
+          0.38802826404571533
+        ],
+        [
+          "",
+          0.38802826404571533
+        ]
+      ]
+    },
+    {
+      "topic_id": 42,
+      "count": 13,
+      "name": "42_water_supply_pump_carrying",
+      "representative_terms": [
+        [
+          "water",
+          0.29116061329841614
+        ],
+        [
+          "supply",
+          0.287738561630249
+        ],
+        [
+          "pump",
+          0.2719312310218811
+        ],
+        [
+          "carrying",
+          0.26772767305374146
+        ],
+        [
+          "drinking",
+          0.265423446893692
+        ],
+        [
+          "shortage",
+          0.26018378138542175
+        ],
+        [
+          "waters",
+          0.24267861247062683
+        ],
+        [
+          "pond",
+          0.2294376939535141
+        ],
+        [
+          "water water",
+          0.2241162806749344
+        ],
+        [
+          "pump water",
+          0.21807701885700226
+        ]
+      ]
+    },
+    {
+      "topic_id": 43,
+      "count": 13,
+      "name": "43_health_genetic_breed_feed",
+      "representative_terms": [
+        [
+          "health",
+          0.38424354791641235
+        ],
+        [
+          "genetic",
+          0.3307318389415741
+        ],
+        [
+          "breed",
+          0.32175183296203613
+        ],
+        [
+          "feed",
+          0.3126923441886902
+        ],
+        [
+          "low genetic",
+          0.2994479835033417
+        ],
+        [
+          "animal feed",
+          0.2736026644706726
+        ],
+        [
+          "bite",
+          0.2670218050479889
+        ],
+        [
+          "husbandry",
+          0.26159653067588806
+        ],
+        [
+          "dog bite",
+          0.25635501742362976
+        ],
+        [
+          "animal husbandry",
+          0.24919317662715912
+        ]
+      ]
+    },
+    {
+      "topic_id": 44,
+      "count": 12,
+      "name": "44_education_educational_consumer_study",
+      "representative_terms": [
+        [
+          "education",
+          0.5388396382331848
+        ],
+        [
+          "educational",
+          0.5386151671409607
+        ],
+        [
+          "consumer",
+          0.4015350341796875
+        ],
+        [
+          "study",
+          0.38917243480682373
+        ],
+        [
+          "assistance study",
+          0.35691818594932556
+        ],
+        [
+          "assistance",
+          0.350841760635376
+        ],
+        [
+          "bank",
+          0.3248240649700165
+        ],
+        [
+          "nmdfc",
+          0.32308104634284973
+        ],
+        [
+          "term",
+          0.31332525610923767
+        ],
+        [
+          "loan educational",
+          0.3001350462436676
+        ]
+      ]
+    },
+    {
+      "topic_id": 45,
+      "count": 12,
+      "name": "45_individual_individual international_person_international",
+      "representative_terms": [
+        [
+          "individual",
+          0.49964043498039246
+        ],
+        [
+          "individual international",
+          0.4441004693508148
+        ],
+        [
+          "person",
+          0.4399842619895935
+        ],
+        [
+          "international",
+          0.4199436902999878
+        ],
+        [
+          "assistance",
+          0.40238267183303833
+        ],
+        [
+          "player",
+          0.3965187966823578
+        ],
+        [
+          "assistance individual",
+          0.39238762855529785
+        ],
+        [
+          "athletes",
+          0.3740760385990143
+        ],
+        [
+          "sportsperson",
+          0.35488614439964294
+        ],
+        [
+          "sports player",
+          0.3359892964363098
+        ]
+      ]
+    },
+    {
+      "topic_id": 46,
+      "count": 12,
+      "name": "46_agriculture_subsidized_credit_subsidy",
+      "representative_terms": [
+        [
+          "agriculture",
+          0.3879009783267975
+        ],
+        [
+          "subsidized",
+          0.3715047538280487
+        ],
+        [
+          "credit",
+          0.36733686923980713
+        ],
+        [
+          "subsidy",
+          0.36486107110977173
+        ],
+        [
+          "koch",
+          0.3333123028278351
+        ],
+        [
+          "subsidies",
+          0.3226778209209442
+        ],
+        [
+          "linked",
+          0.3217785358428955
+        ],
+        [
+          "",
+          0.30991628766059875
+        ],
+        [
+          "",
+          0.30991628766059875
+        ],
+        [
+          "",
+          0.30991628766059875
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+Topic,Count,Name,CustomName,Representation,Representative_Docs,ShortLabel
+-1,232,-1_102_rate_rate super_rank,outlier,"['102', 'rate', 'rate super', 'rank', 'purchase', 'mega', 'fee', 'national', 'business', 'post']","['Self Help Group (SHG)', 'Self-help Group', 'Self-Help Group']",outlier
+0,1,accident,accident,"['accident', '', '', '', '', '', '', '', '', '']",['Accident'],accident
+1,2,disaster relief,topic 1,"['', '', '', '', '', '', '', '', '', '']","['Disaster', 'Natural Disaster']",topic 1
+2,6,accommodation,accommodation,"['hotel', 'facility', 'accommodation', 'accomodation', 'lodging', '', '', '', '', '']","['Free Accommodation', 'Accommodation Facility', 'Accommodation']",accommodation
+3,3,housing,house,"['house', 'assistance', 'housing', '', '', '', '', '', '', '']","['House', 'Housing', 'Housing Assistance']",house
+4,4,construction,topic 4,"['', '', '', '', '', '', '', '', '', '']","['Construction', 'Construction Of House', 'House Construction']",topic 4
+5,18,agriculture,agriculture,"['activities', 'education', 'management', 'infrastructure', 'integrated', '', '', '', '', '']","['Agriculture Activities', 'Agricultural Activities', 'Agriculture']",agriculture
+6,5,crop support,production,"['production', 'assistance', '', '', '', '', '', '', '', '']","['Crop Protection', 'Crop', 'Crop Loss']",production
+7,4,fisheries,requisites,"['requisites', '', '', '', '', '', '', '', '', '']","['Fishermen', 'Fisheries', 'Fisheries Requisites']",requisites
+8,1,animal husbandry,animal husbandry,"['animal husbandry', 'husbandry', 'animal', '', '', '', '', '', '', '']",['Animal Husbandry'],animal husbandry
+9,12,livestock,farmer,"['farmer', 'farming', 'farm', 'animal farm', 'farm cattle', 'cattle', 'cattle farming', 'livestock farmer', 'livestock', 'animal']","['Livestock Development', 'Cattle', 'Livestock']",farmer
+10,2,irrigation,irrigation,"['irrigation', 'irrigation irrigation', 'drip irrigation', '', '', '', '', '', '', '']","['Irrigation', 'Drip Irrigation']",irrigation
+11,5,plantation,plantation crop,"['plantation crop', 'crop', 'crop tea', 'commercial plantation', 'plantation', 'plantation plantation', 'apple plantation', 'plantation commercial', 'tea plantation', 'tea']","['Commercial Plantation', 'Plantation', 'Apple Plantation']",plantation crop
+12,8,health,wellness,"['wellness', 'wellness health', 'health wellness', 'health', 'health treatment', 'illnesses wellness', 'family health', 'health health', 'illnesses', 'family']","['Wellness', 'Health And Wellness', 'Health & Wellness']",wellness
+13,7,medical,healthcare,"['healthcare', 'medicine', 'medical', 'patients', 'doctor', 'medical treatment', 'treatment', 'healthcare medical', 'doctor healthcare', 'course medical']","['Medical', 'Medical Treatment', 'Medical Course']",healthcare
+14,1,ambulance,ambulance,"['ambulance service', 'ambulance', 'service', '', '', '', '', '', '', '']",['Ambulance Service'],ambulance
+15,14,disability,relief,"['relief', 'student', 'person', 'disabilities', '', '', '', '', '', '']","['Disability Person', 'Person With Disability', 'Disability']",relief
+16,1,assistive devices,topic 16,"['', '', '', '', '', '', '', '', '', '']",['Assistive Devices'],topic 16
+17,1,sanitation,worker,"['worker', '', '', '', '', '', '', '', '', '']",['Sanitation Worker'],worker
+18,6,nutrition,food,"['food', 'rich food', 'nutrient', 'nutrient rich', 'food nutrition', 'nutrition', 'nutritional support', 'awareness nutrition', 'support', '']","['Awareness On Nutrition', 'Nutrition', 'Nutrition India']",food
+19,8,maternity,mothers,"['mothers', 'assistance', 'maternity', '', '', '', '', '', '', '']","['Maternity Benefits', 'Maternity', 'Maternity Benefit']",mothers
+20,3,women,topic 20,"['', '', '', '', '', '', '', '', '', '']","['Woman', 'Women', 'Women Collectives']",topic 20
+21,6,girl child,student,"['student', 'child', 'daughter', 'girl', 'child girl', '', '', '', '', '']","['Girl', 'Single Girl Child', 'Girl Child']",student
+22,4,child welfare,youth,"['youth', 'welfare', 'social', 'student', '', '', '', '', '', '']","['Social Welfare', 'Youth Welfare', 'Welfare']",youth
+23,3,anganwadi,topic 23,"['', '', '', '', '', '', '', '', '', '']","['Anganwadi', 'Anganwadi Bal Vatika', 'Anganwadi Centre']",topic 23
+24,12,education,school,"['school', 'education', 'education school', 'educational', 'educaction', 'student', 'education student', 'school secondary', 'education higher', 'education educational']","['Higher Education', 'HIGHER EDUCATION', 'Education']",school
+25,6,scholarship,agriculture,"['merit', '', '', '', '', '', '', '', '', '']","['Artist Scholarship', 'SCHOLARSHIP', 'Scholarship']",agriculture
+26,1,student support,topic 26,"['', '', '', '', '', '', '', '', '', '']",['Student'],topic 26
+27,3,research,researcher,"['researcher', 'research', 'research scholars', '', '', '', '', '', '', '']","['Research', 'Researcher', 'Research Scholars']",researcher
+28,9,skill training,topic 28,"['', '', '', '', '', '', '', '', '', '']","['Skill Development', 'Skill', 'Skill Training']",topic 28
+29,5,employment,job,"['job', '', '', '', '', '', '', '', '', '']","['Unemployment', 'Employment', 'Employment Opportunity']",job
+30,5,self employment,employment,"['employment', 'employed', 'self', 'self employment', 'self employement', 'employement', 'self employed', 'employment self', 'employement self', '']","['Self-Employment', 'Self Employment', 'Self-employment']",employment
+31,4,entrepreneurship,development,"['development', 'entrepreneur', 'entrepreneurs', 'entrepreneurship', '', '', '', '', '', '']","['Entrepreneurs', 'Entrepreneurship', 'Entrepreneurship Development']",development
+32,11,financial assistance,financial,"['financial', 'cash', 'financial assistane', 'financial support', 'cash assistance', 'financial assistance', 'linked financial', 'assistane financial', 'assistance financial', 'relief financial']","['Financial Assistance', 'FINANCIAL ASSISTANCE', 'Financial Assistance,']",financial
+33,7,loan,assistance,"['assistance', 'bank', 'consumer', '', '', '', '', '', '', '']","['Bank Loan', 'Consumer Loan', 'Loan']",assistance
+34,7,subsidy,agriculture,"['subsidy', 'subsidies', 'agriculture', 'subsidy subsidies', 'subsidies subsidy', 'subsidy subsidy', 'agriculture subsidy', '', '', '']","['Subsidy On Inputs', 'Interest Subsidy', 'Subsidy']",agriculture
+35,5,pension,topic 35,"['', '', '', '', '', '', '', '', '', '']","['Widow Pension', 'Additional Pension', 'Pension']",topic 35
+36,2,widow support,widow,"['widow', 'widow widow', 'marriage', 'widow marriage', '', '', '', '', '', '']","['Widow', 'Widow Marriage']",widow
+37,3,senior citizen,topic 37,"['', '', '', '', '', '', '', '', '', '']","['Senior Citizen', 'Senior Citizens', 'Senior Fellows']",topic 37
+38,4,ex servicemen,topic 38,"['', '', '', '', '', '', '', '', '', '']","['Widow Of Ex-Servicemen', 'Ex-servicemen', 'Ex-Servicemen']",topic 38
+39,2,labor welfare,economic,"['economic', 'welfare', '', '', '', '', '', '', '', '']","['Labour', 'Economic Welfare']",economic
+40,3,tribal welfare,welfare,"['welfare', '', '', '', '', '', '', '', '', '']","['Farmer Welfare', 'Tribal Farmers', 'Tribal Welfare']",welfare
+41,9,backward class,class,"['class', '', '', '', '', '', '', '', '', '']","['Other Backward Classes', 'Backward Classes', 'Most Backward Classes']",class
+42,1,minority welfare,minority,"['minority', '', '', '', '', '', '', '', '', '']",['Minority Welfare'],minority
+43,1,social justice,topic 43,"['', '', '', '', '', '', '', '', '', '']",['Social Justice'],topic 43
+44,1,legal aid,legal,"['legal', 'legal aid', '', '', '', '', '', '', '', '']",['Legal Aid'],legal
+45,3,art culture,art,"['art', 'arts', '', '', '', '', '', '', '', '']","['Art', 'Arts', 'Culture']",art
+46,5,sports,training,"['training', 'sports', 'athletes', 'sports training', 'international', '', '', '', '', '']","['Sports Scheme', 'Sports', 'International Sports']",training
+47,3,transport,service,"['service', 'transportation', 'transport service', 'service transportation', '', '', '', '', '', '']","['Transportation', 'Transport Service', 'Transport']",service
+48,1,electric vehicle,topic 48,"['', '', '', '', '', '', '', '', '', '']",['Battery Electric Vehicle'],topic 48
+49,2,water supply,supply,"['supply', '', '', '', '', '', '', '', '', '']","['Water Supply', 'Water Shortage']",supply
+50,27,50_war_student_rehabilitation war_person,war,"['war', 'student', 'rehabilitation war', 'person', 'persons', 'handicap', 'abled student', 'handicapped', 'physically', 'children']","['Differently Abled', 'Differently-abled Person', 'Differently Abled Person']",war
+51,202,51_state_yojana_panchayat_sahayata,state,"['state', 'yojana', 'panchayat', 'sahayata', 'oec', 'nfsa', 'temple', 'bpl', 'safai', 'nari']","['Coir', 'Sanskrit', 'Printing Sanskrit Textbooks']",state
+52,27,52____,topic 52,"['', '', '', '', '', '', '', '', '', '']","['Nomadic Tribes', 'Vimukta Jatis And Nomadic Tribes', 'Vimukta Jatis & Nomadic Tribes']",topic 52
+53,36,53_labor_labour_laborer_labourers,labor,"['labor', 'labour', 'laborer', 'labourers', 'employment', 'industrial', 'government', 'worker', 'workers', 'worker labor']","['Workers', 'Worker', 'Salt Workers']",labor
+54,166,54_cattle_cow_farmer_farm,agriculture,"['cattle', 'cow', 'farmer', 'farm', 'farmers', 'sheep', 'agriculture', 'farming', 'marginal farmer', 'pig farming']","['Agriculture And Rural Development Bank', 'Rural Development', 'Tea Development']",agriculture
+55,12,55_higher_book_sponsorship_marriage,higher,"['higher', 'book', 'sponsorship', 'marriage', 'education', '', '', '', '', '']","['Ignition Grant', 'Merit Grant', 'Grant']",higher
+56,12,56_drinking_aquarium_marine_water,drinking,"['drinking', 'aquarium', 'marine', 'water', 'waters', 'tank', 'drinkers', 'pump', '', '']","['Drinking Water', 'Water Carrying Pipeline', 'Water']",drinking
+57,16,57_production_activities_culture_farmer,production,"['production', 'activities', 'culture', 'farmer', 'farming', 'unit', 'seed farm', 'deep', 'support', 'farm']","['Fish Rearing Unit', 'Fish Activities', 'Support For Acquisition Of Deep Sea Fishing Vessels']",production
+58,33,58_victim violence_victim_sexual abuse_physical abuse,victim violence,"['victim violence', 'victim', 'sexual abuse', 'physical abuse', 'domestic violence', 'violence', 'mental abuse', 'counseling', 'social defence', 'crime']","['Physical Abuse', 'Mental Abuse', 'Sexual Abuse']",victim violence
+59,17,59_family_service_family social_social service,family,"['family', 'service', 'family social', 'social service', 'poverty', 'support', 'livelihood', 'service social', 'livelihood support', 'poor poverty']","['Economically Weaker Section', 'Below Poverty Line', 'Below The Poverty Line']",family
+60,12,60_youth_young youth_youth youth_adolescent,youth,"['youth', 'young youth', 'youth youth', 'adolescent', 'adolescent adolescent', 'young', 'teenage', 'transgender', 'girl', 'chicks']","['Teenage Girl', 'Adolescent Girls', 'Teenage Girls']",youth
+61,25,61_services_labour_family_daughters family,services,"['services', 'labour', 'family', 'daughters family', 'daughters', 'childcare', 'victims', 'parent', 'parents', 'services mother']","['Orphan Child', 'Integrated Child Development Services', 'Child Development']",services
+62,15,62_student_empowerment student_female_empowerment female,student,"['student', 'empowerment student', 'female', 'empowerment female', 'empowerment', 'youth', 'empowerment woman', 'woman', 'female empowerment', '']","['Socio-economic Empowerment', 'Economic Empowerment', 'Empowerment']",student
+63,24,63____,topic 63,"['', '', '', '', '', '', '', '', '', '']","['Child Marriage', 'Child Marriage Prevention', 'Destitute Women']",topic 63
+64,17,64_students_communities_community_government,students,"['students', 'communities', 'community', 'government', 'students equivalent', 'policy', 'minority students', 'govt', 'public', 'scheme']","['Other Equivalent Communities', 'Minority Community', 'Government Scheme For Minorities']",students
+65,15,65____,topic 65,"['', '', '', '', '', '', '', '', '', '']","['Free Textbook', 'Books', 'Books And Stationery']",topic 65
+66,36,66_training_certification_education_courses,training,"['training', 'certification', 'education', 'courses', 'training technical', 'industrial training', 'training industrial', 'professional course', 'training skill', 'trainee training']","['Professional Course', 'Vocational Training', 'Industrial Training Institutes (ITIs)']",training
+67,12,67_preparation_government_preliminary_examination,preparation,"['preparation', 'government', 'preliminary', 'examination', 'exam', 'survey', '', '', '', '']","['Competitive Exam', 'Armed Forces Examination', 'Competitive Examination']",preparation
+68,30,68_researcher_investigator_material_scientist,researcher,"['researcher', 'investigator', 'material', 'scientist', 'scientists', 'woman', 'research investigator', 'research scientist', 'researcher woman', 'science']","['Research Scholar', 'Social Science Research', 'Research Scientist']",researcher
+69,27,69_school_class_residential_education,school,"['school', 'class', 'residential', 'education', 'law', 'schools', 'class school', 'program', 'needy', 'programs']","['Secondary School Students', 'Primary School', 'Primary School Students']",school
+70,14,70_research___,accident,"['research', '', '', '', '', '', '', '', '', '']","['Cashless Health Insurance', 'Affordable Health Insurance', 'Health Insurance']",accident
+71,20,71_school_teacher_teachers_programme,school,"['school', 'teacher', 'teachers', 'programme', '', '', '', '', '', '']","['Junior College', 'Young Faculty', 'Internship Programme']",school
+72,21,72_diploma_graduate post_post graduate_graduation post,diploma,"['diploma', 'graduate post', 'post graduate', 'graduation post', 'post', 'doctoral post', 'law', 'degree diploma', 'graduate', 'post graduation']","['Post Graduation', 'Post-Graduation', 'Post-graduation']",diploma
+73,18,73_assistance_insurance_death_ground,accident,"['assistance', 'insurance', 'death', 'ground', '', '', '', '', '', '']","['Death Assistance', 'Death', 'Funeral']",accident
+74,42,74_diseases relief_life threatening_threatening_repair,accident,"['diseases relief', 'life threatening', 'threatening', 'repair', 'vaccination', 'distribution', 'diseases', 'extension', 'life', 'aids']","['Free Medicines Distribution', 'Cancer Patient', 'Life Threatening Disorders & Diseases']",accident
+75,52,75_educational_assistance educational_remuneration_assitance,accident,"['educational', 'assistance educational', 'remuneration', 'assitance', 'benefit', 'chartered', 'benefits', 'loan educational', 'financial', 'micro']","['Micro Finance', 'Monthly Allowance', 'Allowance']",accident
+76,43,76_road_road road_model_poly,road,"['road', 'road road', 'model', 'poly', 'holiday', 'gate', 'map', 'trekking', 'placement', 'delivery']","['Model Map', 'Map', 'Residential Map']",road
+77,27,77_cash_training_marketing_gold incentive,cash,"['cash', 'training', 'marketing', 'gold incentive', 'incentives', 'incentive cash', 'cash incentive', 'incentive', 'rewards', 'incentive training']","['Incentive', 'Cash Incentive', 'Cash Award']",cash
+78,17,78_spinner_air_vehicle_auto,spinner,"['spinner', 'air', 'vehicle', 'auto', 'goods', 'response', 'cycle', 'bicycle', '', '']","['Response Vehicle', 'Vehicle', 'Compressed Air Vehicle']",spinner
+79,26,79_art___,art,"['art', '', '', '', '', '', '', '', '', '']","['Senior Artisans And Weavers', 'Handloom Exhibition', 'Handloom Weavers']",art
+80,20,80_arts_comedy_iii_competition,arts,"['arts', 'comedy', 'iii', 'competition', 'music', 'iv', 'acting', '', '', '']","['Stage III', 'Fine Arts Competition', 'Classical Music Competition']",arts
+81,19,81____,topic 81,"['', '', '', '', '', '', '', '', '', '']","['Equipment', 'Aids And Appliances', 'Aids Appliances']",topic 81
+82,44,82_information_organized sector_sector_technology,information,"['information', 'organized sector', 'sector', 'technology', 'sectors', 'translation', 'data', 'smart', 'modernization', 'manufacture']","['Technology Translation', 'Technology', 'Trading Sector']",information

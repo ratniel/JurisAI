@@ -1,0 +1,31 @@
+{
+  "run_name": "unique-tags-english-minilm-first-pass",
+  "language": "english",
+  "embedding_model_name": "all-MiniLM-L6-v2",
+  "top_n_words": 10,
+  "ngram_range": [
+    1,
+    2
+  ],
+  "min_topic_size": 12,
+  "nr_topics": null,
+  "calculate_probabilities": false,
+  "low_memory": false,
+  "random_state": 42,
+  "umap_n_neighbors": 15,
+  "umap_n_components": 5,
+  "umap_min_dist": 0.0,
+  "umap_metric": "cosine",
+  "hdbscan_min_cluster_size": 12,
+  "hdbscan_min_samples": 2,
+  "hdbscan_metric": "euclidean",
+  "cluster_selection_method": "eom",
+  "min_df": 1,
+  "max_df": 1.0,
+  "stop_words": "english",
+  "representation_model_name": "keybert",
+  "seed_topic_file": null,
+  "zeroshot_topic_file": null,
+  "zeroshot_min_similarity": 0.7,
+  "max_topic_label_words": 2
+}

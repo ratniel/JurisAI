@@ -1,0 +1,29 @@
+2026-03-10 22:51:57 | INFO | Created run directory: /Users/ratniel/JurisAI/bertopic_runs/20260310T172157Z_unique-tags-english-minilm-first-pass
+2026-03-10 22:51:57 | INFO | Log file: /Users/ratniel/JurisAI/bertopic_runs/20260310T172157Z_unique-tags-english-minilm-first-pass/logs/run.log
+2026-03-10 22:51:57 | INFO | Input file: /Users/ratniel/JurisAI/unique_tags.json
+2026-03-10 22:51:57 | INFO | Output root: /Users/ratniel/JurisAI/bertopic_runs
+2026-03-10 22:51:57 | INFO | Run name: unique-tags-english-minilm-first-pass
+2026-03-10 22:51:57 | INFO | Loaded 1596 tag documents from input JSON.
+2026-03-10 22:51:57 | INFO | Key model config: embedding=all-MiniLM-L6-v2, min_topic_size=12, nr_topics=None, ngram_range=(1, 2), random_state=42
+2026-03-10 22:51:57 | INFO | Clustering config: umap_neighbors=15, umap_components=5, hdbscan_min_cluster_size=12, hdbscan_min_samples=2
+2026-03-10 22:51:57 | INFO | Building BERTopic model and embedding backend.
+2026-03-10 22:52:08 | INFO | BERTopic model constructed successfully.
+2026-03-10 22:52:08 | INFO | Starting fit_transform on 1596 tag documents.
+2026-03-10 22:52:13 | INFO | fit_transform completed.
+2026-03-10 22:52:13 | INFO | Generating short topic labels with max 2 words.
+2026-03-10 22:52:13 | INFO | Applied short topic labels to BERTopic model.
+2026-03-10 22:52:13 | INFO | Collecting topic and document statistics.
+2026-03-10 22:52:13 | INFO | Derived 48 topics (including outlier bucket). Outliers: 221 of 1596 documents.
+2026-03-10 22:52:13 | INFO | Writing CSV statistics.
+2026-03-10 22:52:13 | INFO | Writing config and summary JSON.
+2026-03-10 22:52:13 | INFO | Generating visualization: topics
+2026-03-10 22:52:13 | INFO | Saved visualization: /Users/ratniel/JurisAI/bertopic_runs/20260310T172157Z_unique-tags-english-minilm-first-pass/visualizations/topics.html
+2026-03-10 22:52:13 | INFO | Generating visualization: barchart
+2026-03-10 22:52:13 | INFO | Saved visualization: /Users/ratniel/JurisAI/bertopic_runs/20260310T172157Z_unique-tags-english-minilm-first-pass/visualizations/barchart.html
+2026-03-10 22:52:13 | INFO | Generating visualization: hierarchy
+2026-03-10 22:52:14 | INFO | Saved visualization: /Users/ratniel/JurisAI/bertopic_runs/20260310T172157Z_unique-tags-english-minilm-first-pass/visualizations/hierarchy.html
+2026-03-10 22:52:14 | INFO | Generating visualization: heatmap
+2026-03-10 22:52:14 | INFO | Saved visualization: /Users/ratniel/JurisAI/bertopic_runs/20260310T172157Z_unique-tags-english-minilm-first-pass/visualizations/heatmap.html
+2026-03-10 22:52:14 | INFO | Saving BERTopic model to disk.
+2026-03-10 22:52:14 | INFO | Saved model directory: /Users/ratniel/JurisAI/bertopic_runs/20260310T172157Z_unique-tags-english-minilm-first-pass/model
+2026-03-10 22:52:14 | INFO | Run complete.
