@@ -1,0 +1,826 @@
+- persona_id: p1_vidarbha_farmer
+  role: core_positive
+  scheme_id: 69a522c7e00a48eb32037c5f
+  scheme_name: National Agriculture Insurance Scheme
+  level: central
+  topics:
+  - Agriculture
+  - Social Welfare
+  tags:
+  - Agriculture Subsidy
+  - Crop Insurance
+  - Farmers
+  - Natural Disaster Coverage
+  rationale: Best central fit for crop loss, insurance, and natural-disaster support.
+  source_url: https://www.myscheme.gov.in/schemes/nai
+- persona_id: p1_vidarbha_farmer
+  role: core_positive
+  scheme_id: 69999ec7e00a48eb3203788e
+  scheme_name: National Food Security Mission NFSM
+  level: central
+  topics:
+  - Agriculture
+  tags:
+  - Demonstration
+  - Millets
+  - Nutri Cereals
+  - Pulses
+  - Rice
+  - Seed Distribution
+  - Seed Hub
+  - Seed Production
+  - Wheat
+  rationale: Central agriculture-support scheme relevant to distressed farmers asking for crop help.
+  source_url: https://www.myscheme.gov.in/schemes/nfsmcss
+- persona_id: p1_vidarbha_farmer
+  role: core_positive
+  scheme_id: 6999a539e00a48eb32037a9d
+  scheme_name: National Agriculture Market
+  level: central
+  topics:
+  - Agriculture
+  tags:
+  - APMC
+  - E-bidding
+  - E-payment
+  - Electronic Trading
+  rationale: Relevant agriculture support hit for farmers asking broadly about help and market access.
+  source_url: https://www.myscheme.gov.in/schemes/e-nam
+- persona_id: p1_vidarbha_farmer
+  role: central_fallback
+  scheme_id: 6999a6cfe00a48eb32037b1e
+  scheme_name: Coconut Palm Insurance Scheme
+  level: central
+  topics:
+  - Agriculture
+  - Horticulture
+  tags:
+  - Coconut
+  - Coconut Grower
+  - Farmer
+  - Insurance
+  - Palm
+  rationale: Central farmer insurance scheme that is on-topic but crop-specific, useful as a lower-confidence
+    positive.
+  source_url: https://www.myscheme.gov.in/schemes/cpis
+- persona_id: p1_vidarbha_farmer
+  role: distractor_wrong_state
+  scheme_id: 6999a597e00a48eb32037ab5
+  scheme_name: Mukhyamantri Kisan Sahay Yojana
+  level: state
+  state: Gujarat
+  topics:
+  - Agriculture
+  - Social Welfare
+  tags:
+  - Drought
+  - Earthquake
+  - Financial Assistance
+  - Flood
+  - Kisan Sahay
+  - Natural Calamities
+  rationale: Strong agriculture distress match but wrong state (Gujarat).
+  source_url: https://www.myscheme.gov.in/schemes/mksy
+- persona_id: p1_vidarbha_farmer
+  role: distractor_wrong_state
+  scheme_id: 6999a822e00a48eb32037b9b
+  scheme_name: Jharkhand Rajya Fasal Rahat Yojana
+  level: state
+  state: Jharkhand
+  topics:
+  - Agriculture
+  - Social Welfare
+  tags:
+  - Agriculture
+  - Crop Loss
+  - Farmer
+  - Natural Calamity
+  rationale: Crop-loss scheme that should not outrank central fallback for Maharashtra queries.
+  source_url: https://www.myscheme.gov.in/schemes/jrfry
+- persona_id: p1_vidarbha_farmer
+  role: distractor_wrong_state
+  scheme_id: 69a522c7e00a48eb32037c50
+  scheme_name: Kisan Suryoday Yojana (KSY)
+  level: state
+  state: Gujarat
+  topics:
+  - Agriculture
+  - Energy
+  tags:
+  - Agricultural
+  - Electricity Supply
+  - Farmer
+  - Irrigation
+  - Renewable Energy
+  rationale: Agriculture and irrigation signal but wrong state (Gujarat).
+  source_url: https://www.myscheme.gov.in/schemes/ksyg
+- persona_id: p1_vidarbha_farmer
+  role: distractor_wrong_beneficiary
+  scheme_id: 6999a175e00a48eb3203795b
+  scheme_name: Mahila Kisan Yojana (Maharashtra)
+  level: state
+  state: Maharashtra
+  topics:
+  - Agriculture
+  - Employment
+  - Women Welfare
+  tags:
+  - Charmakar
+  - Employment
+  - Farmer
+  - Loan
+  - Scheduled Caste
+  - Subsidy
+  - Woman
+  rationale: Same state and farmer signal, but woman-only and Scheduled Caste-specific.
+  source_url: https://www.myscheme.gov.in/schemes/mkym
+- persona_id: p1_vidarbha_farmer
+  role: distractor_wrong_state
+  scheme_id: 6999a597e00a48eb32037ab7
+  scheme_name: ₹ 5 Lakh Insurance Cover To Farmers
+  level: state
+  state: Telangana
+  topics: []
+  tags:
+  - Financial
+  - Insurance Coverage
+  - LIC
+  - Security
+  rationale: Farmer insurance hit from Telangana that should not outrank central matches.
+  source_url: https://www.myscheme.gov.in/schemes/farmer-insurance
+- persona_id: p2_tamilnadu_sc_student
+  role: core_positive
+  scheme_id: 69a522c7e00a48eb32037c32
+  scheme_name: Free Education Scholarship for Professional Courses (Engineering, Medical, Agriculture,
+    Veterinary, and Law)
+  level: state
+  state: Tamil Nadu
+  topics:
+  - Education
+  tags:
+  - Education
+  - Minority Welfare
+  - Scholarship
+  rationale: Best in-state engineering scholarship fit for Tamil Nadu.
+  source_url: https://www.myscheme.gov.in/schemes/fesfpc
+- persona_id: p2_tamilnadu_sc_student
+  role: core_positive
+  scheme_id: 6999a822e00a48eb32037b80
+  scheme_name: Scholarship (Above VIII Standard) - Tamil Nadu
+  level: state
+  state: Tamil Nadu
+  topics:
+  - Education
+  tags:
+  - Different Abled Person
+  - Education
+  - Scholarship
+  - Student
+  rationale: General Tamil Nadu scholarship hit that should surface for in-state student queries.
+  source_url: https://www.myscheme.gov.in/schemes/saviiisbwodap
+- persona_id: p2_tamilnadu_sc_student
+  role: core_positive
+  scheme_id: 6999a175e00a48eb32037958
+  scheme_name: Pre-Matric Scholarship Scheme
+  level: state
+  state: Tamil Nadu
+  topics:
+  - Education
+  tags:
+  - Education
+  - Minority Welfare
+  - Pre-Matric
+  - Scholarship
+  rationale: Tamil Nadu scholarship scheme useful for broad scholarship discovery queries.
+  source_url: https://www.myscheme.gov.in/schemes/pmsp
+- persona_id: p2_tamilnadu_sc_student
+  role: central_fallback
+  scheme_id: 6999a539e00a48eb32037a8d
+  scheme_name: Top Class Education For Scheduled Caste Students
+  level: central
+  topics:
+  - Education
+  tags:
+  - Education
+  - Scheduled Caste
+  - Scholarship
+  - Student
+  - Tuition Fee
+  rationale: Best central Scheduled Caste scholarship match.
+  source_url: https://www.myscheme.gov.in/schemes/tce-sc
+- persona_id: p2_tamilnadu_sc_student
+  role: central_fallback
+  scheme_id: 6999a539e00a48eb32037a8a
+  scheme_name: National Overseas Scholarship For Scheduled Caste Etc. Candidates
+  level: central
+  topics:
+  - Education
+  - Science & Research
+  tags:
+  - Degree
+  - International Education
+  - PhD
+  - Post-Graduation
+  - Scheduled Caste
+  - Scholarship
+  - Student
+  - Tuition Fees
+  rationale: Central SC education support relevant to higher-study variants.
+  source_url: https://www.myscheme.gov.in/schemes/nos-sc
+- persona_id: p2_tamilnadu_sc_student
+  role: central_fallback
+  scheme_id: 6999a539e00a48eb32037a76
+  scheme_name: Post-Graduate Scholarships for Professional Courses for SC/ST Candidates
+  level: central
+  topics:
+  - Education
+  tags:
+  - Post Graduate
+  - Professional Course
+  - SC
+  - Scholarship
+  - ST
+  - Student
+  - UGC
+  rationale: Central higher-education fallback for professional-course scholarship intent.
+  source_url: https://www.myscheme.gov.in/schemes/pgspcscstc
+- persona_id: p2_tamilnadu_sc_student
+  role: distractor_wrong_state
+  scheme_id: 6999a2b0e00a48eb32037991
+  scheme_name: Financial Assistance to SC Students for Pursuing Higher Studies Abroad
+  level: state
+  state: Delhi
+  topics:
+  - Education
+  tags:
+  - Abroad
+  - College
+  - Education
+  - Foreign
+  - Scheduled Caste
+  - Scholarship
+  - Student
+  rationale: Strong SC education hit but wrong state (Delhi).
+  source_url: https://www.myscheme.gov.in/schemes/fatssfshsa
+- persona_id: p2_tamilnadu_sc_student
+  role: distractor_wrong_state
+  scheme_id: 6999a597e00a48eb32037af3
+  scheme_name: Fee Waiver Scheme For SC/ST Students Pursuing Higher Education
+  level: state
+  state: Goa
+  topics:
+  - Education
+  tags:
+  - Education
+  - Scheduled Caste
+  - Scheduled Tribe
+  - Scholarship
+  - Student
+  rationale: Relevant scholarship intent but wrong state (Goa).
+  source_url: https://www.myscheme.gov.in/schemes/fwsscstsphe
+- persona_id: p2_tamilnadu_sc_student
+  role: distractor_wrong_state
+  scheme_id: 6999a175e00a48eb3203798a
+  scheme_name: Ambedkar International Scholarship - SC
+  level: state
+  state: Rajasthan
+  topics:
+  - Education
+  - Science & Research
+  tags:
+  - Financial Assistance
+  - International
+  - PhD
+  - Scheduled Caste
+  - Student
+  rationale: Scheduled Caste scholarship signal but wrong state (Rajasthan) and abroad-focused.
+  source_url: https://www.myscheme.gov.in/schemes/ais-sc
+- persona_id: p2_tamilnadu_sc_student
+  role: distractor_wrong_beneficiary
+  scheme_id: 69a522c7e00a48eb32037c2c
+  scheme_name: 'Book Bank Scheme: II'
+  level: state
+  state: Tamil Nadu
+  topics:
+  - Education
+  - Social Welfare
+  tags:
+  - Books
+  - Education
+  - Students
+  - Tribal Welfare
+  rationale: Tamil Nadu education scheme with a tribal-welfare tilt, not a clean SC scholarship match.
+  source_url: https://www.myscheme.gov.in/schemes/bbsii
+- persona_id: p3_rajasthan_widow_support
+  role: core_positive
+  scheme_id: 69999d6ae00a48eb32037866
+  scheme_name: Chief Minister Ekal Nari Samman Pension Yojana
+  level: state
+  state: Rajasthan
+  topics: []
+  tags:
+  - Empowerment
+  - Financial Assistance
+  - Social Welfare
+  rationale: Best Rajasthan widow/single-woman pension match.
+  source_url: https://www.myscheme.gov.in/schemes/cmenspy
+- persona_id: p3_rajasthan_widow_support
+  role: core_positive
+  scheme_id: 6999a6cfe00a48eb32037b4d
+  scheme_name: Vidhva Vivah Uphar Yojana
+  level: state
+  state: Rajasthan
+  topics:
+  - Women Welfare
+  tags:
+  - Financial Assistance
+  - Marriage
+  - Widow
+  - Women
+  rationale: Rajasthan widow-support scheme that should surface for support-focused queries.
+  source_url: https://www.myscheme.gov.in/schemes/vvuy
+- persona_id: p3_rajasthan_widow_support
+  role: core_positive
+  scheme_id: 69999ec7e00a48eb320378c5
+  scheme_name: Indira Mahila Shakti Udyam Protsahan Yojana
+  level: state
+  state: Rajasthan
+  topics:
+  - Women Welfare
+  tags:
+  - Development
+  - Empowerment
+  - Motivaction
+  - Women
+  rationale: Same-state women-support scheme relevant to broader assistance queries.
+  source_url: https://www.myscheme.gov.in/schemes/imspesy
+- persona_id: p3_rajasthan_widow_support
+  role: core_positive
+  scheme_id: 6999a6cfe00a48eb32037b52
+  scheme_name: Mukhyamantri Work Form Home-Job Work Yojana
+  level: state
+  state: Rajasthan
+  topics:
+  - Employment
+  - Women Welfare
+  tags:
+  - Employment
+  - Empower
+  - Women
+  - Work From Home
+  rationale: Same-state support option for work and recovery variants after widowhood.
+  source_url: https://www.myscheme.gov.in/schemes/mwfhjwy
+- persona_id: p3_rajasthan_widow_support
+  role: distractor_wrong_state
+  scheme_id: 6999a597e00a48eb32037abb
+  scheme_name: Widow/Abandoned/Single Woman Pension Scheme
+  level: state
+  state: Himachal Pradesh
+  topics:
+  - Women Welfare
+  tags:
+  - Financial Assistance
+  - Widow Pension
+  rationale: Strong widow-pension match but wrong state (Himachal Pradesh).
+  source_url: https://www.myscheme.gov.in/schemes/wdenp
+- persona_id: p3_rajasthan_widow_support
+  role: distractor_wrong_state
+  scheme_id: 6999a597e00a48eb32037aaa
+  scheme_name: Pension to Widows and Destitute Women
+  level: state
+  state: Haryana
+  topics:
+  - Women Welfare
+  - Social Welfare
+  tags:
+  - Destitute
+  - Pension
+  - Widow
+  - Widows
+  - Woman
+  rationale: Relevant widow pension scheme but wrong state (Haryana).
+  source_url: https://www.myscheme.gov.in/schemes/ptwadw
+- persona_id: p3_rajasthan_widow_support
+  role: distractor_wrong_state
+  scheme_id: 69999ec7e00a48eb320378a5
+  scheme_name: Widow Pension-West Bengal
+  level: state
+  state: West Bengal
+  topics: []
+  tags:
+  - Financial Assistance
+  - Pension
+  - Social Welfare
+  rationale: Widow pension hit with the wrong state.
+  source_url: https://www.myscheme.gov.in/schemes/wpwb
+- persona_id: p3_rajasthan_widow_support
+  role: distractor_wrong_benefit
+  scheme_id: 6999a2b0e00a48eb320379ac
+  scheme_name: Rajasthan Varishth Patrakar Samman Yojana
+  level: state
+  state: Rajasthan
+  topics:
+  - Senior Citizens
+  tags:
+  - Financial Assistance
+  - Honorarium
+  - Journalist
+  - Senior Citizen
+  rationale: Same-state pension-like naming but wrong beneficiary and benefit type.
+  source_url: https://www.myscheme.gov.in/schemes/rsajsy
+- persona_id: p3_rajasthan_widow_support
+  role: distractor_wrong_benefit
+  scheme_id: 6999a023e00a48eb320378e2
+  scheme_name: Indira Mahila Shakti Prashikshan Evam Kaushal Sanvardhan Yojna -RS-CIT
+  level: state
+  state: Rajasthan
+  topics:
+  - Education
+  - Skill Development
+  - Science & Research
+  tags:
+  - Computer
+  - Education
+  - Empowered
+  - Training
+  rationale: Same-state women support but oriented to training rather than widow pension.
+  source_url: https://www.myscheme.gov.in/schemes/imspeksyrc
+- persona_id: p4_central_pwd_support
+  role: core_positive
+  scheme_id: 69999d6ae00a48eb32037865
+  scheme_name: 'Persons With Disabilities Scheme In Colleges: Higher Education For Persons With Special
+    Needs'
+  level: central
+  topics:
+  - Education
+  - Disability Support
+  tags:
+  - Education
+  - Higher Education
+  - Learning
+  - Persons With Disablities
+  rationale: Strong central support match for a disability certificate holder seeking central schemes.
+  source_url: https://www.myscheme.gov.in/schemes/hepsn
+- persona_id: p4_central_pwd_support
+  role: core_positive
+  scheme_id: 69a522c7e00a48eb32037c11
+  scheme_name: Samarth-Respite Care Scheme
+  level: central
+  topics:
+  - Disability Support
+  tags:
+  - Abandoned
+  - Group Home
+  - Orphan
+  - Person With Disability
+  - Respite And Residential Care
+  rationale: Strong central disability-support hit for care and support variants.
+  source_url: https://www.myscheme.gov.in/schemes/srcs
+- persona_id: p4_central_pwd_support
+  role: core_positive
+  scheme_id: 6999a539e00a48eb32037a88
+  scheme_name: Top Class Education For Students With Disabilities
+  level: central
+  topics:
+  - Education
+  - Disability Support
+  tags:
+  - Books And Stationery
+  - Empowerment
+  - Person With Disability
+  - Scholarship
+  - Student
+  - Tuition Fee
+  rationale: Best central disability education-support scheme.
+  source_url: https://www.myscheme.gov.in/schemes/tce-swd
+- persona_id: p4_central_pwd_support
+  role: core_positive
+  scheme_id: 69999d6ae00a48eb32037821
+  scheme_name: Post Matric Scholarship Students With Disabilities
+  level: central
+  topics:
+  - Education
+  - Disability Support
+  tags:
+  - Degree
+  - Diploma
+  - Graduation
+  - Persons With Disability
+  - Post-Graduation
+  - Post-Matric
+  - Scholarship
+  - Student
+  rationale: Central disability-support scholarship that should surface for study and financial help queries.
+  source_url: https://www.myscheme.gov.in/schemes/post-dis
+- persona_id: p4_central_pwd_support
+  role: core_positive
+  scheme_id: 69999d6ae00a48eb3203781b
+  scheme_name: National Overseas Scholarship For Students With Disabilities
+  level: central
+  topics:
+  - Education
+  - Disability Support
+  - Science & Research
+  tags:
+  - Degree
+  - Empowerment
+  - Higher Education
+  - Person With Disability
+  - PhD
+  - Post-Graduation
+  - Scholarship
+  - Student
+  rationale: Central higher-study fallback for disability support queries.
+  source_url: https://www.myscheme.gov.in/schemes/nos-swd
+- persona_id: p4_central_pwd_support
+  role: central_fallback
+  scheme_id: 6999a597e00a48eb32037b00
+  scheme_name: Free Coaching for Students with Disabilities
+  level: central
+  topics:
+  - Education
+  tags:
+  - Education
+  - Exam Preparation
+  - Learning
+  rationale: Central support for training and preparation variants.
+  source_url: https://www.myscheme.gov.in/schemes/fcfswd
+- persona_id: p4_central_pwd_support
+  role: central_fallback
+  scheme_id: 6999a6cfe00a48eb32037b14
+  scheme_name: Disha - Early Intervention and School Readiness Scheme
+  level: central
+  topics:
+  - Skill Development
+  - Child Welfare
+  - Disability Support
+  tags:
+  - Child
+  - Counselling
+  - Person With Disability
+  - Special Care
+  rationale: Central disability-support scheme that should appear for broad support queries.
+  source_url: https://www.myscheme.gov.in/schemes/deisrs
+- persona_id: p4_central_pwd_support
+  role: distractor_wrong_state
+  scheme_id: 6999a597e00a48eb32037ab4
+  scheme_name: Financial Assistance For Aids And Appliances For Disabled Persons
+  level: state
+  state: Maharashtra
+  topics:
+  - Healthcare
+  - Disability Support
+  tags:
+  - Aids And Appliances
+  - Financial Assistance
+  - Person With Disability
+  - Social Welfare
+  rationale: Strong disability-support match but state-specific to Maharashtra.
+  source_url: https://www.myscheme.gov.in/schemes/faaadp
+- persona_id: p4_central_pwd_support
+  role: distractor_wrong_state
+  scheme_id: 69999d6ae00a48eb32037845
+  scheme_name: The Scheme Of State Award For Disabled
+  level: state
+  state: Maharashtra
+  topics:
+  - Employment
+  - Disability Support
+  tags:
+  - Award
+  - Employment
+  - Persons With Disability
+  - Placement
+  rationale: State-only disability hit from Maharashtra that should not outrank central support.
+  source_url: https://www.myscheme.gov.in/schemes/tssad
+- persona_id: p4_central_pwd_support
+  role: distractor_wrong_state
+  scheme_id: 6999a175e00a48eb32037963
+  scheme_name: Indira Gandhi National Disabled Pension Scheme (Madhya Pradesh)
+  level: state
+  state: Madhya Pradesh
+  topics:
+  - Disability Support
+  tags:
+  - Below Poverty Line
+  - BPL
+  - Differently Abled
+  - Disabled
+  - Pension
+  - Person With Disabilty
+  - PwD
+  rationale: State-level disability pension that should be treated as the wrong-state distractor.
+  source_url: https://www.myscheme.gov.in/schemes/ngndpsmp
+- persona_id: p4_central_pwd_support
+  role: distractor_wrong_benefit
+  scheme_id: 6999a6cfe00a48eb32037b12
+  scheme_name: Atal Beemit Vyakti Kalyan Yojana
+  level: central
+  topics:
+  - Employment
+  tags:
+  - Atal
+  - Employee
+  - Insurance
+  - Insured Person
+  - Unemployment
+  rationale: Employment-oriented but not disability-specific, so it should not outrank true disability
+    support.
+  source_url: https://www.myscheme.gov.in/schemes/abvky
+- persona_id: p5_northeast_st_microbusiness
+  role: core_positive
+  scheme_id: 6999a597e00a48eb32037ac0
+  scheme_name: Chief Minister's Jeevan Jyoti Swaniyojan Yojana
+  level: state
+  state: Assam
+  topics:
+  - Employment
+  tags:
+  - Employment
+  - Jeevan Jyoti
+  - Selfemployed
+  - Unemployed
+  - Youth Empowerment
+  rationale: Best Assam self-employment hit for a small-business persona.
+  source_url: https://www.myscheme.gov.in/schemes/cm-swaniyojan-yojana
+- persona_id: p5_northeast_st_microbusiness
+  role: core_positive
+  scheme_id: 6999a023e00a48eb320378e1
+  scheme_name: Meghalaya Agriculture Response Vehicle Scheme
+  level: state
+  state: Meghalaya
+  topics:
+  - Agriculture
+  - Infrastructure
+  - Entrepreneurship
+  tags:
+  - Agriculture
+  - Entrepreneur
+  - Farmer
+  - Farmers Associations
+  - Financial Aid
+  - Response Vehicle
+  rationale: Relevant Meghalaya enterprise-support scheme for a local producer/business persona.
+  source_url: https://www.myscheme.gov.in/schemes/marvs
+- persona_id: p5_northeast_st_microbusiness
+  role: core_positive
+  scheme_id: 69999ec7e00a48eb320378bc
+  scheme_name: Post Harvest Marketing Scheme
+  level: state
+  state: Meghalaya
+  topics:
+  - Agriculture
+  - Horticulture
+  - Rural Development
+  - Infrastructure
+  - Entrepreneurship
+  tags:
+  - Co-Operative Societies
+  - Farmer
+  - FIG
+  - FPO
+  - Horticulture
+  - Infrastructure
+  - Marketing
+  - Post Harvest
+  - SHG Farmers
+  rationale: Useful Meghalaya marketing and enterprise-support scheme for local business expansion.
+  source_url: https://www.myscheme.gov.in/schemes/phms
+- persona_id: p5_northeast_st_microbusiness
+  role: central_fallback
+  scheme_id: 6999a2b0e00a48eb320379dd
+  scheme_name: '"Marketing Incentive" under the "Handloom Marketing Assistance" Component of the National
+    Handloom Development Programme'
+  level: central
+  topics:
+  - Entrepreneurship
+  - Culture
+  tags:
+  - Handloom
+  - Incentive
+  - Marketing
+  - Textile
+  - Weaver
+  rationale: Best central handloom and weaver marketing-support scheme.
+  source_url: https://www.myscheme.gov.in/schemes/mi-hma-nhdp
+- persona_id: p5_northeast_st_microbusiness
+  role: central_fallback
+  scheme_id: 6999a597e00a48eb32037aed
+  scheme_name: PM Vishwakarma
+  level: central
+  topics:
+  - Skill Development
+  - Culture
+  tags:
+  - Artisans
+  - Craftspeople
+  - Skill Upgradation
+  - Toolkit Incentive
+  rationale: Strong central artisan and craftsperson support scheme.
+  source_url: https://www.myscheme.gov.in/schemes/pmv
+- persona_id: p5_northeast_st_microbusiness
+  role: central_fallback
+  scheme_id: 6999a539e00a48eb32037a86
+  scheme_name: 'Khadi Gramodyog Vikas Yojana: Khadi Vikas Yojana'
+  level: central
+  topics:
+  - Rural Development
+  - Entrepreneurship
+  - Culture
+  tags:
+  - Gramodyog
+  - Interest Subsidy
+  - Khadi
+  - Khadi Artisans
+  - Khadi Production
+  - Village Industries
+  rationale: Central artisan and village-industry support fallback.
+  source_url: https://www.myscheme.gov.in/schemes/kvyoj
+- persona_id: p5_northeast_st_microbusiness
+  role: central_fallback
+  scheme_id: 69999d6ae00a48eb3203781e
+  scheme_name: Stand-Up India
+  level: central
+  topics:
+  - Entrepreneurship
+  tags:
+  - Business
+  - Entrepreneur
+  - Finance
+  - Loan
+  rationale: Generic central entrepreneurship and loan fallback for business growth queries.
+  source_url: https://www.myscheme.gov.in/schemes/sui
+- persona_id: p5_northeast_st_microbusiness
+  role: distractor_wrong_state
+  scheme_id: 6999a32ee00a48eb320379f5
+  scheme_name: Cluster Development Scheme
+  level: state
+  state: Gujarat
+  topics:
+  - Skill Development
+  - Entrepreneurship
+  - Culture
+  tags:
+  - Artisan
+  - Enterprise
+  - Handicraft
+  - Marketing
+  - Subsidy
+  - Training
+  rationale: Artisan and enterprise support but wrong state (Gujarat).
+  source_url: https://www.myscheme.gov.in/schemes/cds-g
+- persona_id: p5_northeast_st_microbusiness
+  role: distractor_wrong_state
+  scheme_id: 6999a539e00a48eb32037a4f
+  scheme_name: Assistance to Handloom Artisans - Uttarakhand
+  level: state
+  state: Uttarakhand
+  topics:
+  - Social Welfare
+  - Culture
+  tags:
+  - Artisans
+  - Craftsmen
+  - Disaster
+  - Disaster Affected Artisans
+  - Handloom
+  rationale: Strong handloom match but wrong state.
+  source_url: https://www.myscheme.gov.in/schemes/handloomartisanuk
+- persona_id: p5_northeast_st_microbusiness
+  role: distractor_wrong_state
+  scheme_id: 6999a822e00a48eb32037b93
+  scheme_name: 'Investment Promotion Scheme (IPS) For Handicraft Artisans: Assistance For Capital Investment
+    To Uplift The Economic Condition Of Artisans/ Persons'
+  level: state
+  state: Dadra & Nagar Haveli and Daman & Diu
+  topics:
+  - Entrepreneurship
+  - Culture
+  tags:
+  - Artisans
+  - Capital Investment
+  - Entrepreneurship
+  - Handicraft Artisans
+  - Incentives
+  - IPS
+  - MSMEs
+  - Reimbursement
+  - Subsidy
+  rationale: Very plausible artisan hit but wrong state.
+  source_url: https://www.myscheme.gov.in/schemes/ipshaaciec
+- persona_id: p5_northeast_st_microbusiness
+  role: distractor_wrong_beneficiary
+  scheme_id: 6999a597e00a48eb32037ac3
+  scheme_name: Swanirbhar Naari
+  level: state
+  state: Assam
+  topics:
+  - Culture
+  tags:
+  - Handloom
+  - Indigenous
+  - Procurement
+  - Weavers
+  rationale: Assam handloom support scheme but women-specific, so it is a wrong-beneficiary distractor
+    unless gender is explicit.
+  source_url: https://www.myscheme.gov.in/schemes/naari

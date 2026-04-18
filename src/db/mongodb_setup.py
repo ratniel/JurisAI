@@ -6,7 +6,7 @@ from loguru import logger
 from pymongo import AsyncMongoClient
 
 from src.config.settings import settings
-from src.data_ingestion.data_models import SchemeDetails
+from src.data_ingestion.data_models import RawSchemeDocument
 
 
 async def init_database() -> AsyncMongoClient[dict[str, Any]]:
@@ -20,7 +20,7 @@ async def init_database() -> AsyncMongoClient[dict[str, Any]]:
         # Initialize Beanie with document models
         await init_beanie(
             database=database,
-            document_models=[SchemeDetails]
+            document_models=[RawSchemeDocument]
         )
 
         logger.info("Successfully initialized MongoDB with Beanie ODM")

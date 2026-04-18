@@ -2,7 +2,7 @@ import asyncio
 import sys
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
+from typing import Any, Awaitable, Callable, Literal
 from urllib.parse import urljoin, urlparse
 
 from loguru import logger
@@ -23,13 +23,18 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.config.settings import settings
-from src.data_ingestion.data_models import SchemeDetails
+from src.data_ingestion.enrichment_pipeline import (
+    build_enriched_scheme,
+    dump_enriched_scheme_for_storage,
+)
+from src.data_ingestion.data_models import RawSchemeDocument
 from src.data_ingestion.utils.scheme_details_utils import (
     scrape_scheme_details,
-    scrape_scheme_faqs,
+    scrape_scheme_faq,
     scrape_scheme_sources_and_references,
 )
 from src.db.mongodb_setup import close_database_connection, init_database
+from src.scheme_contracts import RawSchemeData
 
 
 class ScrapeSchemes:
@@ -72,13 +77,13 @@ class ScrapeSchemes:
     async def __aexit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
         # Clean up resources in reverse order
         if self.context is not None:
-            await self.context.close()
+            await self._safe_close("browser context", self.context.close)
 
         if self.browser is not None:
-            await self.browser.close()
+            await self._safe_close("browser", self.browser.close)
 
         if self.playwright is not None:
-            await self.playwright.stop()
+            await self._safe_close("playwright", self.playwright.stop)
         logger.info("Browser closed")
 
         # Close database connection
@@ -89,6 +94,16 @@ class ScrapeSchemes:
         if self.context is None:
             raise RuntimeError("Browser context is not initialized.")
         return self.context
+
+    async def _safe_close(
+        self,
+        resource_name: str,
+        closer: Callable[[], Awaitable[Any]],
+    ) -> None:
+        try:
+            await closer()
+        except Exception as e:
+            logger.warning(f"Ignoring {resource_name} close error: {e}")
 
     def _resolve_scheme_url(self, href: str) -> str | None:
         normalized_url = urljoin(f"{self.settings.base_url.rstrip('/')}/", href.strip())
@@ -101,14 +116,17 @@ class ScrapeSchemes:
             return None
         return normalized_url
 
-    async def _bulk_upsert_schemes(self, schemes: Sequence[SchemeDetails]) -> int:
+    async def _bulk_upsert_schemes(self, schemes: Sequence[RawSchemeData]) -> int:
         if not schemes:
             return 0
 
-        collection: AsyncCollection[dict[str, Any]] = (
-            SchemeDetails.get_pymongo_collection()
+        if self.client is None:
+            raise RuntimeError("Database client is not initialized.")
+
+        raw_collection: AsyncCollection[dict[str, Any]] = (
+            RawSchemeDocument.get_pymongo_collection()
         )
-        operations = [
+        raw_operations = [
             ReplaceOne(
                 filter={"url": scheme.url},
                 replacement=scheme.model_dump(by_alias=True, exclude_none=True),
@@ -116,8 +134,30 @@ class ScrapeSchemes:
             )
             for scheme in schemes
         ]
-        result = await collection.bulk_write(operations, ordered=False)
-        return result.upserted_count + result.matched_count
+        raw_result = await raw_collection.bulk_write(raw_operations, ordered=False)
+
+        enriched_collection: AsyncCollection[dict[str, Any]] = self.client[
+            settings.database_name
+        ][settings.mongo.schemes_enriched_collection]
+        enriched_operations = [
+            ReplaceOne(
+                filter={"url": scheme.url},
+                replacement=dump_enriched_scheme_for_storage(
+                    build_enriched_scheme(scheme)
+                ),
+                upsert=True,
+            )
+            for scheme in schemes
+        ]
+        enriched_result = await enriched_collection.bulk_write(
+            enriched_operations,
+            ordered=False,
+        )
+
+        return max(
+            raw_result.upserted_count + raw_result.matched_count,
+            enriched_result.upserted_count + enriched_result.matched_count,
+        )
 
     async def _find_existing_schemes(
         self,
@@ -127,7 +167,7 @@ class ScrapeSchemes:
             return set(), {}
 
         collection: AsyncCollection[dict[str, Any]] = (
-            SchemeDetails.get_pymongo_collection()
+            RawSchemeDocument.get_pymongo_collection()
         )
         page_urls = list(set(schemes_on_page.values()))
         page_names = list(set(schemes_on_page.keys()))
@@ -160,13 +200,87 @@ class ScrapeSchemes:
         scheme_name: str,
         scheme_url: str,
         semaphore: asyncio.Semaphore,
-    ) -> SchemeDetails | None:
+    ) -> RawSchemeData | None:
         async with semaphore:
             try:
                 return await self.scrape_scheme(scheme_name, scheme_url)
             except Exception as e:
                 logger.error(f"Error scraping scheme: {scheme_name}. Error: {e}")
                 return None
+
+    async def _persist_scheme_batch(
+        self,
+        scheme_batch: list[RawSchemeData],
+        *,
+        label: str,
+    ) -> int:
+        if not scheme_batch:
+            return 0
+
+        batch_size = len(scheme_batch)
+        persisted_count = await self._bulk_upsert_schemes(scheme_batch)
+        logger.info(f"Persisted {label} batch of {batch_size} schemes in MongoDB")
+        scheme_batch.clear()
+        return persisted_count
+
+    async def _collect_schemes_on_page(
+        self,
+        search_page: Page,
+        *,
+        page_num: int,
+    ) -> dict[str, str]:
+        scheme_divs = await search_page.get_by_role("article").all()
+        schemes_on_page: dict[str, str] = {}
+        for row_num, scheme_div in enumerate(scheme_divs, start=1):
+            try:
+                link_locator = scheme_div.get_by_role("link")
+                scheme_name = (await link_locator.text_content() or "").strip()
+                href = await link_locator.get_attribute("href")
+            except Exception as e:
+                logger.warning(
+                    (
+                        f"Skipping unreadable scheme card on page {page_num + 1}, "
+                        f"row {row_num}: {e}"
+                    )
+                )
+                continue
+
+            if not scheme_name or not href:
+                continue
+
+            scheme_url = self._resolve_scheme_url(href)
+            if scheme_url is None:
+                continue
+            schemes_on_page[scheme_name] = scheme_url
+
+        return schemes_on_page
+
+    async def _advance_pagination(
+        self,
+        search_page: Page,
+        *,
+        page_num: int,
+    ) -> Literal["next", "done", "failed"]:
+        try:
+            pagination_ul = search_page.locator("ul.list-none.flex.flex-wrap")
+            next_page_button = pagination_ul.locator("svg").last
+            button_class = await next_page_button.get_attribute("class") or ""
+            if "cursor-not-allowed" in button_class:
+                logger.success("All pages scraped!")
+                return "done"
+
+            await next_page_button.click()
+            await search_page.wait_for_load_state("networkidle")
+            return "next"
+        except Exception as e:
+            logger.error(
+                (
+                    f"Pagination failed after page {page_num + 1}. "
+                    "Stopping gracefully after flushing pending batch. "
+                    f"Error: {e}"
+                )
+            )
+            return "failed"
 
     async def scrape_all_schemes(self) -> int:
         """
@@ -177,124 +291,138 @@ class ScrapeSchemes:
         """
         try:
             async with self:
-                # Load search page
                 search_page: Page = await self._require_context().new_page()
-                await search_page.goto(self.scheme_search_url)
-                container_selector = (
-                    "div.sm\\:col-span-3.col-span-4.items-center.justify-center"
-                )
-                await search_page.wait_for_selector(container_selector, state="visible")
-
                 saved_count = 0
                 scraped_count = 0
-                scheme_batch: list[SchemeDetails] = []
+                scheme_batch: list[RawSchemeData] = []
                 page_num = 0
-                while True:
-                    scheme_divs = await search_page.get_by_role("article").all()
-                    schemes_on_page: dict[str, str] = {}
-                    for scheme_div in scheme_divs:
-                        link_locator = scheme_div.get_by_role("link")
-                        scheme_name = (await link_locator.text_content() or "").strip()
-                        href = await link_locator.get_attribute("href")
-                        if not scheme_name or not href:
-                            continue
-
-                        scheme_url = self._resolve_scheme_url(href)
-                        if scheme_url is None:
-                            continue
-                        schemes_on_page[scheme_name] = scheme_url
-
-                    existing_urls, existing_name_urls = await self._find_existing_schemes(
-                        schemes_on_page
+                completed_normally = False
+                try:
+                    await search_page.goto(self.scheme_search_url)
+                    container_selector = (
+                        "div.sm\\:col-span-3.col-span-4.items-center.justify-center"
                     )
-                    name_url_mismatches = [
-                        (scheme_name, scheme_url, sorted(existing_name_urls[scheme_name]))
-                        for scheme_name, scheme_url in schemes_on_page.items()
-                        if scheme_name in existing_name_urls
-                        and scheme_url not in existing_name_urls[scheme_name]
-                    ]
-                    if name_url_mismatches:
-                        sample_name, sample_url, sample_existing_urls = name_url_mismatches[
-                            0
-                        ]
-                        logger.warning(
+                    await search_page.wait_for_selector(
+                        container_selector,
+                        state="visible",
+                    )
+
+                    while True:
+                        schemes_on_page = await self._collect_schemes_on_page(
+                            search_page,
+                            page_num=page_num,
+                        )
+
+                        existing_urls, existing_name_urls = (
+                            await self._find_existing_schemes(schemes_on_page)
+                        )
+                        name_url_mismatches = [
                             (
-                                f"Detected {len(name_url_mismatches)} name collision(s) "
-                                "with differing URL(s). "
-                                f"Sample: name='{sample_name}', page_url='{sample_url}', "
-                                f"existing_urls={sample_existing_urls}"
+                                scheme_name,
+                                scheme_url,
+                                sorted(existing_name_urls[scheme_name]),
                             )
+                            for scheme_name, scheme_url in schemes_on_page.items()
+                            if scheme_name in existing_name_urls
+                            and scheme_url not in existing_name_urls[scheme_name]
+                        ]
+                        if name_url_mismatches:
+                            sample_name, sample_url, sample_existing_urls = (
+                                name_url_mismatches[0]
+                            )
+                            logger.warning(
+                                (
+                                    f"Detected {len(name_url_mismatches)} name collision(s) "
+                                    "with differing URL(s). "
+                                    f"Sample: name='{sample_name}', page_url='{sample_url}', "
+                                    f"existing_urls={sample_existing_urls}"
+                                )
+                            )
+
+                        schemes_to_scrape = [
+                            (scheme_name, scheme_url)
+                            for scheme_name, scheme_url in schemes_on_page.items()
+                            if scheme_url not in existing_urls
+                        ]
+                        skipped_existing_count = len(schemes_on_page) - len(
+                            schemes_to_scrape
                         )
-
-                    schemes_to_scrape = [
-                        (scheme_name, scheme_url)
-                        for scheme_name, scheme_url in schemes_on_page.items()
-                        if scheme_url not in existing_urls
-                    ]
-                    skipped_existing_count = len(schemes_on_page) - len(
-                        schemes_to_scrape
-                    )
-                    if skipped_existing_count > 0:
-                        logger.info(
-                            f"Skipping {skipped_existing_count} already-known schemes (url match)."
-                        )
-
-                    semaphore = asyncio.Semaphore(self.max_concurrency)
-                    scrape_tasks = [
-                        self._scrape_scheme_safe(scheme_name, scheme_url, semaphore)
-                        for scheme_name, scheme_url in schemes_to_scrape
-                    ]
-                    scraped_schemes = await asyncio.gather(*scrape_tasks)
-                    for scheme in scraped_schemes:
-                        if scheme is None:
-                            continue
-
-                        scheme_batch.append(scheme)
-                        scraped_count += 1
-
-                        if len(scheme_batch) >= self.batch_size:
-                            saved_count += await self._bulk_upsert_schemes(scheme_batch)
+                        if skipped_existing_count > 0:
                             logger.info(
-                                f"Persisted batch of {len(scheme_batch)} schemes in MongoDB"
+                                (
+                                    "Skipping "
+                                    f"{skipped_existing_count} already-known schemes "
+                                    "(url match)."
+                                )
                             )
-                            scheme_batch.clear()
 
-                    # pagination container
-                    pagination_ul = search_page.locator("ul.list-none.flex.flex-wrap")
-                    next_page_button = pagination_ul.locator("svg").last
+                        semaphore = asyncio.Semaphore(self.max_concurrency)
+                        scrape_tasks = [
+                            self._scrape_scheme_safe(
+                                scheme_name,
+                                scheme_url,
+                                semaphore,
+                            )
+                            for scheme_name, scheme_url in schemes_to_scrape
+                        ]
+                        scraped_schemes = await asyncio.gather(*scrape_tasks)
+                        for scheme in scraped_schemes:
+                            if scheme is None:
+                                continue
 
-                    # check if button is active
-                    button_class = await next_page_button.get_attribute("class") or ""
-                    if "cursor-not-allowed" in button_class:
-                        logger.success("All pages scraped!")
-                        break
+                            scheme_batch.append(scheme)
+                            scraped_count += 1
 
-                    await next_page_button.click()
-                    await search_page.wait_for_load_state("networkidle")
+                            if len(scheme_batch) >= self.batch_size:
+                                saved_count += await self._persist_scheme_batch(
+                                    scheme_batch,
+                                    label="intermediate",
+                                )
 
-                    page_num += 1
+                        pagination_status = await self._advance_pagination(
+                            search_page,
+                            page_num=page_num,
+                        )
+                        if pagination_status == "done":
+                            completed_normally = True
+                            break
+                        if pagination_status == "failed":
+                            break
+
+                        page_num += 1
+                        logger.success(
+                            (
+                                f"Page {page_num} scraped. "
+                                f"Scraped {scraped_count}, persisted {saved_count}."
+                            )
+                        )
+                finally:
+                    saved_count += await self._persist_scheme_batch(
+                        scheme_batch,
+                        label="final",
+                    )
+                    await self._safe_close("search page", search_page.close)
+
+                if completed_normally:
                     logger.success(
                         (
-                            f"Page {page_num} scraped. "
+                            "Scraping complete. "
                             f"Scraped {scraped_count}, persisted {saved_count}."
                         )
                     )
-
-                if scheme_batch:
-                    saved_count += await self._bulk_upsert_schemes(scheme_batch)
-                    logger.info(
-                        f"Persisted final batch of {len(scheme_batch)} schemes in MongoDB"
+                else:
+                    logger.warning(
+                        (
+                            "Scraping stopped early after a recoverable failure. "
+                            f"Scraped {scraped_count}, persisted {saved_count}."
+                        )
                     )
-
-                logger.success(
-                    f"Scraping complete. Scraped {scraped_count}, persisted {saved_count}."
-                )
                 return scraped_count
         except Exception as e:
             logger.error(f"Error in scrape_all_schemes: {e}")
             raise
 
-    async def scrape_scheme(self, scheme_name: str, scheme_url: str) -> SchemeDetails:
+    async def scrape_scheme(self, scheme_name: str, scheme_url: str) -> RawSchemeData:
         """
         1. Load scheme page in a new tab.
         2. Scrape scheme details.
@@ -333,11 +461,11 @@ class ScrapeSchemes:
             # details, benefits, eligibility, etc.
             detail_sections = scroll_div.locator("> div[id]")
             scheme_data = await scrape_scheme_details(detail_sections)
-            faqs = await scrape_scheme_faqs(detail_sections)
+            faq = await scrape_scheme_faq(detail_sections)
             sources = await scrape_scheme_sources_and_references(detail_sections)
             logger.success(f"{scheme_name} scraped successfully")
 
-            return SchemeDetails(
+            return RawSchemeData(
                 url=scheme_url,
                 name=scheme_name,
                 level=level,
@@ -348,7 +476,7 @@ class ScrapeSchemes:
                 eligibility=scheme_data.get("eligibility", ""),
                 application_process=scheme_data.get("application-process", ""),
                 documents_required=scheme_data.get("documents-required", ""),
-                faqs=faqs,
+                faq=faq,
                 sources=sources,
             )
         except Exception as e:

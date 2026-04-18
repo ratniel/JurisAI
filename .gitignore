@@ -16,3 +16,12 @@ wheels/
 .cursor/
 .cursorindexingignore
 .specstory/
+
+# architecture diagrams
+docs/arch_diags/
+
+.DS_Store
+
+# generated retrieval-eval run artifacts
+eval/retrieval/runs/*.json
+evals/retrieval/runs/*.json
