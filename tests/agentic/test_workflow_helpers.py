@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import Mock
+
+from bson import ObjectId
 
 from src.agentic.fact_utils import aggregate_intent_facts
 from src.agentic.models import (
@@ -17,6 +20,7 @@ from src.agentic.workflow import (
     build_top_schemes_artifact,
     fallback_retrieval_plan,
     merge_retrieved_scheme_results,
+    BasicAgenticWorkflow,
     preferred_hydration_collections,
 )
 from src.agentic.models import RetrievalToolName
@@ -321,6 +325,123 @@ class WorkflowHelperTests(unittest.TestCase):
         self.assertEqual(artifact.artifact_type, "top_schemes")
         self.assertEqual(artifact.schemes[0].name, "Test Scheme")
         self.assertIn("Scholarship support", artifact.schemes[0].benefits or "")
+
+
+class _FakeCursor:
+    def __init__(self, documents):
+        self._documents = documents
+
+    async def to_list(self, *, length):
+        return list(self._documents)
+
+
+class _FakeCollection:
+    def __init__(self, documents):
+        self.documents = documents
+        self.queries = []
+
+    def find(self, query):
+        self.queries.append(query)
+        requested_ids = set(query["_id"]["$in"])
+        matched = [document for document in self.documents if document["_id"] in requested_ids]
+        return _FakeCursor(matched)
+
+
+class _FakeDatabase:
+    def __init__(self, collections):
+        self._collections = collections
+
+    def __getitem__(self, collection_name):
+        return self._collections[collection_name]
+
+
+class _FakeMongoClient:
+    def __init__(self, databases):
+        self._databases = databases
+        self.closed = False
+
+    def __getitem__(self, database_name):
+        return self._databases[database_name]
+
+    async def close(self):
+        self.closed = True
+
+
+class WorkflowMongoClientTests(unittest.IsolatedAsyncioTestCase):
+    async def test_hydration_reuses_injected_mongo_client_without_closing_it(self) -> None:
+        document_id = ObjectId()
+        enriched_collection = _FakeCollection(
+            [
+                {
+                    "_id": document_id,
+                    "url": "https://example.com/scheme-1",
+                    "name": "Hydrated Scheme",
+                    "level": "state",
+                    "provider": "Maharashtra",
+                    "tags": ["Student"],
+                    "details": "Hydrated details from Mongo.",
+                    "benefits": "Hydrated benefits.",
+                    "eligibility": "Hydrated eligibility.",
+                }
+            ]
+        )
+        fake_client = _FakeMongoClient(
+            {
+                "jurisai": _FakeDatabase(
+                    {
+                        "schemes_enriched": enriched_collection,
+                        "schemes": _FakeCollection([]),
+                    }
+                )
+            }
+        )
+        workflow = BasicAgenticWorkflow(
+            llm=Mock(),
+            classifier=Mock(),
+            retriever=Mock(),
+            mongo_client=fake_client,
+        )
+
+        hydrated = await workflow._hydrate_relevant_schemes(
+            [
+                RetrievedScheme.model_validate(
+                    {
+                        "scheme_id": "scheme-1",
+                        "name": "Scheme 1",
+                        "url": "https://example.com/scheme-1",
+                        "level": "state",
+                        "provider": "Maharashtra",
+                        "provider_type": "state",
+                        "state": "Maharashtra",
+                        "ministry": None,
+                        "tags": ["Student"],
+                        "topics": ["Education"],
+                        "application_modes": {"online": False, "offline": False},
+                        "selected_fields": {},
+                        "mongo_ref": {
+                            "database": "jurisai",
+                            "collection": "schemes",
+                            "document_id": str(document_id),
+                        },
+                        "match_profile": "embedding_a",
+                        "match_score": 0.81,
+                        "matched_profiles": ["embedding_a"],
+                        "profile_scores": {"embedding_a": 0.81},
+                        "match_reasons": ["Strong match."],
+                    }
+                ).model_dump()
+            ]
+        )
+
+        self.assertEqual(len(hydrated), 1)
+        self.assertEqual(hydrated[0].name, "Hydrated Scheme")
+        self.assertEqual(
+            enriched_collection.queries,
+            [{"_id": {"$in": [document_id]}}],
+        )
+        self.assertFalse(fake_client.closed)
+        await workflow.aclose()
+        self.assertFalse(fake_client.closed)
 
 
 if __name__ == "__main__":

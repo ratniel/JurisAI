@@ -48,11 +48,14 @@ async def _run_turn_async(
     session_snapshot: dict[str, Any],
 ) -> AgenticTurnResult:
     workflow = BasicAgenticWorkflow()
-    result = await workflow.run(
-        user_message=user_message,
-        session_snapshot=session_snapshot,
-    )
-    return AgenticTurnResult.model_validate(result)
+    try:
+        result = await workflow.run(
+            user_message=user_message,
+            session_snapshot=session_snapshot,
+        )
+        return AgenticTurnResult.model_validate(result)
+    finally:
+        await workflow.aclose()
 
 
 def _run_turn(

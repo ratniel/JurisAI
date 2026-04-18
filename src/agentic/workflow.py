@@ -537,6 +537,7 @@ class BasicAgenticWorkflow(Workflow):
         classifier: UserIntentClassifier | None = None,
         llm: TextGenerationClient | None = None,
         retriever: QdrantSchemeSearchClient | None = None,
+        mongo_client: AsyncMongoClient[dict[str, Any]] | None = None,
         include_retrieval_debug: bool = False,
         timeout: float = 60.0,
         verbose: bool = False,
@@ -549,7 +550,13 @@ class BasicAgenticWorkflow(Workflow):
         self._classifier = classifier or UserIntentClassifier(llm=self._llm)
         self._retrieval_planner = RetrievalToolPlanner(llm=self._llm)
         self._retriever = retriever or QdrantSchemeSearchClient()
+        self._mongo_client = mongo_client or AsyncMongoClient(settings.mongodb_uri)
+        self._owns_mongo_client = mongo_client is None
         self._include_retrieval_debug = include_retrieval_debug
+
+    async def aclose(self) -> None:
+        if self._owns_mongo_client:
+            await self._mongo_client.close()
 
     @staticmethod
     async def _append_trace_step(
@@ -1091,21 +1098,15 @@ class BasicAgenticWorkflow(Workflow):
 
             span.set_attribute("jurisai.mongo_lookup_group_count", len(grouped_ids))
             documents_by_key: dict[tuple[str, str, str], dict[str, Any]] = {}
-            client: AsyncMongoClient[dict[str, Any]] | None = None
-            try:
-                if grouped_ids:
-                    client = AsyncMongoClient(settings.mongodb_uri)
-                    for (database_name, collection_name), object_ids in grouped_ids.items():
-                        documents = await client[database_name][collection_name].find(
-                            {"_id": {"$in": object_ids}}
-                        ).to_list(length=None)
-                        for document in documents:
-                            documents_by_key[
-                                (database_name, collection_name, str(document["_id"]))
-                            ] = document
-            finally:
-                if client is not None:
-                    await client.close()
+            if grouped_ids:
+                for (database_name, collection_name), object_ids in grouped_ids.items():
+                    documents = await self._mongo_client[database_name][
+                        collection_name
+                    ].find({"_id": {"$in": object_ids}}).to_list(length=None)
+                    for document in documents:
+                        documents_by_key[
+                            (database_name, collection_name, str(document["_id"]))
+                        ] = document
 
             span.set_attribute("jurisai.mongo_document_count", len(documents_by_key))
             hydrated_schemes: list[RelevantScheme] = []
