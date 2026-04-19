@@ -28,3 +28,4 @@ docs/arch_diags/
 # generated retrieval-eval run artifacts
 eval/retrieval/runs/*.json
 evals/retrieval/runs/*.json
+evals/agentic_workflow/runs/*.json
