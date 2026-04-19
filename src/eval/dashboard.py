@@ -1433,7 +1433,7 @@ def create_dashboard(
                         Start it from the repo root with:
 
                         ```bash
-                        /Users/ratniel/JurisAI/.venv/bin/python /Users/ratniel/JurisAI/scripts/run_retrieval_eval_dashboard.py --host 127.0.0.1 --port 7860 --trace-project jurisai-retrieval-eval-dashboard
+                        uv run python scripts/run_retrieval_eval_dashboard.py --host 127.0.0.1 --port 7860 --trace-project jurisai-retrieval-eval-dashboard
                         ```
 
                         Then open [http://127.0.0.1:7860](http://127.0.0.1:7860).
