@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from concurrent.futures import ThreadPoolExecutor
-from collections.abc import Callable
 from typing import Any, TypeVar
 
 from llama_index.llms.google_genai import GoogleGenAI
@@ -34,7 +32,6 @@ class LlamaIndexGoogleGenAIClient:
         self._temperature = temperature
         self._max_retries = max_retries
         self._llm = self._build_llm(self.default_model, temperature=temperature)
-        self._executor = ThreadPoolExecutor(max_workers=4)
 
     def generate_text(
         self,
@@ -54,7 +51,7 @@ class LlamaIndexGoogleGenAIClient:
             prompt=prompt,
             system_instruction=system_instruction,
         )
-        return self._run_in_worker(lambda: llm.complete(full_prompt).text)
+        return llm.complete(full_prompt).text
 
     def generate_structured(
         self,
@@ -76,7 +73,7 @@ class LlamaIndexGoogleGenAIClient:
             prompt=prompt,
             system_instruction=system_instruction,
         )
-        response = self._run_in_worker(lambda: structured_llm.complete(full_prompt))
+        response = structured_llm.complete(full_prompt)
         return response.raw
 
     def _build_llm(
@@ -106,6 +103,3 @@ class LlamaIndexGoogleGenAIClient:
         if not system_instruction:
             return prompt
         return f"System instruction:\n{system_instruction}\n\nUser prompt:\n{prompt}"
-
-    def _run_in_worker(self, fn: Callable[[], Any]) -> Any:
-        return self._executor.submit(fn).result()
