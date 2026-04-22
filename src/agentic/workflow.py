@@ -34,6 +34,8 @@ from src.agentic.models import (
     SessionSnapshot,
     TopSchemeArtifactEntry,
     TopSchemesArtifact,
+    WorkflowAnswerDeltaEvent,
+    WorkflowArtifactReadyEvent,
     WorkflowTraceStep,
     ToolSelectionEvent,
     UserIntentClassification,
@@ -381,6 +383,8 @@ def build_top_schemes_artifact(
                 state=scheme.state,
                 level=scheme.level,
                 provider=scheme.provider,
+                provider_type=scheme.provider_type,
+                ministry=scheme.ministry,
                 details=scheme.details,
                 benefits=scheme.benefits,
                 eligibility=scheme.eligibility,
@@ -397,6 +401,7 @@ def build_top_schemes_artifact(
 
 def build_session_memory(
     *,
+    user_message: str,
     session_snapshot: SessionSnapshot,
     classification: UserIntentClassification,
     decision: OrchestratorDecision,
@@ -405,9 +410,15 @@ def build_session_memory(
 ) -> SessionMemory:
     base_memory = session_snapshot.to_session_memory()
     profile_updates = aggregate_intent_facts(classification.extracted_profile_updates)
+    raw_constraints = aggregate_intent_facts(classification.retrieval_filters)
+    canonical_constraints = build_retrieval_intent_profile(
+        user_message=user_message,
+        retrieval_query=classification.retrieval_query,
+        raw_filters=raw_constraints,
+    ).filters.model_dump(exclude_none=True)
     active_constraints = {
         **base_memory.active_constraints,
-        **aggregate_intent_facts(classification.retrieval_filters),
+        **canonical_constraints,
     }
     recent_scheme_refs = (
         _collect_recent_scheme_refs(relevant_schemes)
@@ -538,10 +549,11 @@ class BasicAgenticWorkflow(Workflow):
         llm: TextGenerationClient | None = None,
         retriever: QdrantSchemeSearchClient | None = None,
         include_retrieval_debug: bool = False,
-        timeout: float = 60.0,
+        timeout: float | None = None,
         verbose: bool = False,
     ) -> None:
-        super().__init__(timeout=timeout, verbose=verbose)
+        resolved_timeout = settings.workflow.timeout_seconds if timeout is None else timeout
+        super().__init__(timeout=resolved_timeout, verbose=verbose)
         self._llm = llm or build_generation_client(
             provider=settings.workflow.generation_provider,
             model=settings.workflow.generation_model,
@@ -799,6 +811,7 @@ class BasicAgenticWorkflow(Workflow):
 
         turn_id = str(await ctx.store.get("turn_id") or _new_turn_id())
         session_memory = build_session_memory(
+            user_message=ev.user_message,
             session_snapshot=ev.session_snapshot,
             classification=ev.classification,
             decision=ev.decision,
@@ -890,6 +903,16 @@ class BasicAgenticWorkflow(Workflow):
                 ),
             )
         )
+        ctx.write_event_to_stream(
+            WorkflowArtifactReadyEvent(
+                artifact_type=top_schemes_artifact.artifact_type,
+                artifact_id=top_schemes_artifact.artifact_id,
+                payload=top_schemes_artifact.model_dump(
+                    mode="json",
+                    exclude_none=True,
+                ),
+            )
+        )
         return ResponseRequestedEvent(
             user_message=ev.user_message,
             session_snapshot=updated_session_snapshot,
@@ -914,6 +937,7 @@ class BasicAgenticWorkflow(Workflow):
             )
         else:
             session_memory = build_session_memory(
+                user_message=ev.user_message,
                 session_snapshot=ev.session_snapshot,
                 classification=ev.classification,
                 decision=ev.decision,
@@ -942,16 +966,34 @@ class BasicAgenticWorkflow(Workflow):
                 else None
             ),
         }
-        reply = self._llm.generate_text(
-            _build_reply_prompt(
-                user_message=ev.user_message,
-                session_memory=session_memory,
-                grounding_pack=current_grounding_pack,
-            ),
-            system_instruction=REPLY_SYSTEM_PROMPT,
-            model=settings.workflow.generation_model,
-            temperature=0.2,
+        reply_prompt = _build_reply_prompt(
+            user_message=ev.user_message,
+            session_memory=session_memory,
+            grounding_pack=current_grounding_pack,
         )
+        reply_parts: list[str] = []
+        astream_text = getattr(self._llm, "astream_text", None)
+        if callable(astream_text):
+            async for chunk in astream_text(
+                reply_prompt,
+                system_instruction=REPLY_SYSTEM_PROMPT,
+                model=settings.workflow.generation_model,
+                temperature=0.2,
+            ):
+                if not chunk:
+                    continue
+                reply_parts.append(chunk)
+                ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=chunk))
+            reply = "".join(reply_parts)
+        else:
+            reply = self._llm.generate_text(
+                reply_prompt,
+                system_instruction=REPLY_SYSTEM_PROMPT,
+                model=settings.workflow.generation_model,
+                temperature=0.2,
+            )
+            if reply:
+                ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=reply))
 
         decision = ev.decision.model_copy(update={"response": reply.strip()})
         await ctx.store.set("response", decision.response)

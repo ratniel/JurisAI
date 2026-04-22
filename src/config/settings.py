@@ -215,6 +215,13 @@ class WorkflowSettings(BaseModel):
             "WORKFLOW_GENERATION_MODEL",
         ),
     )
+    timeout_seconds: float = Field(
+        default=180.0,
+        validation_alias=AliasChoices(
+            "timeout_seconds",
+            "WORKFLOW_TIMEOUT_SECONDS",
+        ),
+    )
     intent_provider: Literal[
         "gemini", "llamaindex_google", "local_openai", "openrouter"
     ] = Field(
@@ -258,6 +265,45 @@ class PhoenixSettings(BaseModel):
     api_key: str | None = Field(
         default=None,
         validation_alias=AliasChoices("api_key", "PHOENIX_API_KEY"),
+    )
+
+
+class ApiSettings(BaseModel):
+    """HTTP API and frontend integration settings."""
+
+    host: str = Field(
+        default="127.0.0.1",
+        validation_alias=AliasChoices("host", "API_HOST"),
+    )
+    port: int = Field(
+        default=8000,
+        validation_alias=AliasChoices("port", "API_PORT"),
+    )
+    reload: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("reload", "API_RELOAD"),
+    )
+    cors_origins: tuple[str, ...] = Field(
+        default=("http://127.0.0.1:5173", "http://localhost:5173"),
+        validation_alias=AliasChoices("cors_origins", "API_CORS_ORIGINS"),
+    )
+    chat_sessions_collection: str = Field(
+        default="chat_sessions",
+        validation_alias=AliasChoices(
+            "chat_sessions_collection",
+            "CHAT_SESSIONS_COLLECTION",
+        ),
+    )
+    chat_runs_collection: str = Field(
+        default="chat_runs",
+        validation_alias=AliasChoices(
+            "chat_runs_collection",
+            "CHAT_RUNS_COLLECTION",
+        ),
+    )
+    frontend_dist_dir: str = Field(
+        default="web/dist",
+        validation_alias=AliasChoices("frontend_dist_dir", "FRONTEND_DIST_DIR"),
     )
 
 
@@ -328,6 +374,7 @@ class Settings(BaseSettings):
     openrouter: OpenRouterSettings = Field(default_factory=OpenRouterSettings)
     workflow: WorkflowSettings = Field(default_factory=WorkflowSettings)
     phoenix: PhoenixSettings = Field(default_factory=PhoenixSettings)
+    api: ApiSettings = Field(default_factory=ApiSettings)
     eval: RetrievalEvalSettings = Field(default_factory=RetrievalEvalSettings)
     legacy_mongodb_uri: str | None = Field(
         default=None,

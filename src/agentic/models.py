@@ -100,6 +100,8 @@ class TopSchemeArtifactEntry(BaseModel):
     state: str | None = None
     level: str | None = None
     provider: str | None = None
+    provider_type: str | None = None
+    ministry: str | None = None
     details: str | None = None
     benefits: str | None = None
     eligibility: str | None = None
@@ -417,6 +419,20 @@ class WorkflowStatusEvent(Event):
 
     stage: str
     detail: str
+
+
+class WorkflowAnswerDeltaEvent(Event):
+    """Streaming answer text delta emitted during final generation."""
+
+    delta: str
+
+
+class WorkflowArtifactReadyEvent(Event):
+    """Signal that a UI-facing artifact is ready to render."""
+
+    artifact_type: str
+    artifact_id: str
+    payload: dict[str, Any] = Field(default_factory=dict)
 
 
 class IntentClassifiedEvent(Event):
