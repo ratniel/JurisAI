@@ -21,9 +21,9 @@ from src.eval.quality_gates import (
 )
 from src.eval.retrieval_eval import (
     _build_summary,
-    _finalize_summary,
     _flush_tracing,
     _select_records,
+    _span_id_hex,
     _trace_id_hex,
     reciprocal_rank,
     write_run_artifact,
@@ -42,6 +42,13 @@ def default_agentic_workflow_output_path(
 ) -> Path:
     timestamp = (started_at or datetime.now(tz=UTC)).strftime("%Y%m%dT%H%M%SZ")
     return DEFAULT_RUNS_ROOT / f"agentic_workflow_eval_{timestamp}.json"
+
+
+def _classification_query_value(classification: Any, field_name: str) -> str | None:
+    value = getattr(classification, field_name, None)
+    if value:
+        return str(value)
+    return None
 
 
 def _collect_actual_filters(tool_calls: list[dict[str, Any]]) -> dict[str, Any]:
@@ -70,6 +77,7 @@ def _flatten_debug_profiles(tool_calls: list[dict[str, Any]]) -> dict[str, Any]:
             profiles.append(
                 {
                     "embedding_profile": f"{tool_name}:{profile_name}",
+                    "query_text": profile.get("query_text"),
                     "raw_hit_count": profile.get("raw_hit_count", 0),
                     "raw_hits": profile.get("raw_hits") or [],
                 }
@@ -85,6 +93,10 @@ async def _run_agentic_turn_async(
     intent_model: str,
     generation_provider: GenerationProviderName,
     generation_model: str,
+    embedding_backend: str,
+    embedding_model: str,
+    retrieval_filters_enabled: bool,
+    retrieval_filter_mode: str,
 ) -> AgenticTurnResult:
     from src.retrieval import QdrantSchemeSearchClient
 
@@ -102,8 +114,14 @@ async def _run_agentic_turn_async(
             provider=intent_provider,
             model=intent_model,
         ),
-        retriever=QdrantSchemeSearchClient(collection_name=collection_name),
+        retriever=QdrantSchemeSearchClient(
+            collection_name=collection_name,
+            embedding_backend=embedding_backend,
+            embedding_model=embedding_model,
+        ),
         include_retrieval_debug=True,
+        retrieval_filters_enabled=retrieval_filters_enabled,
+        retrieval_filter_mode=retrieval_filter_mode,
     )
     result = await workflow.run(
         user_message=user_message,
@@ -120,6 +138,10 @@ def _run_agentic_turn(
     intent_model: str,
     generation_provider: GenerationProviderName,
     generation_model: str,
+    embedding_backend: str,
+    embedding_model: str,
+    retrieval_filters_enabled: bool,
+    retrieval_filter_mode: str,
 ) -> AgenticTurnResult:
     return asyncio.run(
         _run_agentic_turn_async(
@@ -129,6 +151,10 @@ def _run_agentic_turn(
             intent_model=intent_model,
             generation_provider=generation_provider,
             generation_model=generation_model,
+            embedding_backend=embedding_backend,
+            embedding_model=embedding_model,
+            retrieval_filters_enabled=retrieval_filters_enabled,
+            retrieval_filter_mode=retrieval_filter_mode,
         )
     )
 
@@ -143,11 +169,15 @@ def iter_agentic_workflow_eval(
     intent_model: str | None = None,
     generation_provider: GenerationProviderName | None = None,
     generation_model: str | None = None,
+    embedding_backend: str | None = None,
+    embedding_model: str | None = None,
     trace_project: str = settings.phoenix.project_name,
     phoenix_endpoint: str | None = settings.phoenix.collector_endpoint,
     output_path: Path | None = None,
     persist_artifact: bool = False,
     record_ids: list[str] | None = None,
+    retrieval_filters_enabled: bool | None = None,
+    retrieval_filter_mode: str | None = None,
 ) -> Iterator[tuple[dict[str, Any], dict[str, Any], int, int]]:
     from src.observability import configure_phoenix_tracing
 
@@ -165,6 +195,20 @@ def iter_agentic_workflow_eval(
         generation_provider or settings.workflow.generation_provider
     )
     resolved_generation_model = generation_model or settings.workflow.generation_model
+    resolved_embedding_backend = embedding_backend or settings.embeddings.backend
+    resolved_embedding_model = embedding_model or settings.embedding_model(
+        resolved_embedding_backend
+    )
+    resolved_retrieval_filters_enabled = (
+        settings.workflow.retrieval_filters_enabled
+        if retrieval_filters_enabled is None
+        else retrieval_filters_enabled
+    )
+    resolved_retrieval_filter_mode = (
+        settings.workflow.retrieval_filter_mode
+        if retrieval_filter_mode is None
+        else retrieval_filter_mode
+    )
     records = _select_records(record_ids)
     started_at = datetime.now(tz=UTC)
 
@@ -183,12 +227,15 @@ def iter_agentic_workflow_eval(
         started_at=started_at
     )
     run_trace_id: str | None = None
+    run_span_id: str | None = None
     final_summary: dict[str, Any] | None = None
     last_record_result: dict[str, Any] | None = None
+    completed_normally = False
 
     try:
         with TRACER.start_as_current_span("jurisai.agentic_workflow_eval.run") as run_span:
             run_trace_id = _trace_id_hex()
+            run_span_id = _span_id_hex()
             run_span.set_attribute("jurisai.eval.record_count", len(records))
             run_span.set_attribute("jurisai.eval.collection", collection_name)
             run_span.set_attribute("jurisai.eval.use_classifier", True)
@@ -199,12 +246,13 @@ def iter_agentic_workflow_eval(
                     "jurisai.agentic_workflow_eval.record"
                 ) as record_span:
                     record_trace_id = _trace_id_hex()
+                    record_span_id = _span_id_hex()
                     record_span.set_attribute("jurisai.eval.record_id", record.record_id)
                     record_span.set_attribute("jurisai.eval.persona_id", record.persona_id)
-
+    
                     workflow_result: AgenticTurnResult | None = None
                     classifier_error: str | None = None
-
+    
                     try:
                         workflow_result = _run_agentic_turn(
                             user_message=record.user_query,
@@ -213,6 +261,10 @@ def iter_agentic_workflow_eval(
                             intent_model=resolved_intent_model,
                             generation_provider=resolved_generation_provider,
                             generation_model=resolved_generation_model,
+                            embedding_backend=resolved_embedding_backend,
+                            embedding_model=resolved_embedding_model,
+                            retrieval_filters_enabled=resolved_retrieval_filters_enabled,
+                            retrieval_filter_mode=resolved_retrieval_filter_mode,
                         )
                     except Exception as exc:  # noqa: BLE001
                         if fail_on_classifier_error:
@@ -223,10 +275,11 @@ def iter_agentic_workflow_eval(
                             "jurisai.eval.workflow_error",
                             classifier_error[:500],
                         )
-
+    
                     if workflow_result is None:
                         classification_payload = None
                         retrieval_query = None
+                        fit_query = None
                         query_topics: list[str] = []
                         query_tags: list[str] = []
                         query_terms: list[str] = []
@@ -247,7 +300,17 @@ def iter_agentic_workflow_eval(
                         tool_payload = workflow_result.decision.tool_payload
                         tool_calls = list(tool_payload.get("tool_calls") or [])
                         results = list(tool_payload.get("retrieved_schemes") or [])[:limit]
-                        retrieval_query = workflow_result.classification.retrieval_query
+                        retrieval_query = _classification_query_value(
+                            workflow_result.classification,
+                            "discovery_query",
+                        ) or _classification_query_value(
+                            workflow_result.classification,
+                            "retrieval_query",
+                        )
+                        fit_query = _classification_query_value(
+                            workflow_result.classification,
+                            "fit_query",
+                        )
                         query_topics = list(tool_payload.get("query_topics") or [])
                         query_tags = list(tool_payload.get("query_tags") or [])
                         query_terms = list(tool_payload.get("query_terms") or [])
@@ -255,6 +318,19 @@ def iter_agentic_workflow_eval(
                         applied_filters = dict(tool_payload.get("applied_filters") or {})
                         ignored_filters = dict(tool_payload.get("ignored_filters") or {})
                         raw_hit_count = int(tool_payload.get("raw_hit_count") or 0)
+                        retrieval_filters_enabled_for_record = bool(
+                            tool_payload.get(
+                                "retrieval_filters_enabled",
+                                resolved_retrieval_filters_enabled,
+                            )
+                        )
+                        retrieval_filter_mode_for_record = str(
+                            tool_payload.get(
+                                "retrieval_filter_mode",
+                                resolved_retrieval_filter_mode,
+                            )
+                        )
+                        candidate_filters = dict(tool_payload.get("candidate_filters") or {})
                         workflow_trace = [
                             step.model_dump(mode="json", exclude_none=True)
                             for step in workflow_result.workflow_trace
@@ -262,11 +338,13 @@ def iter_agentic_workflow_eval(
                         final_answer = workflow_result.decision.response
                         used_classifier_for_record = True
                         debug_payload = (
-                            _flatten_debug_profiles(tool_calls)
-                            if include_debug
-                            else {"profiles": []}
+                            _flatten_debug_profiles(tool_calls) if include_debug else {"profiles": []}
                         )
-
+                    if workflow_result is None:
+                        retrieval_filters_enabled_for_record = resolved_retrieval_filters_enabled
+                        retrieval_filter_mode_for_record = resolved_retrieval_filter_mode
+                        candidate_filters = {}
+    
                     result_ids = [str(item["scheme_id"]) for item in results]
                     positives = set(record.must_retrieve_scheme_ids)
                     distractors = set(record.must_not_retrieve_scheme_ids)
@@ -304,7 +382,7 @@ def iter_agentic_workflow_eval(
                         distractor_pass=bool(distractor_pass),
                         filter_match=bool(filter_match),
                     ) else 0.0
-
+    
                     record_span.set_attribute("jurisai.eval.raw_hit_count", raw_hit_count)
                     record_span.set_attribute("jurisai.eval.returned_count", len(result_ids))
                     record_span.set_attribute("jurisai.eval.recall_at_5", recall_at_5)
@@ -312,7 +390,7 @@ def iter_agentic_workflow_eval(
                         "jurisai.eval.distractor_pass",
                         bool(distractor_pass),
                     )
-
+    
                     recall_at_3_scores.append(recall_at_3)
                     recall_at_5_scores.append(recall_at_5)
                     mrr_at_5_scores.append(mrr_at_5)
@@ -321,11 +399,12 @@ def iter_agentic_workflow_eval(
                     zero_raw_hit_failures.append(1.0 if raw_hit_count == 0 else 0.0)
                     min_recall_passes.append(min_recall_pass)
                     strict_record_passes.append(strict_record_pass)
-
+    
                     record_result = {
                         "record_id": record.record_id,
                         "persona_id": record.persona_id,
                         "trace_id": record_trace_id,
+                        "span_id": record_span_id,
                         "user_query": record.user_query,
                         "expected_filters": record.expected_filters,
                         "required_query_terms": record.required_query_terms,
@@ -338,6 +417,10 @@ def iter_agentic_workflow_eval(
                         "retrieval_query": retrieval_query,
                         "normalized_query": retrieval_query,
                         "embed_query": retrieval_query,
+                        "fit_query": fit_query,
+                        "retrieval_filters_enabled": retrieval_filters_enabled_for_record,
+                        "retrieval_filter_mode": retrieval_filter_mode_for_record,
+                        "candidate_filters": candidate_filters,
                         "query_topics": query_topics,
                         "query_tags": query_tags,
                         "query_terms": query_terms,
@@ -364,10 +447,12 @@ def iter_agentic_workflow_eval(
                         "intent_model": resolved_intent_model,
                         "generation_provider": resolved_generation_provider,
                         "generation_model": resolved_generation_model,
+                        "embedding_backend": resolved_embedding_backend,
+                        "embedding_model": resolved_embedding_model,
                     }
                     per_record.append(record_result)
                     last_record_result = record_result
-
+    
                     final_summary = _build_summary(
                         started_at=started_at,
                         completed_at=None,
@@ -378,6 +463,7 @@ def iter_agentic_workflow_eval(
                         trace_project=trace_project,
                         trace_status=trace_status,
                         run_trace_id=run_trace_id,
+                        run_span_id=run_span_id,
                         per_record=per_record,
                         recall_at_3_scores=recall_at_3_scores,
                         recall_at_5_scores=recall_at_5_scores,
@@ -394,13 +480,18 @@ def iter_agentic_workflow_eval(
                         intent_model=resolved_intent_model,
                         generation_provider=resolved_generation_provider,
                         generation_model=resolved_generation_model,
+                        embedding_backend=resolved_embedding_backend,
+                        embedding_model=resolved_embedding_model,
+                        retrieval_filters_enabled=resolved_retrieval_filters_enabled,
+                        retrieval_filter_mode=resolved_retrieval_filter_mode,
                     )
                     final_summary["eval_mode"] = "agentic_workflow"
                     yield final_summary, record_result, index, len(records)
-    finally:
-        final_summary = _finalize_summary(
+
+        completed_at = datetime.now(tz=UTC)
+        final_summary = _build_summary(
             started_at=started_at,
-            completed_at=datetime.now(tz=UTC),
+            completed_at=completed_at,
             output_path=resolved_output_path,
             collection_name=collection_name,
             include_debug=include_debug,
@@ -408,6 +499,7 @@ def iter_agentic_workflow_eval(
             trace_project=trace_project,
             trace_status=trace_status,
             run_trace_id=run_trace_id,
+            run_span_id=run_span_id,
             per_record=per_record,
             recall_at_3_scores=recall_at_3_scores,
             recall_at_5_scores=recall_at_5_scores,
@@ -424,12 +516,53 @@ def iter_agentic_workflow_eval(
             intent_model=resolved_intent_model,
             generation_provider=resolved_generation_provider,
             generation_model=resolved_generation_model,
-            eval_mode="agentic_workflow",
+            embedding_backend=resolved_embedding_backend,
+            embedding_model=resolved_embedding_model,
+            retrieval_filters_enabled=resolved_retrieval_filters_enabled,
+            retrieval_filter_mode=resolved_retrieval_filter_mode,
         )
-        if persist_artifact:
+        final_summary["eval_mode"] = "agentic_workflow"
+        completed_normally = True
+        yield final_summary, last_record_result or {}, len(records), len(records)
+    finally:
+        if not completed_normally:
+            completed_at = datetime.now(tz=UTC)
+            final_summary = _build_summary(
+                started_at=started_at,
+                completed_at=completed_at,
+                output_path=resolved_output_path,
+                collection_name=collection_name,
+                include_debug=include_debug,
+                limit=limit,
+                trace_project=trace_project,
+                trace_status=trace_status,
+                run_trace_id=run_trace_id,
+                run_span_id=run_span_id,
+                per_record=per_record,
+                recall_at_3_scores=recall_at_3_scores,
+                recall_at_5_scores=recall_at_5_scores,
+                mrr_at_5_scores=mrr_at_5_scores,
+                distractor_scores=distractor_scores,
+                filter_match_scores=filter_match_scores,
+                zero_raw_hit_failures=zero_raw_hit_failures,
+                min_recall_passes=min_recall_passes,
+                strict_record_passes=strict_record_passes,
+                classifier_error_record_ids=classifier_error_record_ids,
+                record_count=len(records) if records else 0,
+                selected_record_ids=record_ids,
+                intent_provider=resolved_intent_provider,
+                intent_model=resolved_intent_model,
+                generation_provider=resolved_generation_provider,
+                generation_model=resolved_generation_model,
+                embedding_backend=resolved_embedding_backend,
+                embedding_model=resolved_embedding_model,
+                retrieval_filters_enabled=resolved_retrieval_filters_enabled,
+                retrieval_filter_mode=resolved_retrieval_filter_mode,
+            )
+            final_summary["eval_mode"] = "agentic_workflow"
+        if persist_artifact and final_summary is not None:
             write_run_artifact(final_summary, resolved_output_path)
         _flush_tracing()
-    yield final_summary, last_record_result or {}, len(records), len(records)
 
 
 def run_agentic_workflow_eval(
@@ -442,11 +575,15 @@ def run_agentic_workflow_eval(
     intent_model: str | None = None,
     generation_provider: GenerationProviderName | None = None,
     generation_model: str | None = None,
+    embedding_backend: str | None = None,
+    embedding_model: str | None = None,
     trace_project: str = settings.phoenix.project_name,
     phoenix_endpoint: str | None = settings.phoenix.collector_endpoint,
     output_path: Path | None = None,
     persist_artifact: bool = True,
     record_ids: list[str] | None = None,
+    retrieval_filters_enabled: bool | None = None,
+    retrieval_filter_mode: str | None = None,
 ) -> dict[str, Any]:
     final_summary: dict[str, Any] | None = None
     for final_summary, _, _, _ in iter_agentic_workflow_eval(
@@ -458,11 +595,15 @@ def run_agentic_workflow_eval(
         intent_model=intent_model,
         generation_provider=generation_provider,
         generation_model=generation_model,
+        embedding_backend=embedding_backend,
+        embedding_model=embedding_model,
         trace_project=trace_project,
         phoenix_endpoint=phoenix_endpoint,
         output_path=output_path,
         persist_artifact=False,
         record_ids=record_ids,
+        retrieval_filters_enabled=retrieval_filters_enabled,
+        retrieval_filter_mode=retrieval_filter_mode,
     ):
         pass
 
@@ -477,6 +618,7 @@ def run_agentic_workflow_eval(
             trace_project=trace_project,
             trace_status={"enabled": False, "detail": "No records were evaluated."},
             run_trace_id=None,
+            run_span_id=None,
             per_record=[],
             recall_at_3_scores=[],
             recall_at_5_scores=[],
@@ -493,6 +635,20 @@ def run_agentic_workflow_eval(
             intent_model=intent_model or settings.workflow.intent_model,
             generation_provider=generation_provider or settings.workflow.generation_provider,
             generation_model=generation_model or settings.workflow.generation_model,
+            embedding_backend=embedding_backend or settings.embeddings.backend,
+            embedding_model=embedding_model or settings.embedding_model(
+                embedding_backend or settings.embeddings.backend
+            ),
+            retrieval_filters_enabled=(
+                settings.workflow.retrieval_filters_enabled
+                if retrieval_filters_enabled is None
+                else retrieval_filters_enabled
+            ),
+            retrieval_filter_mode=(
+                settings.workflow.retrieval_filter_mode
+                if retrieval_filter_mode is None
+                else retrieval_filter_mode
+            ),
         )
     final_summary["eval_mode"] = "agentic_workflow"
 

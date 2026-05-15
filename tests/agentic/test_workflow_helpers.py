@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import Mock
+
+from bson import ObjectId
 
 from src.agentic.fact_utils import aggregate_intent_facts
 from src.agentic.models import (
     IntentFact,
     MongoReference,
+    RetrievalToolCall,
     RetrievedScheme,
     SchemeRef,
     SessionSnapshot,
@@ -17,6 +21,7 @@ from src.agentic.workflow import (
     build_top_schemes_artifact,
     fallback_retrieval_plan,
     merge_retrieved_scheme_results,
+    BasicAgenticWorkflow,
     preferred_hydration_collections,
 )
 from src.agentic.models import RetrievalToolName
@@ -118,7 +123,7 @@ class WorkflowHelperTests(unittest.TestCase):
         self.assertEqual(relevant.provider_type, "state")
         self.assertEqual(relevant.state, "Maharashtra")
         self.assertTrue(relevant.application_modes.online)
-        self.assertIn("Education", relevant.topics)
+        self.assertIn("education", relevant.topics)
 
     def test_session_snapshot_to_session_memory_prefers_scheme_refs(self) -> None:
         session_snapshot = SessionSnapshot(
@@ -158,10 +163,11 @@ class WorkflowHelperTests(unittest.TestCase):
                 "primary_intent": "scheme_discovery",
                 "confidence": 0.9,
                 "user_goal": "Find help",
-                "retrieval_query": "farmer support scheme",
+                "discovery_query": "farmer support scheme",
+                "fit_query": "eligibility: farmer in maharashtra benefits: support or subsidy",
                 "retrieval_filters": [
                     {"key": "state", "value": "Maharashtra"},
-                    {"key": "topics", "value": "Agriculture"},
+                    {"key": "topics", "value": "agriculture"},
                 ],
                 "reasoning": "Benefits lookup.",
             }
@@ -180,6 +186,58 @@ class WorkflowHelperTests(unittest.TestCase):
                 RetrievalToolName.TOPIC_SCOPED_SEARCH,
             ],
         )
+        self.assertEqual(
+            plan.tool_calls[0].fit_query,
+            "eligibility: farmer in maharashtra benefits: support or subsidy",
+        )
+
+    def test_retrieval_tool_call_backfills_fit_query_from_discovery_query(self) -> None:
+        tool_call = RetrievalToolCall.model_validate(
+            {
+                "tool_name": "semantic_search",
+                "query": "student scholarship tamil nadu",
+            }
+        )
+
+        self.assertEqual(tool_call.fit_query, "student scholarship tamil nadu")
+
+    def test_execute_retrieval_tool_call_can_disable_hard_filters(self) -> None:
+        retriever = Mock()
+        retriever.search.return_value = {
+            "results": [],
+            "retrieval_filters_enabled": False,
+            "retrieval_filter_mode": "none",
+            "candidate_filters": {"state": "Maharashtra", "topics": ["agriculture"]},
+            "applied_filters": {},
+            "ignored_filters": {},
+            "raw_hit_count": 0,
+        }
+        workflow = BasicAgenticWorkflow(
+            classifier=Mock(),
+            llm=Mock(),
+            retriever=retriever,
+            mongo_client=Mock(),
+            retrieval_filters_enabled=False,
+        )
+
+        result = workflow._execute_retrieval_tool_call(
+            user_message="Need crop insurance in Maharashtra.",
+            tool_call=RetrievalToolCall(
+                tool_name=RetrievalToolName.STATE_SCOPED_SEARCH,
+                query="crop insurance for farmers",
+                fit_query="eligibility: farmer benefits: crop insurance",
+                state="Maharashtra",
+                topics=["agriculture"],
+            ),
+        )
+
+        retriever.search.assert_called_once()
+        self.assertFalse(retriever.search.call_args.kwargs["enable_filters"])
+        self.assertFalse(result["output_payload"]["retrieval_filters_enabled"])
+        self.assertEqual(
+            result["output_payload"]["candidate_filters"],
+            {"state": "Maharashtra", "topics": ["agriculture"]},
+        )
 
     def test_merge_retrieved_scheme_results_keeps_best_score_across_tool_calls(self) -> None:
         merged = merge_retrieved_scheme_results(
@@ -197,7 +255,7 @@ class WorkflowHelperTests(unittest.TestCase):
                                 "state": "Maharashtra",
                                 "ministry": None,
                                 "tags": [],
-                                "topics": ["Agriculture"],
+                                "topics": ["agriculture"],
                                 "application_modes": {"online": False, "offline": False},
                                 "selected_fields": {},
                                 "mongo_ref": {},
@@ -223,7 +281,7 @@ class WorkflowHelperTests(unittest.TestCase):
                                 "state": "Maharashtra",
                                 "ministry": None,
                                 "tags": [],
-                                "topics": ["Agriculture"],
+                                "topics": ["agriculture"],
                                 "application_modes": {"online": False, "offline": False},
                                 "selected_fields": {},
                                 "mongo_ref": {},
@@ -321,6 +379,123 @@ class WorkflowHelperTests(unittest.TestCase):
         self.assertEqual(artifact.artifact_type, "top_schemes")
         self.assertEqual(artifact.schemes[0].name, "Test Scheme")
         self.assertIn("Scholarship support", artifact.schemes[0].benefits or "")
+
+
+class _FakeCursor:
+    def __init__(self, documents):
+        self._documents = documents
+
+    async def to_list(self, *, length):
+        return list(self._documents)
+
+
+class _FakeCollection:
+    def __init__(self, documents):
+        self.documents = documents
+        self.queries = []
+
+    def find(self, query):
+        self.queries.append(query)
+        requested_ids = set(query["_id"]["$in"])
+        matched = [document for document in self.documents if document["_id"] in requested_ids]
+        return _FakeCursor(matched)
+
+
+class _FakeDatabase:
+    def __init__(self, collections):
+        self._collections = collections
+
+    def __getitem__(self, collection_name):
+        return self._collections[collection_name]
+
+
+class _FakeMongoClient:
+    def __init__(self, databases):
+        self._databases = databases
+        self.closed = False
+
+    def __getitem__(self, database_name):
+        return self._databases[database_name]
+
+    async def close(self):
+        self.closed = True
+
+
+class WorkflowMongoClientTests(unittest.IsolatedAsyncioTestCase):
+    async def test_hydration_reuses_injected_mongo_client_without_closing_it(self) -> None:
+        document_id = ObjectId()
+        enriched_collection = _FakeCollection(
+            [
+                {
+                    "_id": document_id,
+                    "url": "https://example.com/scheme-1",
+                    "name": "Hydrated Scheme",
+                    "level": "state",
+                    "provider": "Maharashtra",
+                    "tags": ["Student"],
+                    "details": "Hydrated details from Mongo.",
+                    "benefits": "Hydrated benefits.",
+                    "eligibility": "Hydrated eligibility.",
+                }
+            ]
+        )
+        fake_client = _FakeMongoClient(
+            {
+                "jurisai": _FakeDatabase(
+                    {
+                        "schemes_enriched": enriched_collection,
+                        "schemes": _FakeCollection([]),
+                    }
+                )
+            }
+        )
+        workflow = BasicAgenticWorkflow(
+            llm=Mock(),
+            classifier=Mock(),
+            retriever=Mock(),
+            mongo_client=fake_client,
+        )
+
+        hydrated = await workflow._hydrate_relevant_schemes(
+            [
+                RetrievedScheme.model_validate(
+                    {
+                        "scheme_id": "scheme-1",
+                        "name": "Scheme 1",
+                        "url": "https://example.com/scheme-1",
+                        "level": "state",
+                        "provider": "Maharashtra",
+                        "provider_type": "state",
+                        "state": "Maharashtra",
+                        "ministry": None,
+                        "tags": ["Student"],
+                        "topics": ["Education"],
+                        "application_modes": {"online": False, "offline": False},
+                        "selected_fields": {},
+                        "mongo_ref": {
+                            "database": "jurisai",
+                            "collection": "schemes",
+                            "document_id": str(document_id),
+                        },
+                        "match_profile": "embedding_a",
+                        "match_score": 0.81,
+                        "matched_profiles": ["embedding_a"],
+                        "profile_scores": {"embedding_a": 0.81},
+                        "match_reasons": ["Strong match."],
+                    }
+                ).model_dump()
+            ]
+        )
+
+        self.assertEqual(len(hydrated), 1)
+        self.assertEqual(hydrated[0].name, "Hydrated Scheme")
+        self.assertEqual(
+            enriched_collection.queries,
+            [{"_id": {"$in": [document_id]}}],
+        )
+        self.assertFalse(fake_client.closed)
+        await workflow.aclose()
+        self.assertFalse(fake_client.closed)
 
 
 if __name__ == "__main__":

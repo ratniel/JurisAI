@@ -34,6 +34,8 @@ from src.agentic.models import (
     SessionSnapshot,
     TopSchemeArtifactEntry,
     TopSchemesArtifact,
+    WorkflowAnswerDeltaEvent,
+    WorkflowArtifactReadyEvent,
     WorkflowTraceStep,
     ToolSelectionEvent,
     UserIntentClassification,
@@ -107,6 +109,7 @@ def coerce_retrieval_plan(
     *,
     plan: RetrievalPlan | None,
     default_query: str,
+    default_fit_query: str | None = None,
 ) -> RetrievalPlan:
     if plan is None:
         return RetrievalPlan()
@@ -114,10 +117,12 @@ def coerce_retrieval_plan(
     tool_calls: list[RetrievalToolCall] = []
     for call in plan.tool_calls[:3]:
         query = normalize_text(call.query) or default_query
+        fit_query = normalize_text(call.fit_query) or default_fit_query or query
         tool_calls.append(
             call.model_copy(
                 update={
                     "query": query,
+                    "fit_query": fit_query,
                     "state": normalize_text(call.state),
                     "topics": normalize_topics(call.topics),
                     "reasoning": normalize_text(call.reasoning),
@@ -143,10 +148,12 @@ def fallback_retrieval_plan(
     }
     intent_profile = build_retrieval_intent_profile(
         user_message=user_message,
-        retrieval_query=classification.retrieval_query,
+        retrieval_query=classification.discovery_query or classification.retrieval_query,
+        fit_query=classification.fit_query,
         raw_filters=raw_filters,
     )
-    base_query = intent_profile.normalized_query
+    base_query = intent_profile.discovery_query
+    fit_query = intent_profile.fit_query
     tool_calls: list[RetrievalToolCall] = []
 
     if intent_profile.filters.state:
@@ -154,6 +161,7 @@ def fallback_retrieval_plan(
             RetrievalToolCall(
                 tool_name=RetrievalToolName.STATE_SCOPED_SEARCH,
                 query=base_query,
+                fit_query=fit_query,
                 state=intent_profile.filters.state,
                 topics=list(intent_profile.filters.topics),
                 reasoning="State constraint is explicit or strongly implied.",
@@ -165,6 +173,7 @@ def fallback_retrieval_plan(
             RetrievalToolCall(
                 tool_name=RetrievalToolName.TOPIC_SCOPED_SEARCH,
                 query=base_query,
+                fit_query=fit_query,
                 state=intent_profile.filters.state,
                 topics=list(intent_profile.filters.topics),
                 reasoning="Topic intent is explicit enough to warrant a scoped lookup.",
@@ -176,6 +185,7 @@ def fallback_retrieval_plan(
             RetrievalToolCall(
                 tool_name=RetrievalToolName.SEMANTIC_SEARCH,
                 query=base_query,
+                fit_query=fit_query,
                 reasoning="Fallback to broad semantic search.",
             )
         )
@@ -381,6 +391,8 @@ def build_top_schemes_artifact(
                 state=scheme.state,
                 level=scheme.level,
                 provider=scheme.provider,
+                provider_type=scheme.provider_type,
+                ministry=scheme.ministry,
                 details=scheme.details,
                 benefits=scheme.benefits,
                 eligibility=scheme.eligibility,
@@ -397,6 +409,7 @@ def build_top_schemes_artifact(
 
 def build_session_memory(
     *,
+    user_message: str,
     session_snapshot: SessionSnapshot,
     classification: UserIntentClassification,
     decision: OrchestratorDecision,
@@ -405,9 +418,16 @@ def build_session_memory(
 ) -> SessionMemory:
     base_memory = session_snapshot.to_session_memory()
     profile_updates = aggregate_intent_facts(classification.extracted_profile_updates)
+    raw_constraints = aggregate_intent_facts(classification.retrieval_filters)
+    canonical_constraints = build_retrieval_intent_profile(
+        user_message=user_message,
+        retrieval_query=classification.discovery_query or classification.retrieval_query,
+        fit_query=classification.fit_query,
+        raw_filters=raw_constraints,
+    ).filters.model_dump(exclude_none=True)
     active_constraints = {
         **base_memory.active_constraints,
-        **aggregate_intent_facts(classification.retrieval_filters),
+        **canonical_constraints,
     }
     recent_scheme_refs = (
         _collect_recent_scheme_refs(relevant_schemes)
@@ -537,11 +557,15 @@ class BasicAgenticWorkflow(Workflow):
         classifier: UserIntentClassifier | None = None,
         llm: TextGenerationClient | None = None,
         retriever: QdrantSchemeSearchClient | None = None,
+        mongo_client: AsyncMongoClient[dict[str, Any]] | None = None,
         include_retrieval_debug: bool = False,
-        timeout: float = 60.0,
+        retrieval_filters_enabled: bool | None = None,
+        retrieval_filter_mode: str | None = None,
+        timeout: float | None = None,
         verbose: bool = False,
     ) -> None:
-        super().__init__(timeout=timeout, verbose=verbose)
+        resolved_timeout = settings.workflow.timeout_seconds if timeout is None else timeout
+        super().__init__(timeout=resolved_timeout, verbose=verbose)
         self._llm = llm or build_generation_client(
             provider=settings.workflow.generation_provider,
             model=settings.workflow.generation_model,
@@ -549,7 +573,23 @@ class BasicAgenticWorkflow(Workflow):
         self._classifier = classifier or UserIntentClassifier(llm=self._llm)
         self._retrieval_planner = RetrievalToolPlanner(llm=self._llm)
         self._retriever = retriever or QdrantSchemeSearchClient()
+        self._mongo_client = mongo_client or AsyncMongoClient(settings.mongodb_uri)
+        self._owns_mongo_client = mongo_client is None
         self._include_retrieval_debug = include_retrieval_debug
+        self._retrieval_filters_enabled = (
+            settings.workflow.retrieval_filters_enabled
+            if retrieval_filters_enabled is None
+            else retrieval_filters_enabled
+        )
+        self._retrieval_filter_mode = (
+            settings.workflow.retrieval_filter_mode
+            if retrieval_filter_mode is None
+            else retrieval_filter_mode
+        )
+
+    async def aclose(self) -> None:
+        if self._owns_mongo_client:
+            await self._mongo_client.close()
 
     @staticmethod
     async def _append_trace_step(
@@ -688,7 +728,12 @@ class BasicAgenticWorkflow(Workflow):
             planner_error = str(exc)
             planned = None
 
-        retrieval_plan = coerce_retrieval_plan(plan=planned, default_query=default_query)
+        retrieval_plan = coerce_retrieval_plan(
+            plan=planned,
+            default_query=ev.classification.discovery_query or default_query,
+            default_fit_query=ev.decision.tool_payload.get("fit_query")
+            or ev.classification.fit_query,
+        )
         if not retrieval_plan.tool_calls:
             retrieval_plan = fallback_retrieval_plan(
                 user_message=ev.user_message,
@@ -782,8 +827,10 @@ class BasicAgenticWorkflow(Workflow):
         applied_filters: dict[str, Any] = {}
         ignored_filters: dict[str, Any] = {}
         important_ignored_filters: dict[str, Any] = {}
+        candidate_filters: dict[str, Any] = {}
         normalized_queries: list[str] = []
         raw_hit_count = 0
+        retrieval_filters_enabled = self._retrieval_filters_enabled
         for tool_call in executed_tool_calls:
             output_payload = tool_call["output_payload"]
             normalized_queries.append(output_payload["normalized_query"])
@@ -796,9 +843,17 @@ class BasicAgenticWorkflow(Workflow):
             important_ignored_filters.update(
                 output_payload.get("important_ignored_filters") or {}
             )
+            candidate_filters.update(output_payload.get("candidate_filters") or {})
+            retrieval_filters_enabled = bool(
+                output_payload.get(
+                    "retrieval_filters_enabled",
+                    retrieval_filters_enabled,
+                )
+            )
 
         turn_id = str(await ctx.store.get("turn_id") or _new_turn_id())
         session_memory = build_session_memory(
+            user_message=ev.user_message,
             session_snapshot=ev.session_snapshot,
             classification=ev.classification,
             decision=ev.decision,
@@ -810,6 +865,7 @@ class BasicAgenticWorkflow(Workflow):
             turn_id=turn_id,
             user_message=ev.user_message,
             retrieval_query=ev.decision.tool_payload.get("query")
+            or ev.classification.discovery_query
             or ev.classification.retrieval_query,
             relevant_schemes=relevant_schemes,
             applied_filters=applied_filters,
@@ -843,6 +899,8 @@ class BasicAgenticWorkflow(Workflow):
             "tool_calls": executed_tool_calls,
             "retrieved_schemes": merged_results,
             "relevant_schemes": [scheme.model_dump() for scheme in relevant_schemes],
+            "retrieval_filters_enabled": retrieval_filters_enabled,
+            "candidate_filters": candidate_filters,
             "applied_filters": applied_filters,
             "ignored_filters": ignored_filters,
             "raw_hit_count": raw_hit_count,
@@ -890,6 +948,16 @@ class BasicAgenticWorkflow(Workflow):
                 ),
             )
         )
+        ctx.write_event_to_stream(
+            WorkflowArtifactReadyEvent(
+                artifact_type=top_schemes_artifact.artifact_type,
+                artifact_id=top_schemes_artifact.artifact_id,
+                payload=top_schemes_artifact.model_dump(
+                    mode="json",
+                    exclude_none=True,
+                ),
+            )
+        )
         return ResponseRequestedEvent(
             user_message=ev.user_message,
             session_snapshot=updated_session_snapshot,
@@ -914,6 +982,7 @@ class BasicAgenticWorkflow(Workflow):
             )
         else:
             session_memory = build_session_memory(
+                user_message=ev.user_message,
                 session_snapshot=ev.session_snapshot,
                 classification=ev.classification,
                 decision=ev.decision,
@@ -942,16 +1011,34 @@ class BasicAgenticWorkflow(Workflow):
                 else None
             ),
         }
-        reply = self._llm.generate_text(
-            _build_reply_prompt(
-                user_message=ev.user_message,
-                session_memory=session_memory,
-                grounding_pack=current_grounding_pack,
-            ),
-            system_instruction=REPLY_SYSTEM_PROMPT,
-            model=settings.workflow.generation_model,
-            temperature=0.2,
+        reply_prompt = _build_reply_prompt(
+            user_message=ev.user_message,
+            session_memory=session_memory,
+            grounding_pack=current_grounding_pack,
         )
+        reply_parts: list[str] = []
+        astream_text = getattr(self._llm, "astream_text", None)
+        if callable(astream_text):
+            async for chunk in astream_text(
+                reply_prompt,
+                system_instruction=REPLY_SYSTEM_PROMPT,
+                model=settings.workflow.generation_model,
+                temperature=0.2,
+            ):
+                if not chunk:
+                    continue
+                reply_parts.append(chunk)
+                ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=chunk))
+            reply = "".join(reply_parts)
+        else:
+            reply = self._llm.generate_text(
+                reply_prompt,
+                system_instruction=REPLY_SYSTEM_PROMPT,
+                model=settings.workflow.generation_model,
+                temperature=0.2,
+            )
+            if reply:
+                ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=reply))
 
         decision = ev.decision.model_copy(update={"response": reply.strip()})
         await ctx.store.set("response", decision.response)
@@ -1024,14 +1111,17 @@ class BasicAgenticWorkflow(Workflow):
         intent_profile = build_retrieval_intent_profile(
             user_message=user_message,
             retrieval_query=tool_call.query,
+            fit_query=tool_call.fit_query,
             raw_filters=raw_filters,
         )
         retrieval = self._retriever.search(
-            query_text=intent_profile.normalized_query,
+            query_text=intent_profile.discovery_query,
             raw_filters=intent_profile.filters,
             intent_profile=intent_profile,
             limit=settings.workflow.retrieval_limit,
             include_debug=self._include_retrieval_debug,
+            enable_filters=self._retrieval_filters_enabled,
+            filter_mode=self._retrieval_filter_mode,
         )
         ignored_filters = {
             **intent_profile.ignored_filters,
@@ -1043,13 +1133,19 @@ class BasicAgenticWorkflow(Workflow):
             "input_payload": {
                 "tool_name": tool_call.tool_name.value,
                 "retrieval_query": tool_call.query,
+                "fit_query": tool_call.fit_query,
                 "state": tool_call.state,
                 "topics": tool_call.topics,
                 "raw_filters": raw_filters,
             },
             "output_payload": {
                 "normalized_query": intent_profile.normalized_query,
+                "discovery_query": intent_profile.discovery_query,
+                "fit_query": intent_profile.fit_query,
+                "retrieval_filters_enabled": retrieval["retrieval_filters_enabled"],
+                "retrieval_filter_mode": retrieval["retrieval_filter_mode"],
                 "normalized_filters": intent_profile.filters.model_dump(exclude_none=True),
+                "candidate_filters": retrieval["candidate_filters"],
                 "query_topics": intent_profile.query_topics,
                 "query_tags": intent_profile.query_tags,
                 "query_terms": intent_profile.query_terms,
@@ -1091,21 +1187,15 @@ class BasicAgenticWorkflow(Workflow):
 
             span.set_attribute("jurisai.mongo_lookup_group_count", len(grouped_ids))
             documents_by_key: dict[tuple[str, str, str], dict[str, Any]] = {}
-            client: AsyncMongoClient[dict[str, Any]] | None = None
-            try:
-                if grouped_ids:
-                    client = AsyncMongoClient(settings.mongodb_uri)
-                    for (database_name, collection_name), object_ids in grouped_ids.items():
-                        documents = await client[database_name][collection_name].find(
-                            {"_id": {"$in": object_ids}}
-                        ).to_list(length=None)
-                        for document in documents:
-                            documents_by_key[
-                                (database_name, collection_name, str(document["_id"]))
-                            ] = document
-            finally:
-                if client is not None:
-                    await client.close()
+            if grouped_ids:
+                for (database_name, collection_name), object_ids in grouped_ids.items():
+                    documents = await self._mongo_client[database_name][
+                        collection_name
+                    ].find({"_id": {"$in": object_ids}}).to_list(length=None)
+                    for document in documents:
+                        documents_by_key[
+                            (database_name, collection_name, str(document["_id"]))
+                        ] = document
 
             span.set_attribute("jurisai.mongo_document_count", len(documents_by_key))
             hydrated_schemes: list[RelevantScheme] = []
@@ -1163,7 +1253,8 @@ class BasicAgenticWorkflow(Workflow):
                 next_action=NextAction.CALL_SCHEME_RETRIEVAL,
                 selected_agent="retrieval_planner",
                 tool_payload={
-                    "query": classification.retrieval_query,
+                    "query": classification.discovery_query or classification.retrieval_query,
+                    "fit_query": classification.fit_query,
                     "filters": {
                         **session_snapshot.user_profile,
                         **aggregate_intent_facts(classification.retrieval_filters),

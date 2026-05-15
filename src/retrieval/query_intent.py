@@ -103,6 +103,8 @@ class RetrievalIntentProfile(BaseModel):
 
     raw_query: str
     normalized_query: str
+    discovery_query: str
+    fit_query: str
     filters: SchemeRuleFilters = Field(default_factory=SchemeRuleFilters)
     query_topics: list[str] = Field(default_factory=list)
     query_tags: list[str] = Field(default_factory=list)
@@ -177,13 +179,20 @@ def _canonicalize_raw_filters(
             continue
 
         if canonical_key == "topics":
-            recognized_topics = normalize_topics(values)
+            recognized_value_count = 0
+            recognized_topics: list[str] = []
+            for item in values:
+                item_topics = normalize_topics([item])
+                if not item_topics:
+                    continue
+                recognized_value_count += 1
+                recognized_topics = _merge_unique(recognized_topics, item_topics)
             if recognized_topics:
                 pending["topics"] = _merge_unique(
                     list(pending.get("topics") or []),
                     recognized_topics,
                 )
-            if len(recognized_topics) != len(values):
+            if recognized_value_count != len(values):
                 ignored_filters[key] = value
             continue
 
@@ -240,9 +249,11 @@ def build_retrieval_intent_profile(
     *,
     user_message: str,
     retrieval_query: str | None,
+    fit_query: str | None = None,
     raw_filters: dict[str, Any] | None,
 ) -> RetrievalIntentProfile:
     base_query = _normalize_text(retrieval_query) or _normalize_text(user_message)
+    normalized_fit_query = _normalize_text(fit_query) or base_query
     pending_filters, ignored_filters = _canonicalize_raw_filters(raw_filters)
 
     if not pending_filters.get("state"):
@@ -281,6 +292,8 @@ def build_retrieval_intent_profile(
     return RetrievalIntentProfile(
         raw_query=base_query,
         normalized_query=normalized_query,
+        discovery_query=normalized_query,
+        fit_query=normalized_fit_query,
         filters=filters,
         query_topics=query_topics,
         query_tags=query_tags,

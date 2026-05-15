@@ -59,6 +59,34 @@ def main() -> None:
         default=None,
         help="Optional comma-separated record IDs to evaluate.",
     )
+    parser.add_argument(
+        "--embedding-backend",
+        choices=["local", "gemini"],
+        default=None,
+        help="Override the query embedding backend used during retrieval scoring.",
+    )
+    parser.add_argument(
+        "--embedding-model",
+        default=None,
+        help="Override the query embedding model used during retrieval scoring.",
+    )
+    parser.add_argument(
+        "--retrieval-filter-mode",
+        choices=[
+            "all",
+            "none",
+            "state_only",
+            "topics_only",
+            "state_hard_topics_soft",
+        ],
+        default=None,
+        help="Shared retrieval filter policy to apply during scoring.",
+    )
+    parser.add_argument(
+        "--disable-retrieval-filters",
+        action="store_true",
+        help="Disable hard retrieval filters and rely on query similarity only.",
+    )
     args = parser.parse_args()
 
     output_path = Path(args.output_path) if args.output_path else default_run_output_path()
@@ -72,11 +100,15 @@ def main() -> None:
         collection_name=args.collection,
         include_debug=args.include_debug,
         fail_on_classifier_error=args.fail_on_classifier_error,
+        embedding_backend=args.embedding_backend,
+        embedding_model=args.embedding_model,
         trace_project=settings.phoenix.project_name,
         phoenix_endpoint=settings.phoenix.collector_endpoint,
         output_path=output_path,
         persist_artifact=True,
         record_ids=record_ids,
+        retrieval_filters_enabled=not args.disable_retrieval_filters,
+        retrieval_filter_mode=("none" if args.disable_retrieval_filters else args.retrieval_filter_mode),
     )
     print(json.dumps(summary, indent=2))
     if args.enforce_absolute_gate and summary["absolute_gate_failures"]:

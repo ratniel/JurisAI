@@ -20,6 +20,22 @@ class RetrievalIntentProfileTests(unittest.TestCase):
             profile.normalized_query,
             "maharashtra vidarbha kisan hu crop loss hua kuch govt insurance subsidy scheme batao",
         )
+        self.assertEqual(profile.discovery_query, profile.normalized_query)
+        self.assertEqual(profile.fit_query, profile.normalized_query)
+
+    def test_build_profile_preserves_separate_fit_query(self) -> None:
+        profile = build_retrieval_intent_profile(
+            user_message="Need SC scholarship help in Tamil Nadu.",
+            retrieval_query="tamil nadu sc scholarship support",
+            fit_query="eligibility: sc student in tamil nadu\nbenefits: scholarship or fee support",
+            raw_filters={"state": "Tamil Nadu", "tags": ["SC", "student"]},
+        )
+
+        self.assertEqual(profile.discovery_query, "tamil nadu sc scholarship support")
+        self.assertEqual(
+            profile.fit_query,
+            "eligibility: sc student in tamil nadu benefits: scholarship or fee support",
+        )
 
     def test_build_profile_preserves_state_without_softening_free_text_filters(self) -> None:
         profile = build_retrieval_intent_profile(
@@ -35,7 +51,7 @@ class RetrievalIntentProfileTests(unittest.TestCase):
         self.assertEqual(profile.filters.state, "Maharashtra")
         self.assertEqual(profile.filters.tags, ["Student"])
         self.assertEqual(profile.query_tags, ["Student"])
-        self.assertEqual(profile.query_topics, ["Education"])
+        self.assertEqual(profile.query_topics, ["education"])
         self.assertEqual(
             profile.ignored_filters,
             {
@@ -61,7 +77,7 @@ class RetrievalIntentProfileTests(unittest.TestCase):
 
         self.assertEqual(profile.filters.tags, ["Farmer"])
         self.assertEqual(profile.query_tags, ["Farmer"])
-        self.assertEqual(profile.query_topics, ["Agriculture"])
+        self.assertEqual(profile.query_topics, ["agriculture"])
         self.assertEqual(profile.query_terms, [])
 
     def test_conflicting_scalar_filters_are_ignored_without_dropping_tag_lists(self) -> None:
@@ -109,24 +125,55 @@ class RetrievalIntentProfileTests(unittest.TestCase):
             },
         )
 
-    def test_noncanonical_topic_filter_is_ignored(self) -> None:
+    def test_indicative_topic_filter_maps_to_lowercase_canonical_topic(self) -> None:
         profile = build_retrieval_intent_profile(
-            user_message="Need help to learn computers in Maharashtra.",
-            retrieval_query="computer training schemes for women in Maharashtra",
+            user_message="Need scholarship help in Maharashtra.",
+            retrieval_query="scholarship schemes for women in Maharashtra",
             raw_filters={
                 "state": "Maharashtra",
-                "topics": ["computer training"],
+                "topics": ["scholarship"],
                 "tags": ["women"],
             },
         )
 
         self.assertEqual(profile.filters.state, "Maharashtra")
-        self.assertEqual(profile.filters.topics, [])
+        self.assertEqual(profile.filters.topics, ["education"])
         self.assertEqual(profile.filters.tags, ["Women"])
-        self.assertEqual(profile.query_topics, ["Women Welfare"])
+        self.assertEqual(profile.query_topics, ["education"])
+        self.assertEqual(profile.ignored_filters, {})
+
+    def test_lowercase_and_indicative_topic_filters_are_preserved(self) -> None:
+        profile = build_retrieval_intent_profile(
+            user_message="Need irrigation help for farming in Maharashtra.",
+            retrieval_query="agriculture and irrigation support",
+            raw_filters={
+                "state": "Maharashtra",
+                "topics": ["agriculture", "irrigation"],
+            },
+        )
+
+        self.assertEqual(profile.filters.state, "Maharashtra")
+        self.assertEqual(profile.filters.topics, ["agriculture"])
+        self.assertEqual(profile.query_topics, ["agriculture"])
+        self.assertEqual(profile.ignored_filters, {})
+
+    def test_engineering_topic_filter_maps_to_education_and_science(self) -> None:
+        profile = build_retrieval_intent_profile(
+            user_message="Engineering fees are too high for me in Tamil Nadu.",
+            retrieval_query="engineering scholarship support",
+            raw_filters={
+                "state": "Tamil Nadu",
+                "topics": ["engineering"],
+            },
+        )
+
         self.assertEqual(
-            profile.ignored_filters,
-            {"topics": ["computer training"]},
+            profile.filters.topics,
+            ["education", "science & research"],
+        )
+        self.assertEqual(
+            profile.query_topics,
+            ["education", "science & research"],
         )
 
 

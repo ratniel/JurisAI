@@ -20,9 +20,6 @@ wheels/
 # architecture diagrams
 docs/arch_diags/
 
-# local markdown docs and notes should stay out of git
-*.md
-
 .DS_Store
 
 # generated retrieval-eval run artifacts

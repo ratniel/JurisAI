@@ -215,6 +215,13 @@ class WorkflowSettings(BaseModel):
             "WORKFLOW_GENERATION_MODEL",
         ),
     )
+    timeout_seconds: float = Field(
+        default=180.0,
+        validation_alias=AliasChoices(
+            "timeout_seconds",
+            "WORKFLOW_TIMEOUT_SECONDS",
+        ),
+    )
     intent_provider: Literal[
         "gemini", "llamaindex_google", "local_openai", "openrouter"
     ] = Field(
@@ -236,6 +243,26 @@ class WorkflowSettings(BaseModel):
         validation_alias=AliasChoices(
             "retrieval_limit",
             "WORKFLOW_RETRIEVAL_LIMIT",
+        ),
+    )
+    retrieval_filters_enabled: bool = Field(
+        default=True,
+        validation_alias=AliasChoices(
+            "retrieval_filters_enabled",
+            "WORKFLOW_RETRIEVAL_FILTERS_ENABLED",
+        ),
+    )
+    retrieval_filter_mode: Literal[
+        "all",
+        "none",
+        "state_only",
+        "topics_only",
+        "state_hard_topics_soft",
+    ] = Field(
+        default="state_only",
+        validation_alias=AliasChoices(
+            "retrieval_filter_mode",
+            "WORKFLOW_RETRIEVAL_FILTER_MODE",
         ),
     )
 
