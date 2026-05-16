@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import json
-from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -12,24 +10,9 @@ from src.scheme_contracts import (
     normalize_terms,
     normalize_topics,
 )
-from src.topic_catalog import SCHEME_TOPIC_CATALOG
-
-
-def _load_controlled_tag_lookup() -> dict[str, str]:
-    tags_path = Path(__file__).resolve().parents[2] / "unique_tags.json"
-    try:
-        payload = json.loads(tags_path.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
-
-    unique_tags = payload.get("unique_tags") or []
-    lookup: dict[str, str] = {}
-    for item in unique_tags:
-        normalized = " ".join(str(item).replace("\ufeff", " ").split()).strip()
-        if not normalized:
-            continue
-        lookup[normalized.lower()] = normalized
-    return lookup
+from src.data_ingestion.topic_taxonomy import infer_topics_from_tags
+from src.topic_catalog import CONTROLLED_TOPICS
+from src.topic_catalog import CONTROLLED_TOPIC_SET
 
 STATE_ALIASES: tuple[tuple[str, str], ...] = (
     ("andaman and nicobar islands", "Andaman and Nicobar Islands"),
@@ -75,7 +58,20 @@ STATE_ALIASES: tuple[tuple[str, str], ...] = (
     ("west bengal", "West Bengal"),
 )
 
-CONTROLLED_TAG_LOOKUP = _load_controlled_tag_lookup()
+CONTROLLED_TAG_LOOKUP = {
+    "farmer": "Farmer",
+    "student": "Student",
+    "minority community": "Minority Community",
+    "person with disability": "Person With Disability",
+    "pwd": "Person With Disability",
+    "women": "Women",
+    "woman": "Women",
+    "girl": "Girl",
+    "loan": "Loan",
+    "sc": "SC",
+    "st": "ST",
+    "obc": "OBC",
+}
 
 IMPORTANT_FILTER_KEYS = frozenset(
     {
@@ -101,75 +97,14 @@ SPECIAL_FILTER_KEY_ALIASES: dict[str, str] = {
     "state_name": "state",
 }
 
-QUERY_HINTS: tuple[dict[str, Any], ...] = (
-    {
-        "terms": ("student", "students", "school", "college", "scholarship"),
-        "tags": ("Student",),
-        "topics": ("Education",),
-        "query_terms": ("student", "education"),
-    },
-    {
-        "terms": ("minority", "minorities", "minority community"),
-        "tags": ("Minority Community",),
-        "topics": (),
-        "query_terms": ("minority community",),
-    },
-    {
-        "terms": ("disabled", "disability", "pwd", "person with disability"),
-        "tags": ("Person With Disability",),
-        "topics": ("Disability Support",),
-        "query_terms": ("disability support", "person with disability"),
-    },
-    {
-        "terms": ("women", "woman", "female", "girl", "girls", "mahila"),
-        "tags": ("Women", "Girl"),
-        "topics": ("Women Welfare",),
-        "query_terms": ("women welfare",),
-    },
-    {
-        "terms": ("child", "children", "kid", "kids"),
-        "tags": (),
-        "topics": ("Child Welfare",),
-        "query_terms": ("child welfare",),
-    },
-    {
-        "terms": ("farmer", "farmers", "farming", "agriculture", "kisan", "crop", "fasal"),
-        "tags": ("Farmer",),
-        "topics": ("Agriculture",),
-        "query_terms": ("agriculture",),
-    },
-    {
-        "terms": ("job", "jobs", "employment", "unemployment"),
-        "tags": (),
-        "topics": ("Employment",),
-        "query_terms": ("employment",),
-    },
-    {
-        "terms": ("training", "skill", "skills", "apprentice", "apprenticeship"),
-        "tags": (),
-        "topics": ("Skill Development",),
-        "query_terms": ("skill development",),
-    },
-    {
-        "terms": ("loan", "credit", "bank", "banking", "finance"),
-        "tags": ("Loan",),
-        "topics": ("Financial Inclusion",),
-        "query_terms": ("financial inclusion", "loan"),
-    },
-    {
-        "terms": ("health", "medical", "hospital", "treatment", "insurance"),
-        "tags": ("Insurance",),
-        "topics": ("Healthcare",),
-        "query_terms": ("healthcare",),
-    },
-)
-
 
 class RetrievalIntentProfile(BaseModel):
     """Deterministic query-side intent model used to normalize retrieval requests."""
 
     raw_query: str
     normalized_query: str
+    discovery_query: str
+    fit_query: str
     filters: SchemeRuleFilters = Field(default_factory=SchemeRuleFilters)
     query_topics: list[str] = Field(default_factory=list)
     query_tags: list[str] = Field(default_factory=list)
@@ -188,10 +123,6 @@ def _normalize_key(value: Any) -> str:
     return _normalize_text(value).lower()
 
 
-def _looks_like_free_text_tag(value: str) -> bool:
-    return bool(value) and value == value.lower() and " " not in value
-
-
 def _merge_unique(current: list[str], additions: list[str]) -> list[str]:
     seen = {item.lower() for item in current}
     merged = list(current)
@@ -207,24 +138,6 @@ def _merge_unique(current: list[str], additions: list[str]) -> list[str]:
     return merged
 
 
-def _infer_topics_from_text(text: str) -> list[str]:
-    lowered = _normalize_text(text).lower()
-    inferred: list[str] = []
-
-    for definition in SCHEME_TOPIC_CATALOG.topics:
-        topic_name = definition.label.lower()
-        if topic_name in lowered:
-            inferred.append(definition.label)
-            continue
-
-        for term in definition.indicative_terms:
-            if term.lower() in lowered:
-                inferred.append(definition.label)
-                break
-
-    return normalize_topics(inferred)
-
-
 def _infer_state_from_text(text: str) -> str | None:
     lowered = f" {_normalize_text(text).lower()} "
     for alias, canonical in STATE_ALIASES:
@@ -233,54 +146,10 @@ def _infer_state_from_text(text: str) -> str | None:
     return None
 
 
-def _is_agriculture_insurance_context(text: str) -> bool:
-    lowered = _normalize_text(text).lower()
-    has_insurance = "insurance" in lowered
-    has_agriculture = any(
-        term in lowered
-        for term in ("farmer", "farmers", "farming", "agriculture", "kisan", "crop", "fasal")
-    )
-    return has_insurance and has_agriculture
-
-
-def _normalize_inferred_topics(text: str, topics: list[str]) -> list[str]:
-    normalized_topics = _merge_unique([], topics)
-    if (
-        _is_agriculture_insurance_context(text)
-        and "Agriculture" in normalized_topics
-        and "Healthcare" in normalized_topics
-    ):
-        return [topic for topic in normalized_topics if topic != "Healthcare"]
-    return normalized_topics
-
-
-def _apply_query_hints(
-    *,
-    text: str,
-    query_tags: list[str],
-    query_topics: list[str],
-    query_terms: list[str],
-) -> tuple[list[str], list[str], list[str]]:
-    lowered = _normalize_text(text).lower()
-    agriculture_insurance_context = _is_agriculture_insurance_context(text)
-    for hint in QUERY_HINTS:
-        if not any(term in lowered for term in hint["terms"]):
-            continue
-        if agriculture_insurance_context and "insurance" in hint["terms"]:
-            continue
-        query_tags = _merge_unique(query_tags, list(hint["tags"]))
-        query_topics = _merge_unique(query_topics, list(hint["topics"]))
-        query_terms = _merge_unique(query_terms, list(hint["query_terms"]))
-    return query_tags, query_topics, query_terms
-
-
 def _canonicalize_raw_filters(
     raw_filters: dict[str, Any] | None,
-) -> tuple[dict[str, Any], list[str], list[str], list[str], dict[str, Any]]:
+) -> tuple[dict[str, Any], dict[str, Any]]:
     pending: dict[str, Any] = {}
-    query_tags: list[str] = []
-    query_topics: list[str] = []
-    query_terms: list[str] = []
     ignored_filters: dict[str, Any] = {}
 
     for key, value in (raw_filters or {}).items():
@@ -292,55 +161,54 @@ def _canonicalize_raw_filters(
         values = normalize_terms(value)
 
         if canonical_key in {"demographic", "occupation", "community", "category"}:
-            normalized_text = " ".join(values)
-            query_tags, query_topics, query_terms = _apply_query_hints(
-                text=normalized_text,
-                query_tags=query_tags,
-                query_topics=query_topics,
-                query_terms=query_terms,
-            )
-            if not query_terms:
-                query_terms = _merge_unique(query_terms, values)
+            recognized_tags = [
+                CONTROLLED_TAG_LOOKUP[item.lower()]
+                for item in values
+                if item.lower() in CONTROLLED_TAG_LOOKUP
+            ]
+            if recognized_tags:
+                pending["tags"] = _merge_unique(
+                    list(pending.get("tags") or []),
+                    recognized_tags,
+                )
+            unknown_values = [
+                item for item in values if item.lower() not in CONTROLLED_TAG_LOOKUP
+            ]
+            if unknown_values:
+                ignored_filters[key] = value
             continue
 
         if canonical_key == "topics":
-            pending["topics"] = _merge_unique(
-                list(pending.get("topics") or []),
-                normalize_topics(values),
-            )
+            recognized_value_count = 0
+            recognized_topics: list[str] = []
+            for item in values:
+                item_topics = normalize_topics([item])
+                if not item_topics:
+                    continue
+                recognized_value_count += 1
+                recognized_topics = _merge_unique(recognized_topics, item_topics)
+            if recognized_topics:
+                pending["topics"] = _merge_unique(
+                    list(pending.get("topics") or []),
+                    recognized_topics,
+                )
+            if recognized_value_count != len(values):
+                ignored_filters[key] = value
             continue
 
         if canonical_key == "tags":
-            recognized_tags: list[str] = []
-            unknown_tags: list[str] = []
-            for item in values:
-                normalized = _normalize_text(item)
-                if _looks_like_free_text_tag(normalized):
-                    query_tags, query_topics, query_terms = _apply_query_hints(
-                        text=normalized,
-                        query_tags=query_tags,
-                        query_topics=query_topics,
-                        query_terms=query_terms,
-                    )
-                    query_terms = _merge_unique(query_terms, [normalized])
-                    continue
-                canonical_tag = CONTROLLED_TAG_LOOKUP.get(normalized.lower())
-                if canonical_tag:
-                    recognized_tags.append(canonical_tag)
-                else:
-                    unknown_tags.append(normalized)
-            pending["tags"] = _merge_unique(
-                list(pending.get("tags") or []),
-                recognized_tags,
-            )
-            if unknown_tags:
-                query_tags, query_topics, query_terms = _apply_query_hints(
-                    text=" ".join(unknown_tags),
-                    query_tags=query_tags,
-                    query_topics=query_topics,
-                    query_terms=query_terms,
+            recognized_tags = [
+                CONTROLLED_TAG_LOOKUP[item.lower()]
+                for item in values
+                if item.lower() in CONTROLLED_TAG_LOOKUP
+            ]
+            if recognized_tags:
+                pending["tags"] = _merge_unique(
+                    list(pending.get("tags") or []),
+                    recognized_tags,
                 )
-                query_terms = _merge_unique(query_terms, unknown_tags)
+            if len(recognized_tags) != len(values):
+                ignored_filters[key] = value
             continue
 
         if canonical_key in {
@@ -365,72 +233,33 @@ def _canonicalize_raw_filters(
 
         ignored_filters[key] = value
 
-    return pending, query_tags, query_topics, query_terms, ignored_filters
+    return pending, ignored_filters
 
 
 def _build_normalized_query(
     *,
     query_text: str,
     filters: SchemeRuleFilters,
-    query_topics: list[str],
-    query_tags: list[str],
-    query_terms: list[str],
 ) -> str:
-    normalized = _normalize_text(query_text)
-    lowered = normalized.lower()
-    additions: list[str] = []
-
-    for term in query_terms:
-        if term.lower() not in lowered:
-            additions.append(term)
-
-    for tag in query_tags:
-        if tag.lower() not in lowered:
-            additions.append(tag)
-
-    for topic in query_topics:
-        if topic.lower() not in lowered:
-            additions.append(topic)
-
-    if filters.state and filters.state.lower() not in lowered:
-        additions.append(filters.state)
-
-    if filters.application_mode and filters.application_mode.lower() not in lowered:
-        additions.append(filters.application_mode)
-
-    if additions:
-        return " ".join([normalized, *additions]).strip()
-    return normalized
+    del filters
+    return _normalize_text(query_text)
 
 
 def build_retrieval_intent_profile(
     *,
     user_message: str,
     retrieval_query: str | None,
+    fit_query: str | None = None,
     raw_filters: dict[str, Any] | None,
 ) -> RetrievalIntentProfile:
     base_query = _normalize_text(retrieval_query) or _normalize_text(user_message)
-    pending_filters, query_tags, query_topics, query_terms, ignored_filters = (
-        _canonicalize_raw_filters(raw_filters)
-    )
+    normalized_fit_query = _normalize_text(fit_query) or base_query
+    pending_filters, ignored_filters = _canonicalize_raw_filters(raw_filters)
 
     if not pending_filters.get("state"):
         inferred_state = _infer_state_from_text(f"{user_message} {base_query}")
         if inferred_state:
             pending_filters["state"] = inferred_state
-
-    query_tags, query_topics, query_terms = _apply_query_hints(
-        text=base_query,
-        query_tags=query_tags,
-        query_topics=query_topics,
-        query_terms=query_terms,
-    )
-    query_topics = _normalize_inferred_topics(
-        base_query,
-        _merge_unique(query_topics, _infer_topics_from_text(base_query)),
-    )
-    if not pending_filters.get("topics") and len(query_topics) == 1:
-        pending_filters["topics"] = list(query_topics)
 
     filters, coerced_ignored_filters = coerce_rule_filters(pending_filters)
     ignored_filters = {
@@ -438,12 +267,21 @@ def build_retrieval_intent_profile(
         **coerced_ignored_filters,
     }
 
+    query_tags = list(filters.tags or [])
+    query_terms: list[str] = []
+    if filters.topics:
+        query_topics = list(filters.topics)
+    else:
+        inferred_topics = [
+            topic
+            for topic in infer_topics_from_tags(filters.tags or [])
+            if topic in CONTROLLED_TOPIC_SET
+        ]
+        query_topics = sorted(inferred_topics, key=CONTROLLED_TOPICS.index)
+
     normalized_query = _build_normalized_query(
         query_text=base_query,
         filters=filters,
-        query_topics=query_topics,
-        query_tags=query_tags,
-        query_terms=query_terms,
     )
     important_ignored_filters = {
         key: value
@@ -454,6 +292,8 @@ def build_retrieval_intent_profile(
     return RetrievalIntentProfile(
         raw_query=base_query,
         normalized_query=normalized_query,
+        discovery_query=normalized_query,
+        fit_query=normalized_fit_query,
         filters=filters,
         query_topics=query_topics,
         query_tags=query_tags,

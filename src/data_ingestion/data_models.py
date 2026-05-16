@@ -1,45 +1,61 @@
+from __future__ import annotations
+
 from beanie import Document
-from pydantic import BaseModel, Field
+from pydantic import Field
 from pymongo import ASCENDING, IndexModel
-from typing import Dict, List, Literal
+from typing import Literal
+
+from src.config.settings import settings
+from src.scheme_contracts import SchemeSourceRecord
 
 
-class Source(BaseModel):
-    text: str = Field(..., description="The display text of the source link")
-    url: str = Field(..., description="The URL of the source")
+class RawSchemeDocument(Document):
+    """Beanie document for raw scraped schemes stored in MongoDB."""
 
-
-class SchemeDetails(Document):
-    url: str = Field(..., description="The URL of the scheme")
-    name: str = Field(..., description="The name of the scheme")
+    url: str = Field(..., description="The URL of the scheme.")
+    name: str = Field(..., description="The name of the scheme.")
     level: Literal["central", "state"] = Field(
-        ..., description="The level of the scheme"
+        ...,
+        description="Whether the scheme is central or state-level.",
     )
     provider: str = Field(
-        ..., description="The provider of the scheme, could by a ministry or a state"
+        ...,
+        description="The provider of the scheme, such as a ministry or a state.",
     )
-    tags: List[str] = Field(..., description="The tags of the scheme")
-    details: str = Field(..., description="The details of the scheme")
-    benefits: str = Field(..., description="The benefits of the scheme")
-    eligibility: str = Field(..., description="The eligibility of the scheme")
+    tags: list[str] = Field(default_factory=list, description="Scheme tags.")
+    details: str = Field(default="", description="The details of the scheme.")
+    benefits: str = Field(default="", description="The benefits of the scheme.")
+    eligibility: str = Field(default="", description="The eligibility of the scheme.")
     application_process: str = Field(
-        ..., description="The application process of the scheme"
+        default="",
+        description="The raw application process text scraped from the source page.",
     )
     documents_required: str = Field(
-        ..., description="The documents required for the scheme"
+        default="",
+        description="The documents required for the scheme.",
     )
-    faqs: Dict[str, str] | None = Field(
-        default=None, description="The frequently asked questions of the scheme"
+    faq: str = Field(
+        default="",
+        description="Plain-text FAQ content scraped from the source page.",
     )
-    sources: List[Source] | None = Field(
-        default=None, description="The sources and references of the scheme"
+    sources: list[SchemeSourceRecord] = Field(
+        default_factory=list,
+        description="The sources and references of the scheme.",
     )
 
     class Settings:
-        name = "schemes"
+        name = settings.schemes_collection
         indexes = [
             IndexModel([("url", ASCENDING)], name="idx_scheme_url", unique=True),
             IndexModel([("name", ASCENDING)], name="idx_scheme_name"),
-            IndexModel([("level", ASCENDING), ("provider", ASCENDING)], name="idx_level_provider"),
+            IndexModel(
+                [("level", ASCENDING), ("provider", ASCENDING)],
+                name="idx_level_provider",
+            ),
             IndexModel([("tags", ASCENDING)], name="idx_tags"),
         ]
+
+
+# Backward-compatible aliases for older imports.
+SchemeDetails = RawSchemeDocument
+Source = SchemeSourceRecord

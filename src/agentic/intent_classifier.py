@@ -20,9 +20,14 @@ Be conservative and cheap:
 - prefer out_of_scope when the request is unrelated to the assistant's domain
 
 Set needs_clarification=true only when routing would be materially better with one more question.
-If scheme retrieval would be useful, fill retrieval_query and retrieval_filters using only facts present in the user message or session snapshot.
+If scheme retrieval would be useful, fill discovery_query, fit_query, and retrieval_filters using only facts present in the user message or session snapshot.
 Prefer canonical retrieval filter keys when possible: `state`, `level`, `provider`, `provider_type`, `ministry`, `application_mode`, `tags`, `topics`.
-Preserve important user constraints such as geography, beneficiary type, student status, and channel in the retrieval query text even if you are not sure they belong in a structured filter.
+For discovery_query, write a short grounded query that best matches scheme name and details text.
+For fit_query, write a compact query that best matches eligibility and benefits text, using at most:
+- one `eligibility:` line
+- one `benefits:` line
+Do not repeat the same key multiple times inside fit_query.
+Preserve important user constraints such as geography, beneficiary type, student status, and channel in the query text even if you are not sure they belong in a structured filter.
 Keep reasoning short.
 """.strip()
 

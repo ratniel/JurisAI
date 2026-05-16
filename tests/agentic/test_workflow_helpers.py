@@ -9,6 +9,7 @@ from src.agentic.fact_utils import aggregate_intent_facts
 from src.agentic.models import (
     IntentFact,
     MongoReference,
+    RetrievalToolCall,
     RetrievedScheme,
     SchemeRef,
     SessionSnapshot,
@@ -122,7 +123,7 @@ class WorkflowHelperTests(unittest.TestCase):
         self.assertEqual(relevant.provider_type, "state")
         self.assertEqual(relevant.state, "Maharashtra")
         self.assertTrue(relevant.application_modes.online)
-        self.assertIn("Education", relevant.topics)
+        self.assertIn("education", relevant.topics)
 
     def test_session_snapshot_to_session_memory_prefers_scheme_refs(self) -> None:
         session_snapshot = SessionSnapshot(
@@ -162,10 +163,11 @@ class WorkflowHelperTests(unittest.TestCase):
                 "primary_intent": "scheme_discovery",
                 "confidence": 0.9,
                 "user_goal": "Find help",
-                "retrieval_query": "farmer support scheme",
+                "discovery_query": "farmer support scheme",
+                "fit_query": "eligibility: farmer in maharashtra benefits: support or subsidy",
                 "retrieval_filters": [
                     {"key": "state", "value": "Maharashtra"},
-                    {"key": "topics", "value": "Agriculture"},
+                    {"key": "topics", "value": "agriculture"},
                 ],
                 "reasoning": "Benefits lookup.",
             }
@@ -184,6 +186,58 @@ class WorkflowHelperTests(unittest.TestCase):
                 RetrievalToolName.TOPIC_SCOPED_SEARCH,
             ],
         )
+        self.assertEqual(
+            plan.tool_calls[0].fit_query,
+            "eligibility: farmer in maharashtra benefits: support or subsidy",
+        )
+
+    def test_retrieval_tool_call_backfills_fit_query_from_discovery_query(self) -> None:
+        tool_call = RetrievalToolCall.model_validate(
+            {
+                "tool_name": "semantic_search",
+                "query": "student scholarship tamil nadu",
+            }
+        )
+
+        self.assertEqual(tool_call.fit_query, "student scholarship tamil nadu")
+
+    def test_execute_retrieval_tool_call_can_disable_hard_filters(self) -> None:
+        retriever = Mock()
+        retriever.search.return_value = {
+            "results": [],
+            "retrieval_filters_enabled": False,
+            "retrieval_filter_mode": "none",
+            "candidate_filters": {"state": "Maharashtra", "topics": ["agriculture"]},
+            "applied_filters": {},
+            "ignored_filters": {},
+            "raw_hit_count": 0,
+        }
+        workflow = BasicAgenticWorkflow(
+            classifier=Mock(),
+            llm=Mock(),
+            retriever=retriever,
+            mongo_client=Mock(),
+            retrieval_filters_enabled=False,
+        )
+
+        result = workflow._execute_retrieval_tool_call(
+            user_message="Need crop insurance in Maharashtra.",
+            tool_call=RetrievalToolCall(
+                tool_name=RetrievalToolName.STATE_SCOPED_SEARCH,
+                query="crop insurance for farmers",
+                fit_query="eligibility: farmer benefits: crop insurance",
+                state="Maharashtra",
+                topics=["agriculture"],
+            ),
+        )
+
+        retriever.search.assert_called_once()
+        self.assertFalse(retriever.search.call_args.kwargs["enable_filters"])
+        self.assertFalse(result["output_payload"]["retrieval_filters_enabled"])
+        self.assertEqual(
+            result["output_payload"]["candidate_filters"],
+            {"state": "Maharashtra", "topics": ["agriculture"]},
+        )
 
     def test_merge_retrieved_scheme_results_keeps_best_score_across_tool_calls(self) -> None:
         merged = merge_retrieved_scheme_results(
@@ -201,7 +255,7 @@ class WorkflowHelperTests(unittest.TestCase):
                                 "state": "Maharashtra",
                                 "ministry": None,
                                 "tags": [],
-                                "topics": ["Agriculture"],
+                                "topics": ["agriculture"],
                                 "application_modes": {"online": False, "offline": False},
                                 "selected_fields": {},
                                 "mongo_ref": {},
@@ -227,7 +281,7 @@ class WorkflowHelperTests(unittest.TestCase):
                                 "state": "Maharashtra",
                                 "ministry": None,
                                 "tags": [],
-                                "topics": ["Agriculture"],
+                                "topics": ["agriculture"],
                                 "application_modes": {"online": False, "offline": False},
                                 "selected_fields": {},
                                 "mongo_ref": {},

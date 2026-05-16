@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
+import re
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -71,6 +72,8 @@ TOPIC_COUNT_NOTE = (
     "contains 25 labels. This catalog preserves the full agreed list for now "
     "and keeps the mismatch visible for later consolidation."
 )
+
+_TOPIC_NORMALIZE_RE = re.compile(r"[^a-z0-9]+")
 
 
 SCHEME_TOPIC_CATALOG = TopicCatalog(
@@ -229,9 +232,38 @@ SCHEME_TOPIC_CATALOG = TopicCatalog(
     ),
 )
 
-CONTROLLED_TOPICS: tuple[str, ...] = SCHEME_TOPIC_CATALOG.labels
+def normalize_topic_key(value: str | None) -> str:
+    if not value:
+        return ""
+    return _TOPIC_NORMALIZE_RE.sub(" ", value.lower()).strip()
+
+
+CONTROLLED_TOPICS: tuple[str, ...] = tuple(
+    definition.label.lower() for definition in SCHEME_TOPIC_CATALOG.topics
+)
 CONTROLLED_TOPIC_SET = frozenset(CONTROLLED_TOPICS)
+_CONTROLLED_TOPIC_BY_KEY: dict[str, str] = {}
+for definition in SCHEME_TOPIC_CATALOG.topics:
+    canonical_topic = definition.label.lower()
+    for candidate in (
+        definition.label,
+        definition.label.lower(),
+        definition.slug,
+        definition.slug.replace("-", " "),
+    ):
+        normalized_candidate = normalize_topic_key(candidate)
+        if normalized_candidate:
+            _CONTROLLED_TOPIC_BY_KEY[normalized_candidate] = canonical_topic
+
+
+def canonicalize_topic(value: str | None) -> str | None:
+    normalized_value = normalize_topic_key(value)
+    if not normalized_value:
+        return None
+    return _CONTROLLED_TOPIC_BY_KEY.get(normalized_value)
+
+
 TOPIC_DESCRIPTION_BY_LABEL: dict[str, str] = {
-    definition.label: definition.description
+    definition.label.lower(): definition.description
     for definition in SCHEME_TOPIC_CATALOG.topics
 }

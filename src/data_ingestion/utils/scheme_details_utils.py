@@ -34,14 +34,13 @@ async def scrape_scheme_details(detail_sections: Locator) -> Dict[str, str]:
         raise
 
 
-async def scrape_scheme_faqs(detail_sections: Locator) -> Dict[str, str]:
+async def scrape_scheme_faq(detail_sections: Locator) -> str:
     """
-    Scrapes all Frequently Asked Questions from the scheme details page.
-    It iterates through each question, clicks it to reveal the answer,
-    and stores the Q&A pair.
+    Scrapes all Frequently Asked Questions from the scheme details page
+    and returns them as a single plain-text block.
     """
     try:
-        faqs_data = {}
+        faq_sections: list[str] = []
         page = detail_sections.page
 
         faqs_section = page.locator("#faqs")
@@ -61,15 +60,22 @@ async def scrape_scheme_faqs(detail_sections: Locator) -> Dict[str, str]:
                 await answer_locator.wait_for(state="visible", timeout=5000)
                 answer_text = await answer_locator.text_content()
 
-                faqs_data[question_text.strip()] = (answer_text or "").strip()
+                question = question_text.strip()
+                answer = (answer_text or "").strip()
+                if question and answer:
+                    faq_sections.append(f"Q: {question}\nA: {answer}")
+                elif question:
+                    faq_sections.append(f"Q: {question}")
+                elif answer:
+                    faq_sections.append(f"A: {answer}")
 
             except Exception as e:
                 logger.warning(f"Could not scrape a FAQ item. Error: {e}")
                 pass
 
-        return faqs_data
+        return "\n\n".join(faq_sections).strip()
     except Exception as e:
-        logger.error(f"Error in scrape_scheme_faqs: {e}")
+        logger.error(f"Error in scrape_scheme_faq: {e}")
         raise
 
 

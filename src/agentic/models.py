@@ -5,7 +5,7 @@ from typing import Any
 from uuid import uuid4
 
 from llama_index.core.workflow import Event
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from src.scheme_contracts import (
     EnrichedApplicationModes,
@@ -100,6 +100,8 @@ class TopSchemeArtifactEntry(BaseModel):
     state: str | None = None
     level: str | None = None
     provider: str | None = None
+    provider_type: str | None = None
+    ministry: str | None = None
     details: str | None = None
     benefits: str | None = None
     eligibility: str | None = None
@@ -215,10 +217,22 @@ class UserIntentClassification(BaseModel):
     should_update_user_profile: bool = False
     extracted_profile_updates: list[IntentFact] = Field(default_factory=list)
     retrieval_query: str | None = None
+    discovery_query: str | None = None
+    fit_query: str | None = None
     retrieval_filters: list[IntentFact] = Field(default_factory=list)
     reasoning: str = Field(
         description="Short internal rationale to help the orchestrator route the turn."
     )
+
+    @model_validator(mode="after")
+    def _backfill_profile_queries(self) -> "UserIntentClassification":
+        if self.discovery_query is None and self.retrieval_query is not None:
+            self.discovery_query = self.retrieval_query
+        if self.retrieval_query is None and self.discovery_query is not None:
+            self.retrieval_query = self.discovery_query
+        if self.fit_query is None and self.discovery_query is not None:
+            self.fit_query = self.discovery_query
+        return self
 
 
 class OrchestratorDecision(BaseModel):
@@ -235,9 +249,16 @@ class RetrievalToolCall(BaseModel):
 
     tool_name: RetrievalToolName
     query: str
+    fit_query: str | None = None
     state: str | None = None
     topics: list[str] = Field(default_factory=list)
     reasoning: str | None = None
+
+    @model_validator(mode="after")
+    def _backfill_fit_query(self) -> "RetrievalToolCall":
+        if self.fit_query is None:
+            self.fit_query = self.query
+        return self
 
 
 class RetrievalPlan(BaseModel):
@@ -417,6 +438,20 @@ class WorkflowStatusEvent(Event):
 
     stage: str
     detail: str
+
+
+class WorkflowAnswerDeltaEvent(Event):
+    """Streaming answer text delta emitted during final generation."""
+
+    delta: str
+
+
+class WorkflowArtifactReadyEvent(Event):
+    """Signal that a UI-facing artifact is ready to render."""
+
+    artifact_type: str
+    artifact_id: str
+    payload: dict[str, Any] = Field(default_factory=dict)
 
 
 class IntentClassifiedEvent(Event):

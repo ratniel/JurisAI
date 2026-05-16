@@ -11,7 +11,12 @@ from pydantic import (
     field_validator,
 )
 
-from src.topic_catalog import CONTROLLED_TOPIC_SET, CONTROLLED_TOPICS
+from src.data_ingestion.topic_taxonomy import infer_topics_from_tags
+from src.topic_catalog import (
+    CONTROLLED_TOPIC_SET,
+    CONTROLLED_TOPICS,
+    canonicalize_topic,
+)
 
 SchemeLevel = Literal["central", "state"]
 ProviderType = Literal["state", "ministry", "other"]
@@ -87,10 +92,17 @@ def normalize_topics(value: Any) -> list[str]:
     seen: set[str] = set()
     topics: list[str] = []
     for topic in normalize_terms(value):
-        if topic not in CONTROLLED_TOPIC_SET or topic in seen:
-            continue
-        seen.add(topic)
-        topics.append(topic)
+        canonical_topic = canonicalize_topic(topic)
+        inferred_topics = (
+            [canonical_topic]
+            if canonical_topic is not None
+            else infer_topics_from_tags([topic])
+        )
+        for inferred_topic in inferred_topics:
+            if inferred_topic not in CONTROLLED_TOPIC_SET or inferred_topic in seen:
+                continue
+            seen.add(inferred_topic)
+            topics.append(inferred_topic)
     return sorted(topics, key=CONTROLLED_TOPICS.index)
 
 

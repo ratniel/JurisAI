@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from dataclasses import asdict, dataclass
 
-from src.topic_catalog import CONTROLLED_TOPICS, TOPIC_COUNT_NOTE
+from src.topic_catalog import CONTROLLED_TOPICS, TOPIC_COUNT_NOTE, canonicalize_topic
 
 _NORMALIZE_RE = re.compile(r"[^a-z0-9]+")
 
@@ -83,8 +83,8 @@ EXACT_TOPIC_MAP: dict[str, tuple[str, ...]] = {
     "empolyment": ("Employment",),
     "empowerment": (),
     "energy": ("Energy",),
-    "engineer": ("Science & Research",),
-    "engineering": ("Science & Research",),
+    "engineer": ("Education", "Science & Research"),
+    "engineering": ("Education", "Science & Research"),
     "enterprise": ("Entrepreneurship",),
     "enterprises": ("Entrepreneurship",),
     "entrepreneur": ("Entrepreneurship",),
@@ -842,14 +842,20 @@ def map_tag_to_topics(tag: str) -> TagMappingResult:
 
     exact_topics = EXACT_TOPIC_MAP.get(normalized)
     if exact_topics is not None:
-        matched_topics.update(exact_topics)
+        matched_topics.update(
+            canonical_topic
+            for topic in exact_topics
+            if (canonical_topic := canonicalize_topic(topic)) is not None
+        )
         if exact_topics:
             matched_rules.append(f"exact:{normalized}")
 
     for topic, patterns in _COMPILED_PATTERNS.items():
         for pattern in patterns:
             if pattern.search(normalized):
-                matched_topics.add(topic)
+                canonical_topic = canonicalize_topic(topic)
+                if canonical_topic is not None:
+                    matched_topics.add(canonical_topic)
                 matched_rules.append(f"pattern:{topic}:{pattern.pattern}")
                 break
 

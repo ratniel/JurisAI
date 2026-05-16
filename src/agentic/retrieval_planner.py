@@ -24,6 +24,11 @@ Rules:
 - Choose 1 to 3 tool calls in execution order.
 - Only use `state` and `topics` as structured tool inputs.
 - Do not use level, provider, provider_type, ministry, application_mode, tags, or beneficiary filters as structured inputs.
+- Each tool call should carry:
+  - `query`: a short grounded discovery query for the `name + details` profile
+  - `fit_query`: a compact eligibility and benefits query for the `eligibility + benefits` profile
+- Inside `fit_query`, use at most one `eligibility:` line and one `benefits:` line.
+- Do not repeat the same key multiple times inside `fit_query`.
 - Preserve any other important user constraints only inside the query text.
 - Prefer short, grounded query text.
 - If both state and topic matter, you may either compose multiple tool calls or include both on a single tool call when that is clearly useful.
@@ -71,6 +76,8 @@ def _build_planner_prompt(
         f"- clarification_question: {classification.clarification_question or 'none'}",
         f"- is_followup: {classification.is_followup}",
         f"- retrieval_query: {classification.retrieval_query or 'none'}",
+        f"- discovery_query: {classification.discovery_query or 'none'}",
+        f"- fit_query: {classification.fit_query or 'none'}",
         (
             "- retrieval_filters: "
             f"{json.dumps([fact.model_dump(mode='json') for fact in classification.retrieval_filters], ensure_ascii=True)}"

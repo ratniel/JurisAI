@@ -1,0 +1,109 @@
+- persona_id: p1_vidarbha_farmer
+  title: Struggling Farmer From Vidarbha
+  summary: A financially stressed farmer from the Vidarbha region of Maharashtra asking about crop loss,
+    insurance, and drought-related support.
+  geography: Vidarbha, Maharashtra
+  state_focus:
+  - Maharashtra
+  demographics:
+  - farmer
+  - rural household
+  - financial distress
+  language_registers:
+  - hinglish_problem_first
+  - hindi_transliterated
+  - plain_english
+  retrieval_focus: Maharashtra-aware agricultural help with central crop-insurance and farmer-support
+    fallback.
+  constraints:
+  - state=Maharashtra is important
+  - wrong-state agriculture hits should be demoted
+  - woman-only farmer schemes are distractors unless the query says so
+  notes: The current corpus has thin Maharashtra agriculture coverage, so this persona leans on central
+    schemes plus Maharashtra-aware distractors.
+- persona_id: p2_tamilnadu_sc_student
+  title: Tamil Nadu SC Engineering Student
+  summary: An urban Scheduled Caste engineering aspirant in Tamil Nadu asking about scholarships, tuition,
+    and higher-education support.
+  geography: Tamil Nadu
+  state_focus:
+  - Tamil Nadu
+  demographics:
+  - SC student
+  - engineering student
+  - mobile-first
+  language_registers:
+  - english_explicit
+  - hinglish
+  - short_keyword_style
+  retrieval_focus: Tamil Nadu and central scholarship schemes for Scheduled Caste students.
+  constraints:
+  - state=Tamil Nadu should boost in-state matches
+  - wrong-state SC scholarships are distractors
+  - tribal or minority-only Tamil Nadu schemes are wrong-beneficiary distractors
+- persona_id: p3_rajasthan_widow_support
+  title: Widow Seeking Support In Rajasthan
+  summary: A widowed woman in Rajasthan asking about pension, support, and other financial help after
+    the loss of her husband.
+  geography: Rajasthan
+  state_focus:
+  - Rajasthan
+  demographics:
+  - widow
+  - social welfare seeker
+  language_registers:
+  - hindi_indirect
+  - hinglish
+  - short_keyword_style
+  retrieval_focus: Rajasthan widow pension and women-support schemes with same-topic wrong-state distractors.
+  constraints:
+  - state=Rajasthan should matter strongly
+  - widow/women-support benefit type matters
+  - journalist and generic senior-citizen schemes are distractors
+  notes: The corpus has limited true central widow-specific matches, so this seed set treats Rajasthan
+    state schemes as the strongest positives.
+- persona_id: p4_central_pwd_support
+  title: Central-First PwD Support Seeker
+  summary: A person with disability certificate asking for central support, financial help, and study
+    or care-related schemes.
+  geography: India-wide, central-first
+  state_focus: []
+  demographics:
+  - person with disability
+  - certificate holder
+  language_registers:
+  - english_explicit
+  - hinglish
+  - keyword_style
+  retrieval_focus: Central disability-support schemes, with state-level disability schemes serving as
+    wrong-state distractors.
+  constraints:
+  - central preference matters
+  - state-only disability schemes should not outrank central support
+  - employment-only but non-disability schemes are distractors
+  notes: The strongest central matches skew toward disability support, scholarships, coaching, and care
+    rather than pure employment.
+- persona_id: p5_northeast_st_microbusiness
+  title: Northeast ST Microbusiness Owner
+  summary: A Scheduled Tribe microbusiness owner from Assam or Meghalaya asking about loan, subsidy, artisan,
+    or local-enterprise support.
+  geography: Assam and Meghalaya
+  state_focus:
+  - Assam
+  - Meghalaya
+  demographics:
+  - scheduled tribe
+  - microbusiness
+  - artisan or local enterprise
+  language_registers:
+  - english_explicit
+  - hinglish
+  - short_keyword_style
+  retrieval_focus: Assam/Meghalaya entrepreneurship support with central artisan and business fallback
+    schemes.
+  constraints:
+  - state hints should prefer Assam/Meghalaya
+  - handloom/artisan signals matter
+  - women-only schemes are distractors unless gender is explicit
+  notes: The strongest Northeast corpus support mixes state self-employment schemes with central artisan
+    and entrepreneurship schemes.
