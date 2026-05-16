@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import sys
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -44,10 +45,10 @@ def _render_chat_markdown(turns: list[dict[str, str]]) -> str:
 
 async def _run_turn_async(
     *,
+    workflow: BasicAgenticWorkflow,
     user_message: str,
     session_snapshot: dict[str, Any],
 ) -> AgenticTurnResult:
-    workflow = BasicAgenticWorkflow()
     result = await workflow.run(
         user_message=user_message,
         session_snapshot=session_snapshot,
@@ -56,6 +57,7 @@ async def _run_turn_async(
 
 
 def _run_turn(
+    workflow: BasicAgenticWorkflow,
     user_message: str,
     session_editor_value: str,
     session_state_value: dict[str, Any] | None,
@@ -76,6 +78,7 @@ def _run_turn(
 
     result = asyncio.run(
         _run_turn_async(
+            workflow=workflow,
             user_message=message,
             session_snapshot=session_snapshot.model_dump(mode="json", exclude_none=True),
         )
@@ -113,6 +116,14 @@ def _run_turn(
     )
 
 
+def _close_workflow(workflow: BasicAgenticWorkflow) -> None:
+    loop = asyncio.new_event_loop()
+    try:
+        loop.run_until_complete(workflow.aclose())
+    finally:
+        loop.close()
+
+
 def _reset_session():
     empty_session = SessionSnapshot().model_dump(mode="json", exclude_none=True)
     return (
@@ -134,6 +145,7 @@ def _reset_session():
 
 def create_agentic_debug_ui() -> gr.Blocks:
     initial_session = SessionSnapshot().model_dump(mode="json", exclude_none=True)
+    workflow = BasicAgenticWorkflow()
 
     with gr.Blocks(title="JurisAI Agentic Debug UI") as demo:
         session_state = gr.State(value=initial_session)
@@ -202,7 +214,7 @@ def create_agentic_debug_ui() -> gr.Blocks:
                         )
 
         run_button.click(
-            fn=_run_turn,
+            fn=partial(_run_turn, workflow),
             inputs=[message, session_editor, session_state, turn_history],
             outputs=[
                 session_state,
@@ -220,6 +232,7 @@ def create_agentic_debug_ui() -> gr.Blocks:
                 message,
             ],
         )
+        demo.unload(partial(_close_workflow, workflow))
         reset_button.click(
             fn=_reset_session,
             outputs=[

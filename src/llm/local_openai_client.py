@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from typing import Any, TypeVar
 
-from litellm import completion
+from litellm import BadRequestError, UnsupportedParamsError, completion
 from pydantic import BaseModel
 
 from src.config.settings import settings
@@ -13,6 +14,7 @@ StructuredModelT = TypeVar("StructuredModelT", bound=BaseModel)
 
 _THINK_BLOCK_PATTERN = re.compile(r"<think>.*?</think>\s*", flags=re.DOTALL)
 _CODE_FENCE_PATTERN = re.compile(r"^```(?:json)?\s*|\s*```$", flags=re.IGNORECASE)
+LOGGER = logging.getLogger(__name__)
 
 
 class LocalOpenAICompatibleClient:
@@ -96,7 +98,14 @@ class LocalOpenAICompatibleClient:
                 response_format=response_format,
                 **config_overrides,
             )
-        except Exception:
+        except (BadRequestError, UnsupportedParamsError, TypeError) as exc:
+            if not self._should_retry_without_response_format(exc):
+                raise
+            LOGGER.warning(
+                "Retrying local structured completion without response_format after %s: %s",
+                type(exc).__name__,
+                exc,
+            )
             response = self._completion(
                 messages=self._build_messages(
                     prompt=structured_prompt,
@@ -177,6 +186,17 @@ class LocalOpenAICompatibleClient:
         if not system_instruction:
             return suffix
         return f"{system_instruction}\n\n{suffix}"
+
+    @staticmethod
+    def _should_retry_without_response_format(exc: Exception) -> bool:
+        message = str(exc).lower()
+        if isinstance(exc, (BadRequestError, UnsupportedParamsError)):
+            return (
+                "response_format" in message
+                or "json_object" in message
+                or "unsupported" in message
+            )
+        return "response_format" in message
 
     @staticmethod
     def _extract_text(response: Any) -> str:
