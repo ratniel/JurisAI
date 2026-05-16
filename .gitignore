@@ -26,3 +26,8 @@ docs/arch_diags/
 eval/retrieval/runs/*.json
 evals/retrieval/runs/*.json
 evals/agentic_workflow/runs/*.json
+
+# private working notes
+TODO.md
+completed_tasks.md
+docs/retrieval_status_*.md
