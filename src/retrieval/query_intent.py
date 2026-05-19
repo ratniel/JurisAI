@@ -144,6 +144,23 @@ def _infer_state_from_text(text: str) -> str | None:
     return None
 
 
+def _infer_tags_from_text(text: str) -> list[str]:
+    lowered = f" {_normalize_text(text).lower()} "
+    inferred: list[str] = []
+    seen: set[str] = set()
+
+    for alias, canonical in CONTROLLED_TAG_LOOKUP.items():
+        if f" {alias} " not in lowered:
+            continue
+        lowered_canonical = canonical.lower()
+        if lowered_canonical in seen:
+            continue
+        seen.add(lowered_canonical)
+        inferred.append(canonical)
+
+    return inferred
+
+
 def _canonicalize_raw_filters(
     raw_filters: dict[str, Any] | None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -249,6 +266,13 @@ def build_retrieval_intent_profile(
         inferred_state = _infer_state_from_text(f"{user_message} {base_query}")
         if inferred_state:
             pending_filters["state"] = inferred_state
+
+    inferred_tags = _infer_tags_from_text(f"{user_message} {base_query}")
+    if inferred_tags:
+        pending_filters["tags"] = _merge_unique(
+            list(pending_filters.get("tags") or []),
+            inferred_tags,
+        )
 
     filters, coerced_ignored_filters = coerce_rule_filters(pending_filters)
     ignored_filters = {
