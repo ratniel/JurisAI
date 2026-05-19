@@ -47,6 +47,8 @@ export type TopSchemeArtifactEntry = {
   provider?: string | null
   provider_type?: string | null
   ministry?: string | null
+  tags?: string[]
+  topics?: string[]
   details?: string | null
   benefits?: string | null
   eligibility?: string | null

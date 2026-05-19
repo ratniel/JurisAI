@@ -99,19 +99,20 @@ class ChatRuntimeManager:
     ) -> None:
         run_state = self._active_runs[run.run_id]
         await self._repository.mark_run_running(run.run_id)
-        workflow = BasicAgenticWorkflow()
-
-        await self._publish(
-            run_state,
-            StreamEventEnvelope(
-                event_type="run_started",
-                run_id=run.run_id,
-                session_id=session.session_id,
-                data={"message": run.user_message},
-            ),
-        )
 
         try:
+            workflow = BasicAgenticWorkflow()
+
+            await self._publish(
+                run_state,
+                StreamEventEnvelope(
+                    event_type="run_started",
+                    run_id=run.run_id,
+                    session_id=session.session_id,
+                    data={"message": run.user_message},
+                ),
+            )
+
             handler = workflow.run(
                 user_message=run.user_message,
                 session_snapshot=session.session_snapshot.model_dump(
@@ -245,4 +246,3 @@ class ChatRuntimeManager:
                 },
             )
         return None
-

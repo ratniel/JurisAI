@@ -15,11 +15,12 @@ from src.agentic.workflow import (
     build_grounding_pack,
     build_relevant_scheme_from_lookup_document,
     build_top_schemes_artifact,
+    ensure_retrieval_plan_coverage,
     fallback_retrieval_plan,
     merge_retrieved_scheme_results,
     preferred_hydration_collections,
 )
-from src.agentic.models import RetrievalToolName
+from src.agentic.models import RetrievalPlan, RetrievalToolCall, RetrievalToolName
 from src.scheme_contracts import FilterableApplicationModes
 
 
@@ -180,6 +181,47 @@ class WorkflowHelperTests(unittest.TestCase):
                 RetrievalToolName.TOPIC_SCOPED_SEARCH,
             ],
         )
+
+    def test_ensure_retrieval_plan_adds_inferred_topic_coverage(self) -> None:
+        classification = UserIntentClassification.model_validate(
+            {
+                "primary_intent": "scheme_discovery",
+                "confidence": 0.92,
+                "user_goal": "Find schemes for women entrepreneurs in Maharashtra.",
+                "retrieval_query": "government schemes for women entrepreneurs in Maharashtra",
+                "retrieval_filters": [
+                    {"key": "state", "value": "Maharashtra"},
+                ],
+                "reasoning": "Benefits lookup.",
+            }
+        )
+
+        plan = ensure_retrieval_plan_coverage(
+            plan=RetrievalPlan(
+                rationale="Planner returned only a state lookup.",
+                tool_calls=[
+                    RetrievalToolCall(
+                        tool_name=RetrievalToolName.STATE_SCOPED_SEARCH,
+                        query="government schemes for women entrepreneurs in Maharashtra",
+                        state="Maharashtra",
+                        reasoning="State constraint is explicit.",
+                    )
+                ],
+            ),
+            user_message="I am a woman entrepreneur in Maharashtra. Which schemes can help me start and grow?",
+            classification=classification,
+            session_snapshot=SessionSnapshot(),
+        )
+
+        self.assertEqual(
+            [call.tool_name for call in plan.tool_calls],
+            [
+                RetrievalToolName.STATE_SCOPED_SEARCH,
+                RetrievalToolName.TOPIC_SCOPED_SEARCH,
+            ],
+        )
+        self.assertEqual(plan.tool_calls[1].state, "Maharashtra")
+        self.assertEqual(plan.tool_calls[1].topics, ["Women Welfare"])
 
     def test_merge_retrieved_scheme_results_keeps_best_score_across_tool_calls(self) -> None:
         merged = merge_retrieved_scheme_results(

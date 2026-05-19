@@ -102,6 +102,8 @@ class TopSchemeArtifactEntry(BaseModel):
     provider: str | None = None
     provider_type: str | None = None
     ministry: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    topics: list[str] = Field(default_factory=list)
     details: str | None = None
     benefits: str | None = None
     eligibility: str | None = None

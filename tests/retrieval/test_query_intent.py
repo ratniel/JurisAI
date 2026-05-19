@@ -77,7 +77,7 @@ class RetrievalIntentProfileTests(unittest.TestCase):
 
         self.assertEqual(profile.filters.state, "Tamil Nadu")
         self.assertIsNone(profile.filters.level)
-        self.assertEqual(profile.filters.tags, ["SC"])
+        self.assertEqual(profile.filters.tags, ["SC", "Student"])
         self.assertEqual(
             profile.ignored_filters,
             {
@@ -85,7 +85,7 @@ class RetrievalIntentProfileTests(unittest.TestCase):
                 "tags": ["scholarship", "engineering", "SC"],
             },
         )
-        self.assertEqual(profile.query_topics, [])
+        self.assertEqual(profile.query_topics, ["Education"])
 
     def test_invalid_literal_filters_are_ignored_instead_of_crashing(self) -> None:
         profile = build_retrieval_intent_profile(
@@ -128,6 +128,18 @@ class RetrievalIntentProfileTests(unittest.TestCase):
             profile.ignored_filters,
             {"topics": ["computer training"]},
         )
+
+    def test_build_profile_infers_women_tag_from_query_text(self) -> None:
+        profile = build_retrieval_intent_profile(
+            user_message="I am a woman entrepreneur in Maharashtra. Which schemes can help me start and grow?",
+            retrieval_query="government schemes for women entrepreneurs in Maharashtra",
+            raw_filters={"state": "Maharashtra"},
+        )
+
+        self.assertEqual(profile.filters.state, "Maharashtra")
+        self.assertEqual(profile.filters.tags, ["Women"])
+        self.assertEqual(profile.query_tags, ["Women"])
+        self.assertEqual(profile.query_topics, ["Women Welfare"])
 
 
 if __name__ == "__main__":

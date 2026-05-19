@@ -188,6 +188,126 @@ def fallback_retrieval_plan(
     )
 
 
+def ensure_retrieval_plan_coverage(
+    *,
+    plan: RetrievalPlan,
+    user_message: str,
+    classification: UserIntentClassification,
+    session_snapshot: SessionSnapshot,
+) -> RetrievalPlan:
+    raw_filters = {
+        **session_snapshot.user_profile,
+        **aggregate_intent_facts(classification.retrieval_filters),
+    }
+    intent_profile = build_retrieval_intent_profile(
+        user_message=user_message,
+        retrieval_query=classification.retrieval_query,
+        raw_filters=raw_filters,
+    )
+    base_query = intent_profile.normalized_query
+    target_state = intent_profile.filters.state
+    target_topics = list(intent_profile.filters.topics or intent_profile.query_topics)
+
+    existing_calls = [call.model_copy(deep=True) for call in plan.tool_calls]
+    selected_calls: list[RetrievalToolCall] = []
+    consumed_indexes: set[int] = set()
+    coverage_added = False
+
+    def append_call(call: RetrievalToolCall) -> None:
+        signature = (
+            call.tool_name,
+            normalize_text(call.state),
+            tuple(normalize_topics(call.topics)),
+        )
+        current_signatures = {
+            (
+                item.tool_name,
+                normalize_text(item.state),
+                tuple(normalize_topics(item.topics)),
+            )
+            for item in selected_calls
+        }
+        if signature in current_signatures:
+            return
+        selected_calls.append(call)
+
+    if target_state:
+        state_index = next(
+            (
+                index
+                for index, call in enumerate(existing_calls)
+                if call.tool_name == RetrievalToolName.STATE_SCOPED_SEARCH
+                and normalize_text(call.state) == target_state
+            ),
+            None,
+        )
+        if state_index is not None:
+            append_call(existing_calls[state_index])
+            consumed_indexes.add(state_index)
+        else:
+            coverage_added = True
+            append_call(
+                RetrievalToolCall(
+                    tool_name=RetrievalToolName.STATE_SCOPED_SEARCH,
+                    query=base_query,
+                    state=target_state,
+                    reasoning="Deterministic coverage for explicit state intent.",
+                )
+            )
+
+    if target_topics:
+        normalized_topics = normalize_topics(target_topics)
+        topic_index = next(
+            (
+                index
+                for index, call in enumerate(existing_calls)
+                if call.tool_name == RetrievalToolName.TOPIC_SCOPED_SEARCH
+                and normalize_topics(call.topics) == normalized_topics
+                and (not target_state or normalize_text(call.state) == target_state)
+            ),
+            None,
+        )
+        if topic_index is not None:
+            append_call(existing_calls[topic_index])
+            consumed_indexes.add(topic_index)
+        else:
+            coverage_added = True
+            append_call(
+                RetrievalToolCall(
+                    tool_name=RetrievalToolName.TOPIC_SCOPED_SEARCH,
+                    query=base_query,
+                    state=target_state,
+                    topics=normalized_topics,
+                    reasoning="Deterministic coverage for inferred or explicit topic intent.",
+                )
+            )
+
+    for index, call in enumerate(existing_calls):
+        if index in consumed_indexes:
+            continue
+        append_call(call)
+
+    if not selected_calls:
+        selected_calls.append(
+            RetrievalToolCall(
+                tool_name=RetrievalToolName.SEMANTIC_SEARCH,
+                query=base_query,
+                reasoning="Fallback to broad semantic search.",
+            )
+        )
+        coverage_added = True
+
+    rationale = plan.rationale
+    if coverage_added:
+        note = "Deterministic state/topic coverage applied after planner output."
+        rationale = f"{rationale} {note}".strip() if rationale else note
+
+    return RetrievalPlan(
+        rationale=rationale,
+        tool_calls=selected_calls[:3],
+    )
+
+
 def merge_retrieved_scheme_results(
     tool_calls: list[dict[str, Any]],
     *,
@@ -385,6 +505,8 @@ def build_top_schemes_artifact(
                 provider=scheme.provider,
                 provider_type=scheme.provider_type,
                 ministry=scheme.ministry,
+                tags=list(scheme.tags),
+                topics=list(scheme.topics),
                 details=scheme.details,
                 benefits=scheme.benefits,
                 eligibility=scheme.eligibility,
@@ -707,6 +829,12 @@ class BasicAgenticWorkflow(Workflow):
                 classification=ev.classification,
                 session_snapshot=ev.session_snapshot,
             )
+        retrieval_plan = ensure_retrieval_plan_coverage(
+            plan=retrieval_plan,
+            user_message=ev.user_message,
+            classification=ev.classification,
+            session_snapshot=ev.session_snapshot,
+        )
 
         updated_payload = {
             **ev.decision.tool_payload,
