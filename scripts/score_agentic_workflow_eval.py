@@ -60,6 +60,28 @@ def main() -> None:
         help="Optional comma-separated record IDs to evaluate.",
     )
     parser.add_argument(
+        "--intent-provider",
+        choices=["gemini", "llamaindex_google", "local_openai", "openrouter"],
+        default=None,
+        help="Override the classifier provider used during workflow evaluation.",
+    )
+    parser.add_argument(
+        "--intent-model",
+        default=None,
+        help="Override the classifier model used during workflow evaluation.",
+    )
+    parser.add_argument(
+        "--generation-provider",
+        choices=["gemini", "llamaindex_google", "local_openai", "openrouter"],
+        default=None,
+        help="Override the planner/answer provider used during workflow evaluation.",
+    )
+    parser.add_argument(
+        "--generation-model",
+        default=None,
+        help="Override the planner/answer model used during workflow evaluation.",
+    )
+    parser.add_argument(
         "--embedding-backend",
         choices=["local", "gemini"],
         default=None,
@@ -104,6 +126,10 @@ def main() -> None:
         collection_name=args.collection,
         include_debug=args.include_debug,
         fail_on_classifier_error=args.fail_on_classifier_error,
+        intent_provider=args.intent_provider,
+        intent_model=args.intent_model,
+        generation_provider=args.generation_provider,
+        generation_model=args.generation_model,
         embedding_backend=args.embedding_backend,
         embedding_model=args.embedding_model,
         trace_project=settings.phoenix.project_name,
@@ -115,6 +141,8 @@ def main() -> None:
         retrieval_filter_mode=("none" if args.disable_retrieval_filters else args.retrieval_filter_mode),
     )
     print(json.dumps(summary, indent=2))
+    if summary.get("workflow_failure_count"):
+        raise SystemExit(2)
     if args.enforce_absolute_gate and summary["absolute_gate_failures"]:
         raise SystemExit(1)
 

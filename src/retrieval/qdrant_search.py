@@ -8,14 +8,15 @@ from qdrant_client import QdrantClient, models
 from src.agentic.models import MongoReference, RetrievedScheme
 from src.config.settings import settings
 from src.llm import EmbeddingClient, build_embedding_client
+from src.llm.providers import EmbeddingProviderName
 from src.retrieval.query_intent import RetrievalIntentProfile
 from src.retrieval.rule_engine import RETRIEVAL_FILTER_MODES, build_qdrant_filter
 from src.scheme_contracts import (
     QdrantSchemeMetadata,
     SchemeRuleFilters,
     coerce_rule_filters,
+    normalize_topics,
 )
-from src.scheme_contracts import normalize_topics
 
 TRACER = trace.get_tracer(__name__)
 
@@ -47,7 +48,7 @@ class QdrantSchemeSearchClient:
         *,
         qdrant_url: str = settings.qdrant.url,
         collection_name: str = settings.qdrant.default_collection,
-        embedding_backend: str = settings.embeddings.backend,
+        embedding_backend: EmbeddingProviderName = settings.embeddings.backend,
         embedding_model: str = settings.embedding_model(),
         embedding_client: EmbeddingClient | None = None,
     ) -> None:
@@ -58,6 +59,8 @@ class QdrantSchemeSearchClient:
             provider=embedding_backend,
             model=embedding_model,
         )
+        self._dense_vector_name_cache: str | None = None
+        self._dense_vector_name_resolved = False
 
     def search(
         self,
@@ -128,6 +131,7 @@ class QdrantSchemeSearchClient:
                     response = self._client.query_points(
                         collection_name=self._collection_name,
                         query=query_vector,
+                        using=self._dense_vector_name(),
                         query_filter=_merge_filters(query_filter, profile_name),
                         limit=per_profile_limit,
                         with_payload=True,
@@ -170,6 +174,22 @@ class QdrantSchemeSearchClient:
                     "deduped_hits": [result.model_dump() for result in deduped],
                 }
             return payload
+
+    def _dense_vector_name(self) -> str | None:
+        if self._dense_vector_name_resolved:
+            return self._dense_vector_name_cache
+
+        vectors_config = self._client.get_collection(
+            self._collection_name
+        ).config.params.vectors
+        self._dense_vector_name_cache = (
+            settings.qdrant.dense_vector_name
+            if isinstance(vectors_config, dict)
+            and settings.qdrant.dense_vector_name in vectors_config
+            else None
+        )
+        self._dense_vector_name_resolved = True
+        return self._dense_vector_name_cache
 
     @staticmethod
     def _profile_query_text(

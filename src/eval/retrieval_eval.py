@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import json
 from datetime import UTC, datetime
 from pathlib import Path
@@ -23,14 +24,49 @@ from src.eval.quality_gates import (
     record_passes_min_recall,
 )
 from src.eval.retrieval_dataset import load_golden_records
+from src.llm import build_generation_client
+from src.llm.providers import EmbeddingProviderName, GenerationProviderName
 from src.observability import configure_phoenix_tracing
 from src.retrieval import QdrantSchemeSearchClient, build_retrieval_intent_profile
-from src.llm import build_generation_client
-from src.llm.providers import GenerationProviderName
 
 TRACER = trace.get_tracer(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_RUNS_ROOT = PROJECT_ROOT / "evals" / "retrieval" / "runs"
+RETRIEVAL_RUN_LOG_FILENAME = "run_log.csv"
+RETRIEVAL_RUN_ARTIFACT_PREFIX = "retrieval_eval_"
+RETRIEVAL_RUN_LOG_FIELDS = (
+    "started_at",
+    "completed_at",
+    "artifact_file",
+    "output_path",
+    "eval_mode",
+    "record_count",
+    "collection_name",
+    "selected_record_count",
+    "selected_record_ids",
+    "intent_provider",
+    "intent_model",
+    "generation_provider",
+    "generation_model",
+    "embedding_backend",
+    "embedding_model",
+    "retrieval_strategy",
+    "retrieval_filters_enabled",
+    "retrieval_filter_mode",
+    "classifier_error_count",
+    "workflow_failure_count",
+    "nonempty_answer_count",
+    "avg_recall_at_3",
+    "avg_recall_at_5",
+    "avg_mrr_at_5",
+    "distractor_pass_rate",
+    "expected_filter_match_rate",
+    "zero_raw_hit_rate",
+    "per_record_min_recall_pass_rate",
+    "strict_record_pass_rate",
+    "passes_absolute_gate",
+    "run_trace_id",
+)
 
 
 def reciprocal_rank(results: list[str], positives: set[str], limit: int) -> float:
@@ -52,6 +88,89 @@ def write_run_artifact(summary: dict[str, Any], output_path: Path) -> None:
     serialized = json.dumps(payload, indent=2)
     output_path.write_text(serialized, encoding="utf-8")
     (output_path.parent / "latest.json").write_text(serialized, encoding="utf-8")
+    if output_path.name.startswith(RETRIEVAL_RUN_ARTIFACT_PREFIX):
+        refresh_run_log(
+            output_path.parent,
+            artifact_prefix=RETRIEVAL_RUN_ARTIFACT_PREFIX,
+        )
+
+
+def _serialize_run_log_value(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (list, dict)):
+        return json.dumps(value, separators=(",", ":"), ensure_ascii=True)
+    return str(value)
+
+
+def _run_log_row_from_summary(
+    summary: dict[str, Any],
+    artifact_path: Path,
+) -> dict[str, str]:
+    selected_record_ids = summary.get("selected_record_ids") or []
+    row = {
+        "started_at": summary.get("started_at"),
+        "completed_at": summary.get("completed_at"),
+        "artifact_file": artifact_path.name,
+        "output_path": summary.get("output_path") or str(artifact_path),
+        "eval_mode": summary.get("eval_mode"),
+        "record_count": summary.get("record_count"),
+        "collection_name": summary.get("collection_name") or summary.get("collection"),
+        "selected_record_count": len(selected_record_ids),
+        "selected_record_ids": selected_record_ids,
+        "intent_provider": summary.get("intent_provider"),
+        "intent_model": summary.get("intent_model"),
+        "generation_provider": summary.get("generation_provider"),
+        "generation_model": summary.get("generation_model"),
+        "embedding_backend": summary.get("embedding_backend"),
+        "embedding_model": summary.get("embedding_model"),
+        "retrieval_strategy": summary.get("retrieval_strategy"),
+        "retrieval_filters_enabled": summary.get("retrieval_filters_enabled"),
+        "retrieval_filter_mode": summary.get("retrieval_filter_mode"),
+        "classifier_error_count": summary.get("classifier_error_count"),
+        "workflow_failure_count": summary.get("workflow_failure_count"),
+        "nonempty_answer_count": summary.get("nonempty_answer_count"),
+        "avg_recall_at_3": summary.get("avg_recall_at_3"),
+        "avg_recall_at_5": summary.get("avg_recall_at_5"),
+        "avg_mrr_at_5": summary.get("avg_mrr_at_5"),
+        "distractor_pass_rate": summary.get("distractor_pass_rate"),
+        "expected_filter_match_rate": summary.get("expected_filter_match_rate"),
+        "zero_raw_hit_rate": summary.get("zero_raw_hit_rate"),
+        "per_record_min_recall_pass_rate": summary.get(
+            "per_record_min_recall_pass_rate"
+        ),
+        "strict_record_pass_rate": summary.get("strict_record_pass_rate"),
+        "passes_absolute_gate": summary.get("passes_absolute_gate"),
+        "run_trace_id": summary.get("run_trace_id"),
+    }
+    return {
+        key: _serialize_run_log_value(value)
+        for key, value in row.items()
+    }
+
+
+def refresh_run_log(
+    runs_root: Path,
+    *,
+    artifact_prefix: str,
+) -> Path:
+    runs_root.mkdir(parents=True, exist_ok=True)
+    log_path = runs_root / RETRIEVAL_RUN_LOG_FILENAME
+    rows = [
+        _run_log_row_from_summary(
+            json.loads(artifact_path.read_text(encoding="utf-8")),
+            artifact_path,
+        )
+        for artifact_path in sorted(runs_root.glob(f"{artifact_prefix}*.json"))
+    ]
+    rows.sort(key=lambda row: (row["started_at"], row["artifact_file"]))
+    with log_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=RETRIEVAL_RUN_LOG_FIELDS)
+        writer.writeheader()
+        writer.writerows(rows)
+    return log_path
 
 
 def _trace_id_hex() -> str | None:
@@ -150,10 +269,11 @@ def _build_summary(
     intent_model: str | None = None,
     generation_provider: str | None = None,
     generation_model: str | None = None,
-    embedding_backend: str | None = None,
+    embedding_backend: EmbeddingProviderName | None = None,
     embedding_model: str | None = None,
     retrieval_filters_enabled: bool | None = None,
     retrieval_filter_mode: str | None = None,
+    retrieval_strategy: str | None = None,
 ) -> dict[str, Any]:
     summary = {
         "started_at": started_at.isoformat(),
@@ -180,6 +300,7 @@ def _build_summary(
             else retrieval_filters_enabled
         ),
         "retrieval_filter_mode": retrieval_filter_mode or settings.workflow.retrieval_filter_mode,
+        "retrieval_strategy": retrieval_strategy,
         "trace_project": trace_project,
         "trace_status": trace_status,
         "run_trace_id": run_trace_id,
@@ -224,7 +345,7 @@ def iter_retrieval_eval(
     intent_model: str | None = None,
     generation_provider: GenerationProviderName | None = None,
     generation_model: str | None = None,
-    embedding_backend: str | None = None,
+    embedding_backend: EmbeddingProviderName | None = None,
     embedding_model: str | None = None,
     trace_project: str = settings.phoenix.project_name,
     phoenix_endpoint: str | None = settings.phoenix.collector_endpoint,
@@ -604,7 +725,7 @@ def run_retrieval_eval(
     intent_model: str | None = None,
     generation_provider: GenerationProviderName | None = None,
     generation_model: str | None = None,
-    embedding_backend: str | None = None,
+    embedding_backend: EmbeddingProviderName | None = None,
     embedding_model: str | None = None,
     trace_project: str = settings.phoenix.project_name,
     phoenix_endpoint: str | None = settings.phoenix.collector_endpoint,

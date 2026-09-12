@@ -1,11 +1,20 @@
 from __future__ import annotations
 
+from src.llm.embedding_text_formatter import (
+    format_texts_for_embedding,
+    sentence_transformer_load_kwargs,
+)
+
+
 class LocalSentenceTransformerEmbeddingClient:
     def __init__(self, model_name: str) -> None:
         from sentence_transformers import SentenceTransformer
 
         self.default_model = model_name
-        self._model = SentenceTransformer(model_name)
+        self._model = SentenceTransformer(
+            model_name,
+            **sentence_transformer_load_kwargs(model_name),
+        )
 
     def embed_text(
         self,
@@ -33,11 +42,20 @@ class LocalSentenceTransformerEmbeddingClient:
         if model and model != self.default_model:
             from sentence_transformers import SentenceTransformer
 
-            self._model = SentenceTransformer(model)
+            self._model = SentenceTransformer(
+                model,
+                **sentence_transformer_load_kwargs(model),
+            )
             self.default_model = model
 
-        vectors = self._model.encode(
+        resolved_model = model or self.default_model
+        formatted_texts = format_texts_for_embedding(
             texts,
+            model_name=resolved_model,
+            task_type=task_type,
+        )
+        vectors = self._model.encode(
+            formatted_texts,
             normalize_embeddings=True,
             convert_to_numpy=True,
             show_progress_bar=False,

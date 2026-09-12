@@ -73,6 +73,13 @@ class QdrantSettings(BaseModel):
         default=("embedding_a", "embedding_b"),
         validation_alias=AliasChoices("profiles"),
     )
+    dense_vector_name: str = Field(
+        default="dense_vector",
+        validation_alias=AliasChoices(
+            "dense_vector_name",
+            "QDRANT_DENSE_VECTOR_NAME",
+        ),
+    )
 
 
 class EmbeddingSettings(BaseModel):
