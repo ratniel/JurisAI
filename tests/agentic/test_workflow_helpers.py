@@ -9,22 +9,27 @@ from src.agentic.fact_utils import aggregate_intent_facts
 from src.agentic.models import (
     IntentFact,
     MongoReference,
+    NextAction,
+    OrchestratorDecision,
+    RelevantScheme,
     RetrievalToolCall,
+    RetrievalToolName,
     RetrievedScheme,
     SchemeRef,
     SessionSnapshot,
     UserIntentClassification,
 )
 from src.agentic.workflow import (
+    _build_reply_prompt,
     build_grounding_pack,
     build_relevant_scheme_from_lookup_document,
+    build_session_memory,
     build_top_schemes_artifact,
     fallback_retrieval_plan,
     merge_retrieved_scheme_results,
     BasicAgenticWorkflow,
     preferred_hydration_collections,
 )
-from src.agentic.models import RetrievalToolName
 from src.scheme_contracts import FilterableApplicationModes
 
 
@@ -348,6 +353,77 @@ class WorkflowHelperTests(unittest.TestCase):
             "girl student",
         )
         self.assertTrue(grounding_pack.top_scheme_cards[0].evidence_snippets)
+
+    def test_grounding_pack_does_not_endorse_first_hit_or_truncate_conditions(self) -> None:
+        long_condition = "Existing businesses are not eligible. " + ("Required condition. " * 20)
+        scheme = RelevantScheme.from_retrieved_scheme(
+            self._make_retrieved_scheme(
+                selected_fields={
+                    "details": "A one-time marriage gift, not a recurring pension.",
+                    "benefits": long_condition,
+                    "eligibility": long_condition,
+                }
+            )
+        )
+
+        grounding_pack = build_grounding_pack(
+            chat_session_id="chat-123",
+            turn_id="turn-123",
+            user_message="Need a widow pension.",
+            retrieval_query="widow pension",
+            relevant_schemes=[scheme],
+            applied_filters={},
+            ignored_filters={},
+            important_ignored_filters={},
+            selected_scheme_ref=None,
+        )
+
+        card = grounding_pack.top_scheme_cards[0]
+        self.assertIsNone(grounding_pack.selection_hint)
+        self.assertEqual(card.benefits_summary, long_condition.strip())
+        self.assertEqual(card.eligibility_summary, long_condition.strip())
+        self.assertEqual(
+            card.evidence_snippets,
+            ["A one-time marriage gift, not a recurring pension."],
+        )
+
+    def test_session_memory_and_reply_prompt_keep_original_request_authoritative(
+        self,
+    ) -> None:
+        classification = UserIntentClassification.model_validate(
+            {
+                "primary_intent": "scheme_discovery",
+                "confidence": 0.9,
+                "user_goal": "Find information about an exact named scheme",
+                "reasoning": "Benefits lookup.",
+            }
+        )
+        decision = OrchestratorDecision(
+            next_action=NextAction.CALL_SCHEME_RETRIEVAL,
+            selected_agent="retrieval_planner",
+        )
+        user_message = "meghalaya st micro business loan subsidy artisan scheme"
+
+        memory = build_session_memory(
+            user_message=user_message,
+            session_snapshot=SessionSnapshot(chat_session_id="chat-123"),
+            classification=classification,
+            decision=decision,
+            relevant_schemes=[],
+            last_action="retrieval_completed",
+        )
+        prompt = _build_reply_prompt(
+            user_message=user_message,
+            session_memory=memory,
+            grounding_pack=None,
+        )
+
+        self.assertEqual(memory.last_user_goal, user_message)
+        self.assertIn(
+            f"Current request: {user_message}",
+            memory.conversation_summary or "",
+        )
+        self.assertTrue(prompt.startswith("Original user message (authoritative):"))
 
     def test_build_top_schemes_artifact_preserves_richer_fields(self) -> None:
         relevant_scheme = build_relevant_scheme_from_lookup_document(
