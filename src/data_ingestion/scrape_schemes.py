@@ -298,7 +298,10 @@ class ScrapeSchemes:
                 page_num = 0
                 completed_normally = False
                 try:
-                    await search_page.goto(self.scheme_search_url)
+                    await search_page.goto(
+                        self.scheme_search_url,
+                        wait_until="domcontentloaded",
+                    )
                     container_selector = (
                         "div.sm\\:col-span-3.col-span-4.items-center.justify-center"
                     )
