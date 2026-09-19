@@ -286,8 +286,17 @@ class QdrantSchemeSearchClient:
                     update={
                         "matched_profiles": current.matched_profiles,
                         "profile_scores": current.profile_scores,
+                        "selected_fields": {
+                            **current.selected_fields,
+                            **candidate.selected_fields,
+                        },
                     }
                 )
+            else:
+                current.selected_fields = {
+                    **candidate.selected_fields,
+                    **current.selected_fields,
+                }
 
         return sorted(
             best_by_scheme.values(),

@@ -47,7 +47,7 @@ class QdrantSearchTests(unittest.TestCase):
                 state=None,
                 score=0.41,
                 profile="embedding_a",
-            ),
+            ).model_copy(update={"selected_fields": {"details": "Scheme purpose"}}),
             make_retrieved_scheme(
                 scheme_id="scheme-a",
                 name="Scheme A",
@@ -55,6 +55,13 @@ class QdrantSearchTests(unittest.TestCase):
                 state=None,
                 score=0.73,
                 profile="embedding_b",
+            ).model_copy(
+                update={
+                    "selected_fields": {
+                        "benefits": "Scheme benefit",
+                        "eligibility": "Mandatory condition",
+                    }
+                }
             ),
         ]
 
@@ -67,6 +74,14 @@ class QdrantSearchTests(unittest.TestCase):
         self.assertEqual(deduped[0].match_profile, "embedding_b")
         self.assertEqual(deduped[0].match_score, 0.73)
         self.assertEqual(sorted(deduped[0].matched_profiles), ["embedding_a", "embedding_b"])
+        self.assertEqual(
+            deduped[0].selected_fields,
+            {
+                "details": "Scheme purpose",
+                "benefits": "Scheme benefit",
+                "eligibility": "Mandatory condition",
+            },
+        )
 
     def test_dedupe_preserves_raw_score_order_without_reranking(self) -> None:
         hits = [

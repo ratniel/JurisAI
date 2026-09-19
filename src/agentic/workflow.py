@@ -54,11 +54,16 @@ TRACER = trace.get_tracer(__name__)
 REPLY_SYSTEM_PROMPT = """
 You are JurisAI, a concise and careful public-benefits assistant.
 Reply in plain language.
+Treat the original user message as authoritative. Session summaries, retrieval rank, and retrieval metadata are derived context and must not override or narrow it.
 If the orchestrator wants clarification, ask only one focused question.
 If retrieval results are provided, ground the answer only in those schemes.
+Treat retrieved schemes as candidates, not recommendations. Compare each scheme's stated purpose and mandatory eligibility conditions with the user's actual need before presenting it as a fit.
+Distinguish materially different purposes such as a recurring pension, a one-time marriage gift, a business-startup loan, business-expansion support, training, and market access.
 Do not present a scheme as relevant if its state or eligibility clearly contradicts an explicit user constraint.
+When a required eligibility fact is unknown, explain the scheme conditionally (for example, "you may qualify if...") and name the fact that still needs confirmation. Never turn an unknown into an eligibility claim.
 If important filters were ignored or no grounded scheme matches all explicit constraints, say so plainly.
 If no suitable scheme is found, say so plainly and suggest one focused next detail that would improve retrieval.
+Match the language and script of the user's message. Answer Hinglish in natural Hinglish, Hindi in Hindi, and English in English unless the user asks otherwise.
 When citing results, include a short References section with scheme names and URLs when available.
 """.strip()
 
@@ -222,12 +227,16 @@ def _new_turn_id() -> str:
     return uuid4().hex
 
 
-def _normalize_compact_text(value: str | None, *, max_chars: int) -> str | None:
+def _normalize_compact_text(
+    value: str | None,
+    *,
+    max_chars: int | None = None,
+) -> str | None:
     normalized = normalize_text(value)
     if normalized is None:
         return None
     compact = " ".join(normalized.split())
-    if len(compact) <= max_chars:
+    if max_chars is None or len(compact) <= max_chars:
         return compact
     return compact[: max_chars - 3].rstrip() + "..."
 
@@ -286,8 +295,8 @@ def _build_why_relevant(scheme: RelevantScheme) -> str:
         if label
     ]
     if qualifiers:
-        return f"Matched the request with {', '.join(qualifiers)}."
-    return "Matched the request based on retrieval similarity."
+        return f"Retrieval signals: {', '.join(qualifiers)}. Fit is not yet verified."
+    return "Retrieved by semantic similarity; fit is not yet verified."
 
 
 def _build_application_summary(scheme: RelevantScheme) -> str | None:
@@ -312,16 +321,8 @@ def _build_application_summary(scheme: RelevantScheme) -> str | None:
 
 
 def _build_evidence_snippets(scheme: RelevantScheme) -> list[str]:
-    candidates = [
-        _normalize_compact_text(scheme.benefits, max_chars=180),
-        _normalize_compact_text(scheme.eligibility, max_chars=180),
-        _normalize_compact_text(scheme.details, max_chars=180),
-    ]
-    snippets: list[str] = []
-    for item in candidates:
-        if item and item not in snippets:
-            snippets.append(item)
-    return snippets[:3]
+    description = _normalize_compact_text(scheme.details)
+    return [description] if description else []
 
 
 def build_grounding_pack(
@@ -345,11 +346,8 @@ def build_grounding_pack(
             provider=scheme.provider,
             url=scheme.url,
             why_relevant=_build_why_relevant(scheme),
-            benefits_summary=_normalize_compact_text(scheme.benefits, max_chars=220),
-            eligibility_summary=_normalize_compact_text(
-                scheme.eligibility,
-                max_chars=220,
-            ),
+            benefits_summary=_normalize_compact_text(scheme.benefits),
+            eligibility_summary=_normalize_compact_text(scheme.eligibility),
             application_summary=_build_application_summary(scheme),
             evidence_snippets=_build_evidence_snippets(scheme),
         )
@@ -358,8 +356,6 @@ def build_grounding_pack(
     selection_hint = None
     if selected_scheme_ref is not None:
         selection_hint = f"User-selected scheme context: {_format_scheme_ref(selected_scheme_ref)}"
-    elif scheme_cards:
-        selection_hint = f"Lead scheme: {scheme_cards[0].name or scheme_cards[0].scheme_id}"
 
     return GroundingPack(
         chat_session_id=chat_session_id,
@@ -441,9 +437,9 @@ def build_session_memory(
     )
     if prior_summary:
         summary_parts.append(f"Prior context: {prior_summary}")
-    current_goal = _normalize_compact_text(classification.user_goal, max_chars=140)
-    if current_goal:
-        summary_parts.append(f"Current goal: {current_goal}")
+    current_request = _normalize_compact_text(user_message, max_chars=140)
+    if current_request:
+        summary_parts.append(f"Current request: {current_request}")
     if recent_scheme_refs:
         summary_parts.append(f"Recent schemes: {_format_scheme_refs(recent_scheme_refs)}")
 
@@ -458,7 +454,7 @@ def build_session_memory(
             " ".join(summary_parts),
             max_chars=320,
         ),
-        last_user_goal=classification.user_goal,
+        last_user_goal=user_message,
         last_action=last_action or decision.next_action.value,
         active_constraints=active_constraints,
         recent_scheme_refs=recent_scheme_refs,
@@ -473,10 +469,10 @@ def _build_reply_prompt(
     grounding_pack: GroundingPack | None,
 ) -> str:
     lines = [
-        "User message:",
+        "Original user message (authoritative):",
         user_message,
         "",
-        "Session memory:",
+        "Derived session memory (may summarize or omit nuance):",
         f"- chat_session_id: {session_memory.chat_session_id}",
         f"- user_profile: {_format_mapping(session_memory.user_profile)}",
         f"- preferences: {_format_mapping(session_memory.preferences)}",
@@ -514,18 +510,18 @@ def _build_reply_prompt(
         return "\n".join(lines).strip()
 
     for index, card in enumerate(grounding_pack.top_scheme_cards, start=1):
-        evidence = "; ".join(card.evidence_snippets) or "none"
+        purpose = "; ".join(card.evidence_snippets) or "none"
         lines.extend(
             [
                 f"{index}. {card.name or card.scheme_id}",
                 f"   - location: {card.state or 'n/a'}",
                 f"   - level: {card.level or 'n/a'}",
                 f"   - provider: {card.provider or 'n/a'}",
-                f"   - why_relevant: {card.why_relevant or 'none'}",
+                f"   - retrieval_context: {card.why_relevant or 'none'}",
+                f"   - purpose_or_description: {purpose}",
                 f"   - benefits_summary: {card.benefits_summary or 'none'}",
                 f"   - eligibility_summary: {card.eligibility_summary or 'none'}",
                 f"   - application_summary: {card.application_summary or 'none'}",
-                f"   - evidence_snippets: {evidence}",
                 f"   - url: {card.url or 'n/a'}",
             ]
         )
@@ -975,7 +971,7 @@ class BasicAgenticWorkflow(Workflow):
         relevant_schemes = list(ev.session_snapshot.relevant_schemes)
         current_grounding_pack = ev.session_snapshot.latest_grounding_pack
         current_top_schemes_artifact = ev.session_snapshot.latest_top_schemes_artifact
-        if ev.session_snapshot.last_user_goal == ev.classification.user_goal:
+        if ev.session_snapshot.last_user_goal == ev.user_message:
             base_memory = ev.session_snapshot.to_session_memory()
             session_memory = base_memory.model_copy(
                 update={"last_action": "response_generated"}
