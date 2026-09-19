@@ -38,20 +38,20 @@ The first focused experiment is the Vidarbha farmer query, not a broad multi-que
 
 Core files for the dashboard:
 
-- [scripts/run_retrieval_eval_dashboard.py](/Users/ratniel/JurisAI/scripts/run_retrieval_eval_dashboard.py)
-- [src/eval/dashboard.py](/Users/ratniel/JurisAI/src/eval/dashboard.py)
-- [src/eval/agentic_workflow_eval.py](/Users/ratniel/JurisAI/src/eval/agentic_workflow_eval.py)
-- [src/retrieval/qdrant_search.py](/Users/ratniel/JurisAI/src/retrieval/qdrant_search.py)
-- [.vscode/launch.json](/Users/ratniel/JurisAI/.vscode/launch.json)
+- [scripts/run_retrieval_eval_dashboard.py](./scripts/run_retrieval_eval_dashboard.py)
+- [src/eval/dashboard.py](./src/eval/dashboard.py)
+- [src/eval/agentic_workflow_eval.py](./src/eval/agentic_workflow_eval.py)
+- [src/retrieval/qdrant_search.py](./src/retrieval/qdrant_search.py)
+- [.vscode/launch.json](./.vscode/launch.json)
 
 Related evaluation artifacts and models:
 
-- [docs/retrieval_eval_dynamic_plan.md](/Users/ratniel/JurisAI/docs/retrieval_eval_dynamic_plan.md)
-- [eval/retrieval/personas_v1.yaml](/Users/ratniel/JurisAI/eval/retrieval/personas_v1.yaml)
-- [eval/retrieval/shortlists_v1.yaml](/Users/ratniel/JurisAI/eval/retrieval/shortlists_v1.yaml)
-- [eval/retrieval/golden_classifier_retrieval_v1.jsonl](/Users/ratniel/JurisAI/eval/retrieval/golden_classifier_retrieval_v1.jsonl)
-- [src/eval/retrieval_dataset.py](/Users/ratniel/JurisAI/src/eval/retrieval_dataset.py)
-- [evals/retrieval/runs/run_log.csv](/Users/ratniel/JurisAI/evals/retrieval/runs/run_log.csv)
+- [docs/retrieval_eval_dynamic_plan.md](./docs/retrieval_eval_dynamic_plan.md)
+- [eval/retrieval/personas_v1.yaml](./eval/retrieval/personas_v1.yaml)
+- [eval/retrieval/shortlists_v1.yaml](./eval/retrieval/shortlists_v1.yaml)
+- [eval/retrieval/golden_classifier_retrieval_v1.jsonl](./eval/retrieval/golden_classifier_retrieval_v1.jsonl)
+- [src/eval/retrieval_dataset.py](./src/eval/retrieval_dataset.py)
+- [evals/retrieval/runs/run_log.csv](./evals/retrieval/runs/run_log.csv)
 
 The CSV run log is the canonical tabular ledger for persisted retrieval-core experiments.
 It should be used for quick comparison across runs, while the per-run JSON artifacts remain the detailed debug source of truth.
@@ -204,7 +204,7 @@ flowchart TD
 From the repo root:
 
 ```bash
-/Users/ratniel/JurisAI/.venv/bin/python /Users/ratniel/JurisAI/scripts/run_retrieval_eval_dashboard.py --host 127.0.0.1 --port 7860 --trace-project jurisai-retrieval-eval-dashboard
+./.venv/bin/python ./scripts/run_retrieval_eval_dashboard.py --host 127.0.0.1 --port 7860 --trace-project jurisai-retrieval-eval-dashboard
 ```
 
 Then open:
@@ -215,7 +215,7 @@ Then open:
 
 A launch profile is available in:
 
-- [.vscode/launch.json](/Users/ratniel/JurisAI/.vscode/launch.json)
+- [.vscode/launch.json](./.vscode/launch.json)
 
 Use the `Retrieval Eval Dashboard` configuration in Run and Debug.
 
@@ -232,7 +232,7 @@ Dashboard-triggered evaluation runs are instrumented through the existing Phoeni
 
 The dashboard uses:
 
-- [src/observability/phoenix_tracing.py](/Users/ratniel/JurisAI/src/observability/phoenix_tracing.py)
+- [src/observability/phoenix_tracing.py](./src/observability/phoenix_tracing.py)
 
 Each run records:
 
@@ -278,9 +278,9 @@ The dashboard reads from three places:
 
 ### Canonical reviewed artifacts
 
-- [eval/retrieval/personas_v1.yaml](/Users/ratniel/JurisAI/eval/retrieval/personas_v1.yaml)
-- [eval/retrieval/shortlists_v1.yaml](/Users/ratniel/JurisAI/eval/retrieval/shortlists_v1.yaml)
-- [eval/retrieval/golden_classifier_retrieval_v1.jsonl](/Users/ratniel/JurisAI/eval/retrieval/golden_classifier_retrieval_v1.jsonl)
+- [eval/retrieval/personas_v1.yaml](./eval/retrieval/personas_v1.yaml)
+- [eval/retrieval/shortlists_v1.yaml](./eval/retrieval/shortlists_v1.yaml)
+- [eval/retrieval/golden_classifier_retrieval_v1.jsonl](./eval/retrieval/golden_classifier_retrieval_v1.jsonl)
 
 ### MongoDB
 
@@ -315,9 +315,9 @@ The local embedding stack used to be imported too early. That was changed to laz
 
 Relevant files:
 
-- [src/llm/__init__.py](/Users/ratniel/JurisAI/src/llm/__init__.py)
-- [src/llm/providers.py](/Users/ratniel/JurisAI/src/llm/providers.py)
-- [src/llm/local_embedding_client.py](/Users/ratniel/JurisAI/src/llm/local_embedding_client.py)
+- [src/llm/__init__.py](./src/llm/__init__.py)
+- [src/llm/providers.py](./src/llm/providers.py)
+- [src/llm/local_embedding_client.py](./src/llm/local_embedding_client.py)
 
 ### Port already in use
 
@@ -331,7 +331,7 @@ Either:
 Example:
 
 ```bash
-/Users/ratniel/JurisAI/.venv/bin/python /Users/ratniel/JurisAI/scripts/run_retrieval_eval_dashboard.py --host 127.0.0.1 --port 7865 --trace-project jurisai-retrieval-eval-dashboard
+./.venv/bin/python ./scripts/run_retrieval_eval_dashboard.py --host 127.0.0.1 --port 7865 --trace-project jurisai-retrieval-eval-dashboard
 ```
 
 ### Classifier quota errors

@@ -12,11 +12,11 @@ Use these repo conventions when writing or updating `AGENTS.md`, skills, and oth
 
 - Repo-root `AGENTS.md`:
   - Holds repo-wide rules, architecture, stack choices, workflow expectations, and cross-stack decisions.
-  - Use it for guidance that applies across `/Users/ratniel/JurisAI/src`, `/Users/ratniel/JurisAI/web`, scripts, evals, and docs.
-- Surface-specific `AGENTS.md` files such as `/Users/ratniel/JurisAI/web/AGENTS.md`:
+  - Use it for guidance that applies across `./src`, `./web`, scripts, evals, and docs.
+- Surface-specific `AGENTS.md` files such as `./web/AGENTS.md`:
   - Hold local instructions for one app surface or workspace only.
   - Do not duplicate repo-wide guidance unless the local surface needs a narrowed version of it.
-- Skills under `/Users/ratniel/JurisAI/skills/*/SKILL.md`:
+- Skills under `./skills/*/SKILL.md`:
   - Capture reusable workflows for a specific subsystem, tool, datastore, or operational task.
   - Keep them procedural and concrete: when to use the skill, safety rules, current conventions, and canonical commands.
 - Private working notes such as repo-root `TODO.md`, `completed_tasks.md`, and ad hoc retrieval status snapshots:
@@ -27,9 +27,9 @@ Use these repo conventions when writing or updating `AGENTS.md`, skills, and oth
 ## Writing rules
 
 - Write according to ownership boundaries in the repo:
-  - backend and eval guidance should point to `/Users/ratniel/JurisAI/src`
-  - frontend guidance should point to `/Users/ratniel/JurisAI/web`
-  - shared workflow guidance should stay at repo root or under `/Users/ratniel/JurisAI/docs`
+  - backend and eval guidance should point to `./src`
+  - frontend guidance should point to `./web`
+  - shared workflow guidance should stay at repo root or under `./docs`
 - Prefer current decisions, active conventions, and stable commands over historical narrative.
 - Keep instructions explicit where ambiguity would cause drift:
   - source-of-truth files
@@ -54,6 +54,6 @@ Use these repo conventions when writing or updating `AGENTS.md`, skills, and oth
 
 - `AGENTS.md`: update for new rules, architecture decisions, workflow expectations, or repo structure changes.
 - `skills/*/SKILL.md`: update for new commands, safety rules, datastore conventions, or subsystem workflows.
-- Relevant docs in `/Users/ratniel/JurisAI/docs`: update when harness instructions reference behavior that changed in code.
+- Relevant docs in `./docs`: update when harness instructions reference behavior that changed in code.
 - Versioned structured ledgers such as `evals/retrieval/runs/run_log.csv`: keep them programmatically regenerable from canonical artifacts whenever possible.
 - Local-only note files: keep them gitignored and out of version control unless the user explicitly asks to publish them.
