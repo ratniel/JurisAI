@@ -54,10 +54,10 @@
 
 ## UI And Repo Layout
 
-- The main UI lives inside this same repo at `/Users/ratniel/JurisAI/web`.
+- The main UI lives inside this same repo at web/.
 - Treat this as one repo with two app surfaces:
-  - Python backend under `/Users/ratniel/JurisAI/src`
-  - Bun/Vite frontend under `/Users/ratniel/JurisAI/web`
+  - Python backend under src/
+  - Bun/Vite frontend under web/
 - Do not split the frontend into a separate repo unless explicitly requested.
 - Prefer keeping the FastAPI contract and React UI aligned through shared repo docs rather than duplicating API expectations in frontend-only notes.
 - Dark mode is the required default for the main UI.
