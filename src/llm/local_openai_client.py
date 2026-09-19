@@ -20,6 +20,9 @@ LOGGER = logging.getLogger(__name__)
 class LocalOpenAICompatibleClient:
     """Chat client for local OpenAI-compatible inference servers."""
 
+    TRANSPORT_MAX_RETRIES = 2
+    INFERENCE_MAX_RETRIES = 2
+
     def __init__(
         self,
         *,
@@ -33,6 +36,9 @@ class LocalOpenAICompatibleClient:
     ) -> None:
         config = settings.local_generation
         self.default_model = model or config.model
+        self.provider_name = "local_openai"
+        self.last_invocation_metadata: dict[str, Any] | None = None
+        self.invocation_history: list[dict[str, Any]] = []
         self._base_url = base_url or config.base_url
         self._api_key = api_key or config.api_key
         self._timeout_seconds = timeout_seconds or config.timeout_seconds
@@ -56,19 +62,47 @@ class LocalOpenAICompatibleClient:
         temperature: float | None = 0.2,
         **config_overrides: Any,
     ) -> str:
-        response = self._completion(
-            messages=self._build_messages(
-                prompt=prompt,
-                system_instruction=system_instruction,
-            ),
-            model=model,
-            temperature=temperature,
-            **config_overrides,
+        for attempt in range(1, self.INFERENCE_MAX_RETRIES + 2):
+            response = self._completion(
+                messages=self._build_messages(
+                    prompt=prompt,
+                    system_instruction=system_instruction,
+                ),
+                model=model,
+                temperature=temperature,
+                **config_overrides,
+            )
+            text = self._extract_text(response)
+            if not self._enable_thinking:
+                text = self._strip_thinking_content(text)
+            if text.strip():
+                self._record_invocation(
+                    response=response,
+                    model=model,
+                    operation="text_generation",
+                    attempt=attempt,
+                    outcome="success",
+                )
+                return text
+
+            self._record_invocation(
+                response=response,
+                model=model,
+                operation="text_generation",
+                attempt=attempt,
+                outcome="empty_response",
+            )
+            if attempt <= self.INFERENCE_MAX_RETRIES:
+                LOGGER.warning(
+                    "Retrying empty model response (%s/%s).",
+                    attempt,
+                    self.INFERENCE_MAX_RETRIES + 1,
+                )
+
+        raise ValueError(
+            "Model returned an empty answer after "
+            f"{self.INFERENCE_MAX_RETRIES + 1} inference attempts."
         )
-        text = self._extract_text(response)
-        if not self._enable_thinking:
-            return self._strip_thinking_content(text)
-        return text
 
     def generate_structured(
         self,
@@ -87,38 +121,79 @@ class LocalOpenAICompatibleClient:
             system_instruction=system_instruction,
         )
 
-        try:
-            response = self._completion(
-                messages=self._build_messages(
-                    prompt=structured_prompt,
-                    system_instruction=structured_system_instruction,
-                ),
-                model=model,
-                temperature=temperature,
-                response_format=response_format,
-                **config_overrides,
-            )
-        except (BadRequestError, UnsupportedParamsError, TypeError) as exc:
-            if not self._should_retry_without_response_format(exc):
-                raise
-            LOGGER.warning(
-                "Retrying local structured completion without response_format after %s: %s",
-                type(exc).__name__,
-                exc,
-            )
-            response = self._completion(
-                messages=self._build_messages(
-                    prompt=structured_prompt,
-                    system_instruction=structured_system_instruction,
-                ),
-                model=model,
-                temperature=temperature,
-                **config_overrides,
-            )
+        messages = self._build_messages(
+            prompt=structured_prompt,
+            system_instruction=structured_system_instruction,
+        )
+        use_response_format = True
+        response_format_fallback_used = False
+        last_error: ValueError | None = None
 
-        content = self._extract_text(response)
-        payload = self._extract_json_payload(content)
-        return response_model.model_validate(payload)
+        for attempt in range(1, self.INFERENCE_MAX_RETRIES + 2):
+            try:
+                response = self._completion(
+                    messages=messages,
+                    model=model,
+                    temperature=temperature,
+                    **({"response_format": response_format} if use_response_format else {}),
+                    **config_overrides,
+                )
+            except (BadRequestError, UnsupportedParamsError, TypeError) as exc:
+                if not use_response_format or not self._should_retry_without_response_format(exc):
+                    raise
+                LOGGER.warning(
+                    "Retrying structured completion without response_format after %s: %s",
+                    type(exc).__name__,
+                    exc,
+                )
+                use_response_format = False
+                response_format_fallback_used = True
+                response = self._completion(
+                    messages=messages,
+                    model=model,
+                    temperature=temperature,
+                    **config_overrides,
+                )
+
+            try:
+                content = self._extract_text(response)
+                payload = self._extract_json_payload(content)
+                result = response_model.model_validate(payload)
+            except ValueError as exc:
+                last_error = exc
+                self._record_invocation(
+                    response=response,
+                    model=model,
+                    operation="structured_generation",
+                    attempt=attempt,
+                    outcome="invalid_structured_response",
+                    response_format_fallback_used=response_format_fallback_used,
+                    error=str(exc)[:500],
+                )
+                if attempt <= self.INFERENCE_MAX_RETRIES:
+                    LOGGER.warning(
+                        "Retrying invalid structured model response (%s/%s): %s",
+                        attempt,
+                        self.INFERENCE_MAX_RETRIES + 1,
+                        exc,
+                    )
+                    continue
+                break
+
+            self._record_invocation(
+                response=response,
+                model=model,
+                operation="structured_generation",
+                attempt=attempt,
+                outcome="success",
+                response_format_fallback_used=response_format_fallback_used,
+            )
+            return result
+
+        raise ValueError(
+            "Model did not return valid structured JSON after "
+            f"{self.INFERENCE_MAX_RETRIES + 1} inference attempts."
+        ) from last_error
 
     def _completion(
         self,
@@ -130,6 +205,7 @@ class LocalOpenAICompatibleClient:
     ) -> Any:
         completion_kwargs = dict(config_overrides)
         completion_kwargs.setdefault("drop_params", True)
+        completion_kwargs.setdefault("max_retries", self.TRANSPORT_MAX_RETRIES)
         if self._extra_headers:
             completion_kwargs["extra_headers"] = {
                 **self._extra_headers,
@@ -153,6 +229,55 @@ class LocalOpenAICompatibleClient:
             temperature=temperature,
             **completion_kwargs,
         )
+
+    def _record_invocation(
+        self,
+        *,
+        response: Any,
+        model: str | None,
+        operation: str,
+        attempt: int,
+        outcome: str,
+        response_format_fallback_used: bool = False,
+        error: str | None = None,
+    ) -> None:
+        finish_reason = None
+        try:
+            finish_reason = response.choices[0].finish_reason
+        except (AttributeError, IndexError, KeyError, TypeError):
+            pass
+        metadata = {
+            "provider": self.provider_name,
+            "operation": operation,
+            "requested_model": self._resolve_model_name(model),
+            "response_model": str(getattr(response, "model", "") or "") or None,
+            "attempt": attempt,
+            "outcome": outcome,
+            "transport_max_retries": self.TRANSPORT_MAX_RETRIES,
+            "inference_max_retries": self.INFERENCE_MAX_RETRIES,
+            "response_format_fallback_used": response_format_fallback_used,
+            "finish_reason": finish_reason,
+            "usage": self._usage_to_dict(getattr(response, "usage", None)),
+            "error": error,
+        }
+        self.last_invocation_metadata = metadata
+        self.invocation_history.append(metadata)
+
+    @staticmethod
+    def _usage_to_dict(usage: Any) -> dict[str, Any]:
+        if usage is None:
+            return {}
+        if isinstance(usage, dict):
+            return dict(usage)
+        model_dump = getattr(usage, "model_dump", None)
+        if callable(model_dump):
+            payload = model_dump()
+            return payload if isinstance(payload, dict) else {}
+        return {
+            key: value
+            for key, value in vars(usage).items()
+            if not key.startswith("_")
+        } if hasattr(usage, "__dict__") else {}
 
     @staticmethod
     def _build_messages(

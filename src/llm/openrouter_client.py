@@ -44,3 +44,4 @@ class OpenRouterClient(LocalOpenAICompatibleClient):
             extra_headers=extra_headers,
             disable_thinking_via_extra_body=False,
         )
+        self.provider_name = "openrouter"

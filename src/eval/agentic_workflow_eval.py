@@ -7,8 +7,8 @@ from typing import Any, Iterator
 
 from opentelemetry import trace
 
-from src.agentic.models import AgenticTurnResult, SessionSnapshot
 from src.agentic.intent_classifier import UserIntentClassifier
+from src.agentic.models import AgenticTurnResult, SessionSnapshot
 from src.agentic.workflow import BasicAgenticWorkflow
 from src.config.settings import settings
 from src.eval.filter_signals import (
@@ -26,14 +26,22 @@ from src.eval.retrieval_eval import (
     _span_id_hex,
     _trace_id_hex,
     reciprocal_rank,
+    refresh_run_log,
     write_run_artifact,
 )
 from src.llm import build_generation_client
-from src.llm.providers import GenerationProviderName
+from src.llm.providers import EmbeddingProviderName, GenerationProviderName
 
 TRACER = trace.get_tracer(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_RUNS_ROOT = PROJECT_ROOT / "evals" / "agentic_workflow" / "runs"
+AGENTIC_WORKFLOW_RUN_ARTIFACT_PREFIX = "agentic_workflow_eval_"
+
+
+class AgenticWorkflowRunError(RuntimeError):
+    def __init__(self, message: str, llm_invocations: list[dict[str, Any]]) -> None:
+        super().__init__(message)
+        self.llm_invocations = llm_invocations
 
 
 def default_agentic_workflow_output_path(
@@ -42,6 +50,51 @@ def default_agentic_workflow_output_path(
 ) -> Path:
     timestamp = (started_at or datetime.now(tz=UTC)).strftime("%Y%m%dT%H%M%SZ")
     return DEFAULT_RUNS_ROOT / f"agentic_workflow_eval_{timestamp}.json"
+
+
+def write_agentic_workflow_run_artifact(
+    summary: dict[str, Any],
+    output_path: Path,
+) -> None:
+    write_run_artifact(summary, output_path)
+    if output_path.name.startswith(AGENTIC_WORKFLOW_RUN_ARTIFACT_PREFIX):
+        refresh_run_log(
+            output_path.parent,
+            artifact_prefix=AGENTIC_WORKFLOW_RUN_ARTIFACT_PREFIX,
+        )
+
+
+def _client_invocations(
+    client: Any,
+    *,
+    structured_stage: str,
+    text_stage: str,
+) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    for metadata in getattr(client, "invocation_history", []):
+        stage = (
+            structured_stage
+            if metadata.get("operation") == "structured_generation"
+            else text_stage
+        )
+        records.append({"stage": stage, **metadata})
+    return records
+
+
+def _annotate_workflow_summary(summary: dict[str, Any]) -> None:
+    records = summary.get("records") or []
+    failure_ids = [
+        record["record_id"]
+        for record in records
+        if not record.get("workflow_succeeded")
+    ]
+    summary["retrieval_strategy"] = "dense"
+    summary["workflow_failure_record_ids"] = failure_ids
+    summary["workflow_failure_count"] = len(failure_ids)
+    summary["nonempty_answer_count"] = sum(
+        bool(str(record.get("final_answer") or "").strip())
+        for record in records
+    )
 
 
 def _classification_query_value(classification: Any, field_name: str) -> str | None:
@@ -93,7 +146,7 @@ async def _run_agentic_turn_async(
     intent_model: str,
     generation_provider: GenerationProviderName,
     generation_model: str,
-    embedding_backend: str,
+    embedding_backend: EmbeddingProviderName,
     embedding_model: str,
     retrieval_filters_enabled: bool,
     retrieval_filter_mode: str,
@@ -104,13 +157,14 @@ async def _run_agentic_turn_async(
         provider=generation_provider,
         model=generation_model,
     )
+    intent_llm = build_generation_client(
+        provider=intent_provider,
+        model=intent_model,
+    )
     workflow = BasicAgenticWorkflow(
         llm=generation_llm,
         classifier=UserIntentClassifier(
-            llm=build_generation_client(
-                provider=intent_provider,
-                model=intent_model,
-            ),
+            llm=intent_llm,
             provider=intent_provider,
             model=intent_model,
         ),
@@ -123,11 +177,48 @@ async def _run_agentic_turn_async(
         retrieval_filters_enabled=retrieval_filters_enabled,
         retrieval_filter_mode=retrieval_filter_mode,
     )
-    result = await workflow.run(
-        user_message=user_message,
-        session_snapshot=SessionSnapshot().model_dump(mode="json", exclude_none=True),
+    try:
+        result = await workflow.run(
+            user_message=user_message,
+            session_snapshot=SessionSnapshot().model_dump(mode="json", exclude_none=True),
+        )
+    except Exception as exc:
+        invocations = _client_invocations(
+            intent_llm,
+            structured_stage="intent_classification",
+            text_stage="intent_classification",
+        ) + _client_invocations(
+            generation_llm,
+            structured_stage="retrieval_planning",
+            text_stage="answer_generation",
+        )
+        raise AgenticWorkflowRunError(
+            f"{type(exc).__name__}: {exc}",
+            invocations,
+        ) from exc
+
+    turn_result = AgenticTurnResult.model_validate(result)
+    invocations = _client_invocations(
+        intent_llm,
+        structured_stage="intent_classification",
+        text_stage="intent_classification",
+    ) + _client_invocations(
+        generation_llm,
+        structured_stage="retrieval_planning",
+        text_stage="answer_generation",
     )
-    return AgenticTurnResult.model_validate(result)
+    return turn_result.model_copy(
+        update={
+            "decision": turn_result.decision.model_copy(
+                update={
+                    "tool_payload": {
+                        **turn_result.decision.tool_payload,
+                        "llm_invocations": invocations,
+                    }
+                }
+            )
+        }
+    )
 
 
 def _run_agentic_turn(
@@ -138,7 +229,7 @@ def _run_agentic_turn(
     intent_model: str,
     generation_provider: GenerationProviderName,
     generation_model: str,
-    embedding_backend: str,
+    embedding_backend: EmbeddingProviderName,
     embedding_model: str,
     retrieval_filters_enabled: bool,
     retrieval_filter_mode: str,
@@ -169,7 +260,7 @@ def iter_agentic_workflow_eval(
     intent_model: str | None = None,
     generation_provider: GenerationProviderName | None = None,
     generation_model: str | None = None,
-    embedding_backend: str | None = None,
+    embedding_backend: EmbeddingProviderName | None = None,
     embedding_model: str | None = None,
     trace_project: str = settings.phoenix.project_name,
     phoenix_endpoint: str | None = settings.phoenix.collector_endpoint,
@@ -252,6 +343,7 @@ def iter_agentic_workflow_eval(
     
                     workflow_result: AgenticTurnResult | None = None
                     classifier_error: str | None = None
+                    llm_invocations: list[dict[str, Any]] = []
     
                     try:
                         workflow_result = _run_agentic_turn(
@@ -270,6 +362,9 @@ def iter_agentic_workflow_eval(
                         if fail_on_classifier_error:
                             raise
                         classifier_error = str(exc)
+                        llm_invocations = list(
+                            getattr(exc, "llm_invocations", [])
+                        )
                         classifier_error_record_ids.append(record.record_id)
                         record_span.set_attribute(
                             "jurisai.eval.workflow_error",
@@ -298,6 +393,7 @@ def iter_agentic_workflow_eval(
                             exclude_none=True,
                         )
                         tool_payload = workflow_result.decision.tool_payload
+                        llm_invocations = list(tool_payload.get("llm_invocations") or [])
                         tool_calls = list(tool_payload.get("tool_calls") or [])
                         results = list(tool_payload.get("retrieved_schemes") or [])[:limit]
                         retrieval_query = _classification_query_value(
@@ -413,6 +509,11 @@ def iter_agentic_workflow_eval(
                         "notes": record.notes,
                         "classification": classification_payload,
                         "classifier_error": classifier_error,
+                        "workflow_error": classifier_error,
+                        "workflow_succeeded": bool(
+                            workflow_result is not None
+                            and str(final_answer or "").strip()
+                        ),
                         "used_classifier": used_classifier_for_record,
                         "retrieval_query": retrieval_query,
                         "normalized_query": retrieval_query,
@@ -442,6 +543,14 @@ def iter_agentic_workflow_eval(
                         "debug": debug_payload,
                         "workflow_trace": workflow_trace,
                         "final_answer": final_answer,
+                        "llm_invocations": llm_invocations,
+                        "selected_response_models": list(
+                            dict.fromkeys(
+                                str(item["response_model"])
+                                for item in llm_invocations
+                                if item.get("response_model")
+                            )
+                        ),
                         "eval_mode": "agentic_workflow",
                         "intent_provider": resolved_intent_provider,
                         "intent_model": resolved_intent_model,
@@ -486,6 +595,7 @@ def iter_agentic_workflow_eval(
                         retrieval_filter_mode=resolved_retrieval_filter_mode,
                     )
                     final_summary["eval_mode"] = "agentic_workflow"
+                    _annotate_workflow_summary(final_summary)
                     yield final_summary, record_result, index, len(records)
 
         completed_at = datetime.now(tz=UTC)
@@ -522,6 +632,7 @@ def iter_agentic_workflow_eval(
             retrieval_filter_mode=resolved_retrieval_filter_mode,
         )
         final_summary["eval_mode"] = "agentic_workflow"
+        _annotate_workflow_summary(final_summary)
         completed_normally = True
         yield final_summary, last_record_result or {}, len(records), len(records)
     finally:
@@ -560,8 +671,9 @@ def iter_agentic_workflow_eval(
                 retrieval_filter_mode=resolved_retrieval_filter_mode,
             )
             final_summary["eval_mode"] = "agentic_workflow"
+            _annotate_workflow_summary(final_summary)
         if persist_artifact and final_summary is not None:
-            write_run_artifact(final_summary, resolved_output_path)
+            write_agentic_workflow_run_artifact(final_summary, resolved_output_path)
         _flush_tracing()
 
 
@@ -575,7 +687,7 @@ def run_agentic_workflow_eval(
     intent_model: str | None = None,
     generation_provider: GenerationProviderName | None = None,
     generation_model: str | None = None,
-    embedding_backend: str | None = None,
+    embedding_backend: EmbeddingProviderName | None = None,
     embedding_model: str | None = None,
     trace_project: str = settings.phoenix.project_name,
     phoenix_endpoint: str | None = settings.phoenix.collector_endpoint,
@@ -651,6 +763,7 @@ def run_agentic_workflow_eval(
             ),
         )
     final_summary["eval_mode"] = "agentic_workflow"
+    _annotate_workflow_summary(final_summary)
 
     if output_path is not None:
         resolved_output_path = output_path
@@ -661,5 +774,5 @@ def run_agentic_workflow_eval(
     final_summary["output_path"] = str(resolved_output_path)
 
     if persist_artifact:
-        write_run_artifact(final_summary, resolved_output_path)
+        write_agentic_workflow_run_artifact(final_summary, resolved_output_path)
     return final_summary
