@@ -70,10 +70,10 @@
 - For local chat-product development, prefer the repo-root combined launcher:
   - `bun run dev`
 - Frontend commands should use Bun from the repo root or the `web/` workspace:
-  - `cd /Users/ratniel/JurisAI/web && bun run dev -- --host 127.0.0.1 --port 5173`
-  - `bun --cwd /Users/ratniel/JurisAI/web run build`
+  - cd web && bun run dev -- --host 127.0.0.1 --port 5173
+  - bun --cwd web run build
 - The FastAPI chat server runs via:
-  - `uv run python /Users/ratniel/JurisAI/scripts/run_chat_api.py --host 127.0.0.1 --port 8000`
+  - uv run python scripts/run_chat_api.py --host 127.0.0.1 --port 8000
 
 ## Code Hygiene Rules
 
