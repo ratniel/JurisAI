@@ -146,6 +146,7 @@ def fallback_retrieval_plan(
     user_message: str,
     classification: UserIntentClassification,
     session_snapshot: SessionSnapshot,
+    default_query: str | None = None,
 ) -> RetrievalPlan:
     raw_filters = {
         **session_snapshot.user_profile,
@@ -154,7 +155,11 @@ def fallback_retrieval_plan(
     }
     intent_profile = build_retrieval_intent_profile(
         user_message=user_message,
-        retrieval_query=classification.discovery_query or classification.retrieval_query,
+        retrieval_query=(
+            default_query
+            or classification.discovery_query
+            or classification.retrieval_query
+        ),
         fit_query=classification.fit_query,
         raw_filters=raw_filters,
     )
@@ -439,6 +444,11 @@ def build_session_memory(
     if prior_summary:
         summary_parts.append(f"Prior context: {prior_summary}")
     continuation_goal = normalize_text(decision.tool_payload.get("continuation_goal"))
+    if (
+        not continuation_goal
+        and session_snapshot.last_action == NextAction.ASK_CLARIFYING_QUESTION.value
+    ):
+        continuation_goal = session_snapshot.last_user_goal
     current_request = _normalize_compact_text(user_message, max_chars=140)
     if current_request:
         summary_parts.append(f"Current request: {current_request}")
@@ -739,6 +749,7 @@ class BasicAgenticWorkflow(Workflow):
                 user_message=ev.user_message,
                 classification=ev.classification,
                 session_snapshot=ev.session_snapshot,
+                default_query=default_query,
             )
 
         updated_payload = {
@@ -1252,6 +1263,12 @@ class BasicAgenticWorkflow(Workflow):
     ) -> OrchestratorDecision:
         clarification_question = normalize_text(classification.clarification_question)
         if classification.needs_clarification and clarification_question:
+            continuation_goal = (
+                session_snapshot.last_user_goal
+                if session_snapshot.last_action
+                == NextAction.ASK_CLARIFYING_QUESTION.value
+                else None
+            )
             return OrchestratorDecision(
                 next_action=NextAction.ASK_CLARIFYING_QUESTION,
                 selected_agent="user_clarifier",
@@ -1260,6 +1277,7 @@ class BasicAgenticWorkflow(Workflow):
                         classification.extracted_profile_updates
                     ),
                     "question": clarification_question,
+                    "continuation_goal": continuation_goal,
                 },
             )
 

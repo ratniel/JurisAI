@@ -220,6 +220,26 @@ class WorkflowHelperTests(unittest.TestCase):
         self.assertEqual(plan.tool_calls[0].tool_name, RetrievalToolName.STATE_SCOPED_SEARCH)
         self.assertEqual(plan.tool_calls[0].state, "Maharashtra")
 
+    def test_fallback_retrieval_plan_preserves_deferred_goal(self) -> None:
+        classification = UserIntentClassification(
+            primary_intent=PrimaryIntent.PROFILE_UPDATE,
+            confidence=0.95,
+            user_goal="Share state",
+            extracted_profile_updates=[
+                IntentFact(key="state", value="Maharashtra")
+            ],
+            reasoning="User answered the state clarification.",
+        )
+
+        plan = fallback_retrieval_plan(
+            user_message="Maharashtra",
+            classification=classification,
+            session_snapshot=SessionSnapshot(),
+            default_query="Find engineering scholarships",
+        )
+
+        self.assertEqual(plan.tool_calls[0].query, "Find engineering scholarships")
+
     def test_decision_preserves_exact_clarification_question(self) -> None:
         classification = UserIntentClassification(
             primary_intent=PrimaryIntent.SCHEME_DISCOVERY,
@@ -289,6 +309,43 @@ class WorkflowHelperTests(unittest.TestCase):
             decision=decision,
             relevant_schemes=[],
             last_action="retrieval_completed",
+        )
+        self.assertEqual(memory.last_user_goal, "Find engineering scholarships")
+
+    def test_consecutive_clarification_preserves_prior_goal(self) -> None:
+        classification = UserIntentClassification(
+            primary_intent=PrimaryIntent.PROFILE_UPDATE,
+            confidence=0.91,
+            user_goal="Share state",
+            extracted_profile_updates=[
+                IntentFact(key="state", value="Maharashtra")
+            ],
+            needs_clarification=True,
+            clarification_question="Which category do you belong to?",
+            reasoning="Category is still needed.",
+        )
+        snapshot = SessionSnapshot(
+            last_user_goal="Find engineering scholarships",
+            last_action=NextAction.ASK_CLARIFYING_QUESTION.value,
+        )
+
+        decision = BasicAgenticWorkflow._decide_next_action(
+            classification,
+            snapshot,
+        )
+        memory = build_session_memory(
+            user_message="Maharashtra",
+            session_snapshot=snapshot,
+            classification=classification,
+            decision=decision,
+            relevant_schemes=[],
+            last_action=NextAction.ASK_CLARIFYING_QUESTION.value,
+        )
+
+        self.assertEqual(decision.next_action, NextAction.ASK_CLARIFYING_QUESTION)
+        self.assertEqual(
+            decision.tool_payload["continuation_goal"],
+            "Find engineering scholarships",
         )
         self.assertEqual(memory.last_user_goal, "Find engineering scholarships")
 
