@@ -89,6 +89,10 @@ class EmbeddingSettings(BaseModel):
         default="local",
         validation_alias=AliasChoices("backend", "EMBEDDING_BACKEND"),
     )
+    model: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("model", "EMBEDDING_MODEL"),
+    )
     local_model: str = Field(
         default="all-MiniLM-L6-v2",
         validation_alias=AliasChoices(
@@ -438,6 +442,11 @@ class Settings(BaseSettings):
         validation_alias="EMBEDDING_BACKEND",
         exclude=True,
     )
+    legacy_embedding_model: str | None = Field(
+        default=None,
+        validation_alias="EMBEDDING_MODEL",
+        exclude=True,
+    )
     legacy_local_embedding_model: str | None = Field(
         default=None,
         validation_alias="LOCAL_EMBEDDING_MODEL",
@@ -559,6 +568,8 @@ class Settings(BaseSettings):
             self.qdrant.api_key = self.legacy_qdrant_api_key
         if self.legacy_embedding_backend is not None:
             self.embeddings.backend = self.legacy_embedding_backend
+        if self.legacy_embedding_model is not None:
+            self.embeddings.model = self.legacy_embedding_model
         if self.legacy_local_embedding_model is not None:
             self.embeddings.local_model = self.legacy_local_embedding_model
         if self.legacy_gemini_embedding_model is not None:
@@ -634,6 +645,8 @@ class Settings(BaseSettings):
         return self.openrouter.model
 
     def embedding_model(self, backend: Literal["local", "gemini"] | None = None) -> str:
+        if self.embeddings.model:
+            return self.embeddings.model
         resolved_backend = backend or self.embeddings.backend
         if resolved_backend == "local":
             return self.embeddings.local_model
