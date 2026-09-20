@@ -9,6 +9,7 @@ from google.genai import types
 from pydantic import BaseModel
 
 from src.config.settings import settings
+from src.llm.contracts import LLMInvocationMetadata, TokenUsage
 
 StructuredModelT = TypeVar("StructuredModelT", bound=BaseModel)
 
@@ -30,6 +31,8 @@ class GeminiClient:
             )
 
         self.default_model = model or settings.gemini_model
+        self.provider_name = "gemini"
+        self.last_invocation_metadata: LLMInvocationMetadata | None = None
         self._client = genai.Client(
             api_key=resolved_api_key,
             http_options=types.HttpOptions(api_version=api_version),
@@ -80,7 +83,7 @@ class GeminiClient:
         temperature: float | None = 0.2,
         **config_overrides: Any,
     ) -> types.GenerateContentResponse:
-        return self._client.models.generate_content(
+        response = self._client.models.generate_content(
             model=model or self.default_model,
             contents=prompt,
             config=self._build_config(
@@ -89,6 +92,11 @@ class GeminiClient:
                 **config_overrides,
             ),
         )
+        self.last_invocation_metadata = self._build_invocation_metadata(
+            response=response,
+            model_name=model or self.default_model,
+        )
+        return response
 
     async def agenerate(
         self,
@@ -99,7 +107,7 @@ class GeminiClient:
         temperature: float | None = 0.2,
         **config_overrides: Any,
     ) -> types.GenerateContentResponse:
-        return await self._client.aio.models.generate_content(
+        response = await self._client.aio.models.generate_content(
             model=model or self.default_model,
             contents=prompt,
             config=self._build_config(
@@ -108,6 +116,11 @@ class GeminiClient:
                 **config_overrides,
             ),
         )
+        self.last_invocation_metadata = self._build_invocation_metadata(
+            response=response,
+            model_name=model or self.default_model,
+        )
+        return response
 
     def generate_structured(
         self,
@@ -263,6 +276,53 @@ class GeminiClient:
         if temperature is not None:
             config_kwargs["temperature"] = temperature
         return types.GenerateContentConfig(**config_kwargs)
+
+    def _build_invocation_metadata(
+        self,
+        *,
+        response: types.GenerateContentResponse,
+        model_name: str,
+    ) -> LLMInvocationMetadata:
+        usage_metadata = getattr(response, "usage_metadata", None)
+        return LLMInvocationMetadata(
+            provider=self.provider_name,
+            model=model_name,
+            usage=TokenUsage(
+                prompt_tokens=self._coerce_int(
+                    getattr(usage_metadata, "prompt_token_count", None),
+                    getattr(usage_metadata, "input_token_count", None),
+                ),
+                completion_tokens=self._coerce_int(
+                    getattr(usage_metadata, "candidates_token_count", None),
+                    getattr(usage_metadata, "output_token_count", None),
+                ),
+                total_tokens=self._coerce_int(
+                    getattr(usage_metadata, "total_token_count", None),
+                ),
+                reasoning_tokens=self._coerce_int(
+                    getattr(usage_metadata, "thoughts_token_count", None),
+                ),
+                cached_tokens=self._coerce_int(
+                    getattr(usage_metadata, "cached_content_token_count", None),
+                ),
+            ),
+            raw_usage=(
+                usage_metadata.model_dump()
+                if usage_metadata is not None and hasattr(usage_metadata, "model_dump")
+                else {}
+            ),
+        )
+
+    @staticmethod
+    def _coerce_int(value: Any, fallback: Any = None) -> int:
+        for candidate in (value, fallback):
+            if candidate is None:
+                continue
+            try:
+                return int(candidate)
+            except (TypeError, ValueError):
+                continue
+        return 0
 
 
 def main() -> None:

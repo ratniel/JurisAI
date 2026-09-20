@@ -179,7 +179,10 @@ class ScrapeSchemes:
             async with self:
                 # Load search page
                 search_page: Page = await self._require_context().new_page()
-                await search_page.goto(self.scheme_search_url)
+                await search_page.goto(
+                    self.scheme_search_url,
+                    wait_until="domcontentloaded",
+                )
                 container_selector = (
                     "div.sm\\:col-span-3.col-span-4.items-center.justify-center"
                 )

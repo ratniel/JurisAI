@@ -2,14 +2,31 @@ from __future__ import annotations
 
 from typing import Any, Protocol, TypeVar, runtime_checkable
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 StructuredModelT = TypeVar("StructuredModelT", bound=BaseModel)
+
+
+class TokenUsage(BaseModel):
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+    total_tokens: int = 0
+    reasoning_tokens: int = 0
+    cached_tokens: int = 0
+
+
+class LLMInvocationMetadata(BaseModel):
+    provider: str
+    model: str
+    usage: TokenUsage = Field(default_factory=TokenUsage)
+    finish_reason: str | None = None
+    raw_usage: dict[str, Any] = Field(default_factory=dict)
 
 
 @runtime_checkable
 class TextGenerationClient(Protocol):
     default_model: str
+    last_invocation_metadata: LLMInvocationMetadata | None
 
     def generate_text(
         self,
