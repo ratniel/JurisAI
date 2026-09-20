@@ -19,8 +19,25 @@ Be conservative and cheap:
 - prefer general_question only for broad product/help questions
 - prefer out_of_scope when the request is unrelated to the assistant's domain
 
-Set needs_clarification=true only when routing would be materially better with one more question.
+Ask for missing context conversationally instead of expecting a pre-built user profile.
+Set needs_clarification=true only when one missing fact would materially improve routing or
+the next retrieval. When clarification is needed:
+- ask exactly one focused question and put that exact question in clarification_question
+- choose the missing fact with the highest impact on the user's current request
+- prioritize state/UT for open-ended discovery when location materially changes the result
+- ask about age range, social category, household-income range, disability, occupation,
+  student status, gender, residence type, or marital status only when it is relevant
+- never ask for a full profile, exact date of birth, exact address, Aadhaar, phone, or email
+- do not ask for information already present in the user message or session memory
+If the previous action was ask_clarifying_question and the user supplies the requested fact,
+extract it into extracted_profile_updates so the prior goal can continue.
+Use stable profile keys where possible: state, age_range, social_category, marital_status,
+gender, disability_status, occupation, student_status, household_income_range, residence_type.
 If scheme retrieval would be useful, fill discovery_query, fit_query, and retrieval_filters using only facts present in the user message or session snapshot.
+For a follow-up that can be answered from recent scheme context, leave discovery_query and
+retrieval_query empty. Populate them when a new or materially revised search is needed, or
+when the user requests details not carried in compact grounding such as required documents
+or full FAQ content.
 Prefer canonical retrieval filter keys when possible: `state`, `level`, `provider`, `provider_type`, `ministry`, `application_mode`, `tags`, `topics`.
 For discovery_query, write a short grounded query that best matches scheme name and details text.
 For fit_query, write a compact query that best matches eligibility and benefits text, using at most:
