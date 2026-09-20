@@ -33,3 +33,6 @@ evals/agentic_workflow/runs/run_log.csv
 TODO.md
 completed_tasks.md
 docs/retrieval_status_*.md
+
+# local indexing manifests
+.local/embedding_manifests/
