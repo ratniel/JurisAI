@@ -25,6 +25,8 @@
 - The dashboard and CLI must consume the same shared evaluation logic.
 - Retrieval-eval run artifacts belong only under `evals/retrieval/runs/`.
 - The canonical retrieval experiment ledger is `evals/retrieval/runs/run_log.csv`.
+- Agentic-workflow run artifacts belong under `evals/agentic_workflow/runs/`, with `run_log.csv` as the canonical ledger.
+- The Jev experiment is an offline decision comparison against the agentic classifier using the shared golden corpus. It does not replace the retrieval eval path; see `docs/jev_decision_experiment.md`.
 - Keep `run_log.csv` aligned with the JSON run artifacts; do not maintain separate ad hoc experiment tables when the CSV can be regenerated from the persisted runs.
 - `eval/retrieval/` is for canonical seed assets only:
   - `personas_v1.yaml`
