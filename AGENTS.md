@@ -66,6 +66,7 @@
 
 - Prefer `uv run ...` for scripts and tests when possible.
 - If the repo-local virtualenv is already in use, `.venv/bin/python ...` is acceptable.
+- Use paths relative to the repository root in commands, package scripts, and documentation. Do not hardcode machine-specific absolute paths such as `/Users/...`; this project must run from another checkout or deployment environment.
 - Start local infra through the repo `docker-compose.yml` when MongoDB or Qdrant is missing.
 - For local chat-product development, prefer the repo-root combined launcher:
   - `bun run dev`

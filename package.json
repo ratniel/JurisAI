@@ -1,0 +1,17 @@
+{
+  "name": "jurisai",
+  "private": true,
+  "workspaces": [
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently -k --names api,web --prefix-colors blue,green \"bun run dev:api\" \"bun run dev:web\"",
+    "dev:api": "uv run python scripts/run_chat_api.py --host 127.0.0.1 --port 8000 --reload",
+    "dev:web": "cd web && bun x vite --host 127.0.0.1 --port 5173",
+    "build:web": "bun --cwd web run build",
+    "lint:web": "bun --cwd web run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
