@@ -80,6 +80,20 @@ class QdrantSettings(BaseModel):
             "QDRANT_DENSE_VECTOR_NAME",
         ),
     )
+    sparse_vector_name: str = Field(
+        default="keyword_sparse_vector",
+        validation_alias=AliasChoices(
+            "sparse_vector_name",
+            "QDRANT_SPARSE_VECTOR_NAME",
+        ),
+    )
+    sparse_keyword_dimensions: int = Field(
+        default=32768,
+        validation_alias=AliasChoices(
+            "sparse_keyword_dimensions",
+            "QDRANT_SPARSE_KEYWORD_DIMENSIONS",
+        ),
+    )
 
 
 class EmbeddingSettings(BaseModel):
