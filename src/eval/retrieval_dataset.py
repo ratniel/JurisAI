@@ -9,6 +9,7 @@ import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from src.config.settings import settings
+from src.agentic.models import PrimaryIntent
 
 ShortlistRole = Literal[
     "core_positive",
@@ -146,6 +147,9 @@ class GoldenRecord(BaseModel):
     notes: str = ""
     generation_provenance: GenerationProvenance
     review_status: ReviewStatus = "seed_reviewed"
+    # Optional human labels; absence must not be scored as a negative decision.
+    expected_primary_intent: PrimaryIntent | None = None
+    expected_needs_clarification: bool | None = Field(default=None, strict=True)
 
     @field_validator("record_id", "persona_id", "user_query", "notes", mode="before")
     @classmethod
