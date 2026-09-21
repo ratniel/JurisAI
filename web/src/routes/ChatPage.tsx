@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowUpRight } from '@phosphor-icons/react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import { ArrowUpRight, CaretDown } from '@phosphor-icons/react'
 import { createFixtureArtifact, createFixtureSession, FIXTURE_ANSWER } from '../fixtures'
 import type { FormEvent, KeyboardEvent } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
 import { createMessage, getSession } from '../api'
+import '../styles/disclosures.css'
 import type {
   ChatMessageRecord,
   ChatSessionRecord,
@@ -19,8 +20,6 @@ type StageEntry = {
   stage: string
   detail: string
 }
-
-const COLLAPSE_PREVIEW_LENGTH = 360
 
 const FRIENDLY_STAGE_LABELS: Record<string, string> = {
   run_started: 'Thinking',
@@ -48,6 +47,7 @@ export function ChatPage() {
   const { sessionId = '' } = useParams()
   const fixtureMode = import.meta.env.DEV && new URLSearchParams(window.location.search).get('fixture') === '1'
   const location = useLocation()
+  const navigate = useNavigate()
   const [session, setSession] = useState<ChatSessionRecord | null>(null)
   const [composer, setComposer] = useState('')
   const [loading, setLoading] = useState(true)
@@ -63,7 +63,9 @@ export function ChatPage() {
   const [lastPrompt, setLastPrompt] = useState('')
   const eventSourceRef = useRef<EventSource | null>(null)
   const initialPromptAppliedRef = useRef(false)
-  const startMessageRef = useRef<(message: string, sessionOverride?: ChatSessionRecord) => Promise<void>>(async () => {})
+  const initialLocationStateRef = useRef(location.state as ChatLocationState | null)
+  const runInFlightRef = useRef(false)
+  const startMessageRef = useRef(startMessage)
   const composerFormRef = useRef<HTMLFormElement | null>(null)
   const composerRef = useRef<HTMLTextAreaElement | null>(null)
   const messageScrollAreaRef = useRef<HTMLDivElement | null>(null)
@@ -89,10 +91,15 @@ export function ChatPage() {
         setSession(response.session)
         setCurrentArtifact(latestArtifact)
         setSessionErrorMessage(null)
-        const locationState = location.state as ChatLocationState | null
+        const locationState = initialLocationStateRef.current
         const initialPrompt = locationState?.initialPrompt?.trim()
         if (!initialPromptAppliedRef.current && initialPrompt) {
           initialPromptAppliedRef.current = true
+          initialLocationStateRef.current = null
+          void navigate(`${location.pathname}${location.search}`, {
+            replace: true,
+            state: null,
+          })
           if (locationState?.autoSubmit) void startMessageRef.current(initialPrompt, response.session)
           else setComposer(initialPrompt)
         }
@@ -115,7 +122,7 @@ export function ChatPage() {
       cancelled = true
       eventSourceRef.current?.close()
     }
-  }, [sessionId, location.state, fixtureMode])
+  }, [sessionId, fixtureMode, location.pathname, location.search, navigate])
 
 
   useEffect(() => {
@@ -129,6 +136,18 @@ export function ChatPage() {
   }, [composer])
 
   const transcript = useMemo(() => session?.messages ?? [], [session?.messages])
+  const displayTranscript = useMemo(
+    () =>
+      transcript.filter((message, index, messages) => {
+        const previous = messages[index - 1]
+        return !(
+          message.role === 'user' &&
+          previous?.role === 'user' &&
+          previous.content.trim() === message.content.trim()
+        )
+      }),
+    [transcript],
+  )
 
   useEffect(() => {
     const scrollArea = messageScrollAreaRef.current
@@ -156,16 +175,25 @@ export function ChatPage() {
     Boolean(draftAnswer.trim()) ||
     Boolean(runErrorMessage) ||
     stageLog.length > 0
+  const progressInsertionIndex =
+    showLiveAssistant && !sending && displayTranscript.at(-1)?.role === 'assistant'
+      ? displayTranscript.length - 1
+      : displayTranscript.length
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     await startMessage(composer.trim())
   }
 
-  async function startMessage(message: string, sessionOverride?: ChatSessionRecord) {
+  async function startMessage(
+    message: string,
+    sessionOverride?: ChatSessionRecord,
+    retry = false,
+  ) {
     const activeSession = sessionOverride ?? session
-    if (!message || !activeSession || sending) return
+    if (!message || !activeSession || runInFlightRef.current) return
 
+    runInFlightRef.current = true
     setLastPrompt(message)
     setRunErrorMessage(null)
     setSending(true)
@@ -173,22 +201,24 @@ export function ChatPage() {
     setStageLog([])
     setStageHistoryExpanded(false)
     setComposer('')
-    setSession((current) =>
-      current
-        ? {
-            ...current,
-            messages: [
-              ...current.messages,
-              {
-                message_id: `optimistic-${Date.now()}`,
-                role: 'user',
-                content: message,
-                created_at: new Date().toISOString(),
-              },
-            ],
-          }
-        : current,
-    )
+    if (!retry) {
+      setSession((current) =>
+        current
+          ? {
+              ...current,
+              messages: [
+                ...current.messages,
+                {
+                  message_id: `optimistic-${Date.now()}`,
+                  role: 'user',
+                  content: message,
+                  created_at: new Date().toISOString(),
+                },
+              ],
+            }
+          : current,
+      )
+    }
 
     try {
       if (fixtureMode) {
@@ -211,17 +241,19 @@ export function ChatPage() {
           setStageHistoryExpanded(true)
         } else {
           const answer = long ? `${FIXTURE_ANSWER}\n\n${FIXTURE_ANSWER}\n\n${FIXTURE_ANSWER}` : FIXTURE_ANSWER
-          for (let i = 0; i < answer.length; i += 13) {
+          const chunks = answer.match(/[\s\S]{1,13}/g) ?? []
+          for (const chunk of chunks) {
             await new Promise(resolve => window.setTimeout(resolve, 18))
-            setDraftAnswer(current => current + answer.slice(i, i + 13))
+            setDraftAnswer(current => current + chunk)
           }
           setStageHistoryExpanded(false)
         }
+        runInFlightRef.current = false
         setSending(false)
         return
       }
 
-      const response = await createMessage(activeSession.session_id, message)
+      const response = await createMessage(activeSession.session_id, message, retry)
       let terminalEventReceived = false
       eventSourceRef.current?.close()
       const source = new EventSource(response.stream_path)
@@ -278,6 +310,7 @@ export function ChatPage() {
             null,
         )
         setSending(false)
+        runInFlightRef.current = false
         source.close()
         eventSourceRef.current = null
       })
@@ -290,6 +323,7 @@ export function ChatPage() {
         setRunErrorMessage(payload.error)
         setStageHistoryExpanded(true)
         setSending(false)
+        runInFlightRef.current = false
         source.close()
         eventSourceRef.current = null
       })
@@ -304,10 +338,12 @@ export function ChatPage() {
         )
         setStageHistoryExpanded(true)
         setSending(false)
+        runInFlightRef.current = false
         source.close()
         eventSourceRef.current = null
       }
     } catch (error) {
+      runInFlightRef.current = false
       setSending(false)
       setRunErrorMessage(
         error instanceof Error ? error.message : 'Failed to send message.',
@@ -315,8 +351,6 @@ export function ChatPage() {
       setStageHistoryExpanded(true)
     }
   }
-
-  startMessageRef.current = startMessage
 
   function handleComposerKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key !== 'Enter' || event.shiftKey) {
@@ -339,7 +373,7 @@ export function ChatPage() {
             <Link className="brand-mark" to="/" aria-label="JurisAI home">J</Link>
             <div>
               <p className="eyebrow">JurisAI</p>
-              <h1>{transcript.length ? 'Scheme guidance' : 'New conversation'}</h1>
+              <h1>{displayTranscript.length ? 'Scheme guidance' : 'New conversation'}</h1>
             </div>
           </div>
           <div className="topbar-meta">
@@ -356,12 +390,16 @@ export function ChatPage() {
           <section className="error-state">{sessionErrorMessage}</section>
         ) : (
           <section className="chat-grid">
+            {showArtifacts && currentArtifact ? (
+              <SchemeShelf key={currentArtifact.artifact_id} artifact={currentArtifact} />
+            ) : null}
+
             <section className="transcript-panel">
               <div className="panel-header">
                 <div>
                   <p className="panel-kicker">Conversation</p>
                   <h2>
-                    {transcript.length
+                    {displayTranscript.length
                       ? 'Ask follow-ups naturally'
                       : 'Ask about eligibility, benefits, documents, or the best fit'}
                   </h2>
@@ -375,7 +413,7 @@ export function ChatPage() {
 
               <div className="message-scroll-area" ref={messageScrollAreaRef}>
                 <div className="message-list">
-                  {transcript.length === 0 && !showLiveAssistant ? (
+                  {displayTranscript.length === 0 && !showLiveAssistant ? (
                     <section className="welcome-panel">
                       <div className="welcome-copy">
                         <p className="section-label">Start here</p>
@@ -401,15 +439,27 @@ export function ChatPage() {
                     </section>
                   ) : null}
 
-                  {transcript.map((message) => (
-                    <ChatMessageBubble key={message.message_id} message={message} />
+                  {displayTranscript.map((message, index) => (
+                    <Fragment key={message.message_id}>
+                      {showLiveAssistant && index === progressInsertionIndex ? (
+                        <LiveAssistantBubble
+                          draftAnswer={draftAnswer}
+                          errorMessage={runErrorMessage}
+                          onRetry={() => void startMessage(lastPrompt, undefined, true)}
+                          expanded={stageHistoryExpanded}
+                          onToggleExpanded={() => setStageHistoryExpanded((current) => !current)}
+                          stageLog={stageLog}
+                        />
+                      ) : null}
+                      <ChatMessageBubble message={message} />
+                    </Fragment>
                   ))}
 
-                  {showLiveAssistant ? (
+                  {showLiveAssistant && progressInsertionIndex === displayTranscript.length ? (
                     <LiveAssistantBubble
                       draftAnswer={draftAnswer}
                       errorMessage={runErrorMessage}
-                      onRetry={() => void startMessage(lastPrompt)}
+                      onRetry={() => void startMessage(lastPrompt, undefined, true)}
                       expanded={stageHistoryExpanded}
                       onToggleExpanded={() => setStageHistoryExpanded((current) => !current)}
                       stageLog={stageLog}
@@ -451,13 +501,6 @@ export function ChatPage() {
               </form>
             </section>
 
-            {showArtifacts ? (
-              <section className="inline-artifacts" aria-label="Retrieved schemes">
-                <div className="artifact-heading"><span className="section-index">SCHEME MATCHES</span><span>{schemeCount} found</span></div>
-                {(currentArtifact?.schemes ?? []).slice(0, 3).map(scheme => <SchemeCard key={scheme.scheme_id} scheme={scheme}/>) }
-                {schemeCount > 3 ? <details className="more-schemes"><summary>Show {schemeCount - 3} more schemes</summary>{(currentArtifact?.schemes ?? []).slice(3).map(scheme => <SchemeCard key={scheme.scheme_id} scheme={scheme}/>)}</details> : null}
-              </section>
-            ) : null}
           </section>
         )}
       </section>
@@ -493,15 +536,15 @@ function LiveAssistantBubble({
   onToggleExpanded: () => void
   stageLog: StageEntry[]
 }) {
-  const latestStageIndex = stageLog.length - 1
   const latestStage = stageLog.at(-1)
+  const completedStages = stageLog.slice(0, -1)
   const latestStageContent = latestStage
     ? describeStageEntry(latestStage)
     : {
         label: 'Thinking',
         detail: 'Preparing your grounded response.',
       }
-  const canExpand = stageLog.length > 0 || Boolean(errorMessage)
+  const canExpand = completedStages.length > 0
 
   return (
     <article className="message-bubble message-assistant message-live">
@@ -526,16 +569,14 @@ function LiveAssistantBubble({
           </span>
         </button>
 
-        {expanded ? (
+        {expanded && completedStages.length ? (
           <div className="stage-list">
-            {stageLog.map((entry, index) => {
+            {completedStages.map((entry, index) => {
               const describedEntry = describeStageEntry(entry)
               return (
                 <div
                   key={`${entry.stage}-${index}`}
-                  className={`stage-item ${
-                    index === latestStageIndex ? 'stage-item-active' : 'stage-item-complete'
-                  }`}
+                  className="stage-item stage-item-complete"
                 >
                   <span className="stage-dot" />
                   <div>
@@ -548,19 +589,6 @@ function LiveAssistantBubble({
           </div>
         ) : null}
 
-        {!stageLog.length ? (
-          <div className="stage-list">
-            <div
-              className="stage-item stage-item-active"
-            >
-              <span className="stage-dot" />
-              <div>
-                <p className="stage-label">Thinking</p>
-                <p className="stage-detail">Preparing your grounded response.</p>
-              </div>
-            </div>
-          </div>
-        ) : null}
       </div>
 
       {draftAnswer.trim() ? (
@@ -585,6 +613,8 @@ function LiveAssistantBubble({
 function SchemeCard({ scheme }: { scheme: TopSchemeArtifactEntry }) {
   const badgeLabel = getSchemeBadgeLabel(scheme)
   const meta = getSchemeMeta(scheme)
+  const sourceLinks = getSchemeSourceLinks(scheme)
+  const [detailsOpen, setDetailsOpen] = useState(false)
 
   return (
     <article className="scheme-card">
@@ -600,24 +630,82 @@ function SchemeCard({ scheme }: { scheme: TopSchemeArtifactEntry }) {
       ) : null}
 
       <div>
-        <details className="scheme-details">
-          <summary>View scheme details</summary>
+        <div className="scheme-details">
+          <button
+            aria-expanded={detailsOpen}
+            className="scheme-details-toggle"
+            onClick={() => setDetailsOpen((current) => !current)}
+            type="button"
+          >
+            <span>{detailsOpen ? 'Hide scheme details' : 'View scheme details'}</span>
+            <CaretDown className={detailsOpen ? 'disclosure-icon disclosure-icon-open' : 'disclosure-icon'} size={16} />
+          </button>
+          {detailsOpen ? (
           <div className="scheme-sections">
-            <ExpandableMarkdownSection content={scheme.details} label="Details" />
-            <ExpandableMarkdownSection content={scheme.eligibility} label="Eligibility" />
-            <ExpandableMarkdownSection content={scheme.benefits} label="Benefits" />
-            <ExpandableMarkdownSection content={scheme.documents_required} label="Documents required" />
+            <SchemeMarkdownSection content={scheme.details} label="Details" />
+            <SchemeMarkdownSection content={scheme.eligibility} label="Eligibility" />
+            <SchemeMarkdownSection content={scheme.benefits} label="Benefits" />
+            <SchemeMarkdownSection content={scheme.documents_required} label="Documents required" />
           </div>
-        </details>
-        {scheme.url ? <a className="official-source" href={scheme.url} target="_blank" rel="noreferrer">Official source <ArrowUpRight size={15}/></a> : null}
-
-
+          ) : null}
+        </div>
+        {sourceLinks.length ? (
+          <div className="scheme-sources" aria-label="Scheme sources">
+            <span className="scheme-sources-label">Sources</span>
+            <div className="scheme-source-links">
+              {sourceLinks.map((source) => (
+                <a
+                  className="official-source"
+                  href={source.url}
+                  key={`${source.label}-${source.url}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {source.label} <ArrowUpRight size={15} />
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
     </article>
   )
 }
 
-function ExpandableMarkdownSection({
+function SchemeShelf({ artifact }: { artifact: TopSchemesArtifact }) {
+  const [showAll, setShowAll] = useState(false)
+  const visibleSchemes = showAll ? artifact.schemes : artifact.schemes.slice(0, 3)
+  const hiddenCount = Math.max(artifact.schemes.length - 3, 0)
+
+  return (
+    <section className="inline-artifacts scheme-shelf" aria-label="Retrieved schemes">
+      <div className="artifact-heading">
+        <div>
+          <span className="section-index">SCHEME MATCHES</span>
+          <strong>{artifact.schemes.length} found</strong>
+        </div>
+        {hiddenCount ? (
+          <button
+            aria-expanded={showAll}
+            className="shelf-toggle"
+            onClick={() => setShowAll((current) => !current)}
+            type="button"
+          >
+            <span>{showAll ? 'Show top 3' : `Show ${hiddenCount} more`}</span>
+            <CaretDown className={showAll ? 'disclosure-icon disclosure-icon-open' : 'disclosure-icon'} size={16} />
+          </button>
+        ) : null}
+      </div>
+      <div className="scheme-rail">
+        {visibleSchemes.map((scheme) => (
+          <SchemeCard key={scheme.scheme_id} scheme={scheme} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function SchemeMarkdownSection({
   content,
   label,
 }: {
@@ -625,29 +713,16 @@ function ExpandableMarkdownSection({
   label: string
 }) {
   const trimmedContent = content?.trim()
-  const [expanded, setExpanded] = useState(false)
-
   if (!trimmedContent) {
     return null
   }
-
-  const canCollapse = trimmedContent.length > COLLAPSE_PREVIEW_LENGTH
 
   return (
     <section className="scheme-field">
       <div className="scheme-field-header">
         <h4>{label}</h4>
-        {canCollapse ? (
-          <button
-            className="inline-button"
-            onClick={() => setExpanded((current) => !current)}
-            type="button"
-          >
-            {expanded ? 'Less' : 'More'}
-          </button>
-        ) : null}
       </div>
-      <div className={`scheme-field-body ${canCollapse && !expanded ? 'collapsed' : ''}`}>
+      <div className="scheme-field-body">
         <MarkdownBlock className="scheme-rich-text markdown-content" content={trimmedContent} />
       </div>
     </section>
@@ -781,4 +856,25 @@ function getSchemeMeta(scheme: TopSchemeArtifactEntry): string | null {
 
   const metaParts = [scheme.state ?? scheme.provider, scheme.level].filter(Boolean)
   return metaParts.length ? metaParts.join(' • ') : null
+}
+
+function getSchemeSourceLinks(
+  scheme: TopSchemeArtifactEntry,
+): Array<{ label: string; url: string }> {
+  const links = (scheme.references ?? []).flatMap((source) => {
+    const url = source.url?.trim()
+    if (!url) return []
+    return [{ label: source.text?.trim() || sourceHostname(url), url }]
+  })
+
+  if (links.length || !scheme.url?.trim()) return links
+  return [{ label: 'Official scheme page', url: scheme.url.trim() }]
+}
+
+function sourceHostname(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    return 'Source'
+  }
 }

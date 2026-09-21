@@ -85,6 +85,7 @@ class CreateMessageRequest(BaseModel):
     """POST body for a new user message."""
 
     message: str
+    retry: bool = False
 
 
 class CreateMessageResponse(BaseModel):

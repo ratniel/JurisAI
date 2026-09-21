@@ -69,6 +69,7 @@ class ChatRuntimeManager:
         *,
         session: ChatSessionRecord,
         user_message: str,
+        append_user_message: bool = True,
     ) -> ChatRunRecord:
         run = await self._repository.create_run(
             session_id=session.session_id,
@@ -77,13 +78,14 @@ class ChatRuntimeManager:
         run_state = ChatRunState()
         self._active_runs[run.run_id] = run_state
 
-        user_entry = ChatMessageRecord(role="user", content=user_message)
-        updated_session = await self._repository.append_session_message(
-            session_id=session.session_id,
-            message=user_entry,
-        )
-        if updated_session is not None:
-            session = updated_session
+        if append_user_message:
+            user_entry = ChatMessageRecord(role="user", content=user_message)
+            updated_session = await self._repository.append_session_message(
+                session_id=session.session_id,
+                message=user_entry,
+            )
+            if updated_session is not None:
+                session = updated_session
 
         asyncio.create_task(self._execute_run(session=session, run=run))
         return run

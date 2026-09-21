@@ -100,7 +100,23 @@ def create_app() -> FastAPI:
         session = await repository.get_session(session_id)
         if session is None:
             raise HTTPException(status_code=404, detail="Session not found.")
-        run = await runtime.start_run(session=session, user_message=request.message.strip())
+        user_message = request.message.strip()
+        if request.retry:
+            latest_user_message = next(
+                (message for message in reversed(session.messages) if message.role == "user"),
+                None,
+            )
+            if latest_user_message is None or latest_user_message.content != user_message:
+                raise HTTPException(
+                    status_code=409,
+                    detail="A retry must match the latest user message in this session.",
+                )
+
+        run = await runtime.start_run(
+            session=session,
+            user_message=user_message,
+            append_user_message=not request.retry,
+        )
         return CreateMessageResponse(
             run_id=run.run_id,
             session_id=session_id,

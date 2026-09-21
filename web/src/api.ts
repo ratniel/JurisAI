@@ -34,10 +34,10 @@ export async function getSession(sessionId: string): Promise<GetSessionResponse>
 export async function createMessage(
   sessionId: string,
   message: string,
+  retry = false,
 ): Promise<CreateMessageResponse> {
   return requestJson<CreateMessageResponse>(`/api/chat/sessions/${sessionId}/messages`, {
     method: 'POST',
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({ message, retry }),
   })
 }
-
