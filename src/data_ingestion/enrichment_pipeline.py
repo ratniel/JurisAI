@@ -173,5 +173,10 @@ def build_enriched_scheme(
 
 def dump_enriched_scheme_for_storage(document: EnrichedSchemeData) -> dict[str, Any]:
     payload = document.model_dump(by_alias=True, exclude_none=True)
+    # document_id round-trips through this model as a str, so it must never
+    # be written back to Mongo as "_id" - that stores a plain string instead
+    # of a native ObjectId. Callers that need to pin _id to match the raw
+    # document's real ObjectId must set it explicitly after calling this.
+    payload.pop("_id", None)
     payload["application_modes"] = document.application_modes.model_dump()
     return payload
