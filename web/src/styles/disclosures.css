@@ -188,6 +188,7 @@
 .scheme-rail {
   display: flex;
   align-items: stretch;
+  align-self: start;
   gap: 10px;
   overflow-x: auto;
   padding: 1px 1px 8px;
