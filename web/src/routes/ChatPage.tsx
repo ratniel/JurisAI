@@ -673,34 +673,50 @@ function SchemeCard({ scheme }: { scheme: TopSchemeArtifactEntry }) {
 }
 
 function SchemeShelf({ artifact }: { artifact: TopSchemesArtifact }) {
+  const [expanded, setExpanded] = useState(false)
   const [showAll, setShowAll] = useState(false)
   const visibleSchemes = showAll ? artifact.schemes : artifact.schemes.slice(0, 3)
   const hiddenCount = Math.max(artifact.schemes.length - 3, 0)
 
   return (
-    <section className="inline-artifacts scheme-shelf" aria-label="Retrieved schemes">
+    <section
+      className={`inline-artifacts scheme-shelf ${expanded ? 'scheme-shelf-expanded' : ''}`}
+      aria-label="Retrieved schemes"
+    >
       <div className="artifact-heading">
         <div>
           <span className="section-index">SCHEME MATCHES</span>
           <strong>{artifact.schemes.length} found</strong>
         </div>
-        {hiddenCount ? (
+        <div className="shelf-actions">
+          {expanded && hiddenCount ? (
+            <button
+              aria-expanded={showAll}
+              className="shelf-secondary-toggle"
+              onClick={() => setShowAll((current) => !current)}
+              type="button"
+            >
+              <span>{showAll ? 'Show top 3' : `Show ${hiddenCount} more`}</span>
+            </button>
+          ) : null}
           <button
-            aria-expanded={showAll}
+            aria-expanded={expanded}
             className="shelf-toggle"
-            onClick={() => setShowAll((current) => !current)}
+            onClick={() => setExpanded((current) => !current)}
             type="button"
           >
-            <span>{showAll ? 'Show top 3' : `Show ${hiddenCount} more`}</span>
-            <CaretDown className={showAll ? 'disclosure-icon disclosure-icon-open' : 'disclosure-icon'} size={16} />
+            <span>{expanded ? 'Hide matches' : 'View matches'}</span>
+            <CaretDown className={expanded ? 'disclosure-icon disclosure-icon-open' : 'disclosure-icon'} size={16} />
           </button>
-        ) : null}
+        </div>
       </div>
-      <div className="scheme-rail">
-        {visibleSchemes.map((scheme) => (
-          <SchemeCard key={scheme.scheme_id} scheme={scheme} />
-        ))}
-      </div>
+      {expanded ? (
+        <div className="scheme-rail">
+          {visibleSchemes.map((scheme) => (
+            <SchemeCard key={scheme.scheme_id} scheme={scheme} />
+          ))}
+        </div>
+      ) : null}
     </section>
   )
 }

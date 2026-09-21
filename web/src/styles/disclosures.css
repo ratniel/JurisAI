@@ -113,12 +113,18 @@
 
 .scheme-shelf {
   min-width: 0;
+  max-height: none;
+  overflow: hidden;
+  padding: 10px 0;
+  border-top: 1px solid #ffffff12;
+  border-bottom: 1px solid #ffffff12;
+}
+
+.scheme-shelf-expanded {
   max-height: min(34dvh, 310px);
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 13px 0 15px;
-  border-top: 1px solid #ffffff12;
-  border-bottom: 1px solid #ffffff12;
+  padding-bottom: 15px;
 }
 
 .scheme-shelf .artifact-heading {
@@ -153,12 +159,35 @@
   cursor: pointer;
 }
 
+.shelf-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.shelf-secondary-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  padding: 4px 0;
+  background: transparent;
+  color: var(--dim);
+  font: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.shelf-secondary-toggle:hover {
+  color: var(--text);
+}
+
 .shelf-toggle:hover {
   color: var(--text);
 }
 
 .scheme-rail {
   display: flex;
+  align-items: stretch;
   gap: 10px;
   overflow-x: auto;
   padding: 1px 1px 8px;
@@ -168,8 +197,17 @@
 }
 
 .scheme-rail .scheme-card {
+  display: flex;
+  flex-direction: column;
   flex: 0 0 clamp(280px, 31vw, 360px);
   scroll-snap-align: start;
+}
+
+.scheme-rail .scheme-card > div:last-child {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
 }
 
 .scheme-rail .scheme-highlight {
@@ -182,7 +220,8 @@
 .scheme-sources {
   display: grid;
   gap: 7px;
-  margin-top: 12px;
+  margin-top: auto;
+  padding-top: 12px;
 }
 
 .scheme-sources-label {
@@ -200,6 +239,8 @@
 
 .scheme-source-links .official-source {
   margin-top: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .scheme-rail .scheme-details[open] .scheme-highlight {
@@ -217,8 +258,12 @@
   }
 
   .scheme-shelf {
+    padding-block: 8px;
+  }
+
+  .scheme-shelf-expanded {
     max-height: min(31dvh, 250px);
-    padding-block: 9px 11px;
+    padding-bottom: 11px;
   }
 
   .scheme-rail .scheme-card {
