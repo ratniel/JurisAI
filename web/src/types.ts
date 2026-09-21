@@ -53,6 +53,7 @@ export type TopSchemeArtifactEntry = {
   documents_required?: string | null
   faq?: string | null
   application_modes?: EnrichedApplicationModes | null
+  sources?: SchemeSource[]
   references?: SchemeSource[]
   retrieval_reason?: string | null
 }

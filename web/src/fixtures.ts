@@ -4,6 +4,10 @@ const scheme = (n: number) => ({
   scheme_id: `fixture-${n}`,
   name: ['PM-KISAN', 'Pradhan Mantri Fasal Bima Yojana', 'Maharashtra Micro Irrigation Support', 'Kisan Credit Card'][n - 1] ?? `Sample Scheme ${n}`,
   url: 'https://www.myscheme.gov.in/',
+  sources: [
+    { text: 'Scheme guidelines', url: 'https://www.myscheme.gov.in/' },
+    { text: 'Application information', url: 'https://www.myscheme.gov.in/' },
+  ],
   level: n === 3 ? 'state' : 'central',
   provider: n === 3 ? 'Maharashtra' : 'Government of India',
   details: 'Support for eligible applicants under the published scheme guidelines. Check the official source for current application steps and local availability.',

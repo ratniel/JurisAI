@@ -56,15 +56,66 @@
 }
 
 .chat-grid > .scheme-shelf {
-  order: 1;
+  grid-row: 3;
 }
 
-.chat-grid > .message-scroll-area {
-  order: 2;
+.transcript-panel > .message-scroll-area {
+  grid-row: 2;
+}
+
+.chat-shell {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.chat-app-frame {
+  height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+.topbar {
+  flex: none;
+}
+
+.chat-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 12px;
+  overflow: hidden;
+  padding-top: 18px;
+}
+
+.transcript-panel > .panel-header {
+  grid-row: 1;
+}
+
+.transcript-panel > .message-scroll-area {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px 8px 12px 0;
+  scrollbar-color: #6b5b45 transparent;
+  scrollbar-width: thin;
+}
+
+.transcript-panel > .composer {
+  grid-row: 4;
+  margin: 0;
+  padding: 0 0 max(14px, env(safe-area-inset-bottom));
+  background: var(--bg);
 }
 
 .scheme-shelf {
   min-width: 0;
+  max-height: min(34dvh, 310px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 13px 0 15px;
   border-top: 1px solid #ffffff12;
   border-bottom: 1px solid #ffffff12;
@@ -156,6 +207,20 @@
 }
 
 @media (max-width: 760px) {
+  .chat-grid {
+    gap: 9px;
+    padding-top: 12px;
+  }
+
+  .transcript-panel > .panel-header {
+    display: none;
+  }
+
+  .scheme-shelf {
+    max-height: min(31dvh, 250px);
+    padding-block: 9px 11px;
+  }
+
   .scheme-rail .scheme-card {
     flex-basis: min(84vw, 330px);
   }

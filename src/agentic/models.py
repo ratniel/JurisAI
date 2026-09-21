@@ -110,6 +110,7 @@ class TopSchemeArtifactEntry(BaseModel):
     application_modes: EnrichedApplicationModes = Field(
         default_factory=EnrichedApplicationModes
     )
+    sources: list["SchemeSource"] = Field(default_factory=list)
     references: list["SchemeSource"] = Field(default_factory=list)
     retrieval_reason: str | None = None
 

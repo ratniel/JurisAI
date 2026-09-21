@@ -861,7 +861,7 @@ function getSchemeMeta(scheme: TopSchemeArtifactEntry): string | null {
 function getSchemeSourceLinks(
   scheme: TopSchemeArtifactEntry,
 ): Array<{ label: string; url: string }> {
-  const links = (scheme.references ?? []).flatMap((source) => {
+  const links = (scheme.sources ?? scheme.references ?? []).flatMap((source) => {
     const url = source.url?.trim()
     if (!url) return []
     return [{ label: source.text?.trim() || sourceHostname(url), url }]

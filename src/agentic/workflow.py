@@ -395,7 +395,7 @@ def build_top_schemes_artifact(
                 documents_required=scheme.documents_required,
                 faq=scheme.faq,
                 application_modes=scheme.application_mode_details,
-                references=list(scheme.sources),
+                sources=list(scheme.sources),
                 retrieval_reason=_build_why_relevant(scheme),
             )
             for scheme in relevant_schemes
