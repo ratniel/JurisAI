@@ -213,14 +213,14 @@ class WorkflowSettings(BaseModel):
     generation_provider: Literal[
         "gemini", "llamaindex_google", "local_openai", "openrouter"
     ] = Field(
-        default="gemini",
+        default="openrouter",
         validation_alias=AliasChoices(
             "generation_provider",
             "WORKFLOW_GENERATION_PROVIDER",
         ),
     )
     generation_model: str = Field(
-        default="models/gemini-flash-latest",
+        default="openrouter/free",
         validation_alias=AliasChoices(
             "generation_model",
             "WORKFLOW_GENERATION_MODEL",
@@ -236,14 +236,14 @@ class WorkflowSettings(BaseModel):
     intent_provider: Literal[
         "gemini", "llamaindex_google", "local_openai", "openrouter"
     ] = Field(
-        default="gemini",
+        default="openrouter",
         validation_alias=AliasChoices(
             "intent_provider",
             "WORKFLOW_INTENT_PROVIDER",
         ),
     )
     intent_model: str = Field(
-        default="models/gemini-flash-lite-latest",
+        default="openrouter/free",
         validation_alias=AliasChoices(
             "intent_model",
             "WORKFLOW_INTENT_MODEL",

@@ -3,10 +3,20 @@ from __future__ import annotations
 import os
 import unittest
 
-from src.config.settings import Settings
+from src.config.settings import OpenRouterSettings, Settings, WorkflowSettings
 
 
 class SettingsEnvOverrideTests(unittest.TestCase):
+    def test_agentic_workflow_defaults_to_openrouter_free_router(self) -> None:
+        workflow = WorkflowSettings()
+        openrouter = OpenRouterSettings()
+
+        self.assertEqual(workflow.generation_provider, "openrouter")
+        self.assertEqual(workflow.generation_model, "openrouter/free")
+        self.assertEqual(workflow.intent_provider, "openrouter")
+        self.assertEqual(workflow.intent_model, "openrouter/free")
+        self.assertEqual(openrouter.model, "openrouter/free")
+
     def test_workflow_provider_legacy_env_overrides_apply(self) -> None:
         original_generation = os.environ.get("WORKFLOW_GENERATION_PROVIDER")
         original_intent = os.environ.get("WORKFLOW_INTENT_PROVIDER")
