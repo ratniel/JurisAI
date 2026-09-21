@@ -370,6 +370,12 @@ class RelevantScheme(BaseModel):
             details=scheme.selected_fields.get("details"),
             benefits=scheme.selected_fields.get("benefits"),
             eligibility=scheme.selected_fields.get("eligibility"),
+            documents_required=scheme.selected_fields.get("documents_required"),
+            faq=scheme.selected_fields.get("faq"),
+            sources=[
+                SchemeSource.model_validate(source)
+                for source in (scheme.selected_fields.get("sources") or [])
+            ],
             mongo_ref=scheme.mongo_ref,
             match_profile=scheme.match_profile,
             match_score=scheme.match_score,
