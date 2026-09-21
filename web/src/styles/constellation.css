@@ -1,0 +1,94 @@
+.constellation-field {
+  --pointer-x: -1000px;
+  --pointer-y: -1000px;
+  --pointer-active: 0;
+  position: absolute;
+  inset: -4rem -2vw;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: auto;
+  color: #9a8a73;
+  opacity: 0.82;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 11%, transparent 34%, transparent 66%, #000 89%, #000 100%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 11%, transparent 34%, transparent 66%, #000 89%, #000 100%);
+}
+
+.constellation-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.constellation-curves path {
+  fill: none;
+  stroke: #77736d;
+  stroke-width: 0.8;
+  stroke-opacity: calc(0.22 + var(--pointer-active) * 0.26);
+  transition: stroke-opacity 450ms ease;
+}
+
+.constellation-node circle {
+  fill: #94866f;
+  opacity: 0.62;
+  transition: opacity 350ms ease;
+}
+
+.constellation-node text {
+  fill: #928c82;
+  font: 8px/1 ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.16em;
+  opacity: 0.38;
+  transition: opacity 400ms ease;
+}
+
+.constellation-pointer {
+  position: absolute;
+  left: var(--pointer-x);
+  top: var(--pointer-y);
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.constellation-pointer::before {
+  position: absolute;
+  inset: -108px;
+  width: 216px;
+  height: 216px;
+  border-radius: 50%;
+  content: "";
+  background: radial-gradient(circle, rgb(161 140 108 / 12%) 0%, rgb(161 140 108 / 5%) 32%, transparent 70%);
+  opacity: var(--pointer-active);
+  transition: opacity 350ms ease;
+}
+
+.constellation-field:has(.constellation-pointer:hover) .constellation-node circle,
+.constellation-field:has(.constellation-pointer:hover) .constellation-node text {
+  opacity: 0.8;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .constellation-field:hover .constellation-curves path { stroke-opacity: 0.38; }
+  .constellation-field:hover .constellation-node circle { opacity: 0.82; }
+  .constellation-field:hover .constellation-node text { opacity: 0.56; }
+}
+
+@media (pointer: coarse) {
+  .constellation-field { inset: 0; opacity: 0.52; pointer-events: none; }
+  .constellation-curves path { stroke-opacity: 0.28; }
+  .constellation-node text { opacity: 0.42; }
+  .constellation-pointer { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .constellation-field { transform: none !important; }
+  .constellation-curves path,
+  .constellation-node circle,
+  .constellation-node text,
+  .constellation-pointer::before { transition: none; }
+  .constellation-curves path { stroke-opacity: 0.28; }
+  .constellation-node circle { opacity: 0.62; }
+  .constellation-node text { opacity: 0.42; }
+  .constellation-pointer { display: none; }
+}
