@@ -19,6 +19,9 @@
   - state-scoped search
   - topic-scoped search
 - The LLM/orchestrator should decide which retrieval tool to use, whether to pass filters, and how to compose retrieval with final answer generation.
+- Do not rerun retrieval on every conversational turn. Reuse stored hydrated candidates for clarification answers and follow-ups that do not request a new or materially revised search. Run retrieval when scheme discovery is requested, the classifier supplies a new retrieval query, prior candidates are unavailable, or assessment requests one bounded corrective search.
+- Treat retrieval scores as candidate-generation signals, not eligibility decisions. Assess every hydrated candidate against the complete scheme record and classify it as matching known facts, a potential option with unknown conditions, or conflicting with known facts before answer generation.
+- Track pending clarifications by stable fact key. Ask one high-impact question at a time, keep unrelated unknowns pending, resolve only keys supplied by the user, and do not repeat an already-asked question. Preserve the prior goal and reassess the stored candidates as answers arrive.
 - Keep the base retrieval primitives simple and explicit. Do not hide too much policy inside a single monolithic search function.
 - Use one shared eval corpus. Do not introduce persona-scoped vector collections or persona-only retrieval shortcuts.
 - Use one shared retrieval evaluation runner in `src/eval/retrieval_eval.py`.

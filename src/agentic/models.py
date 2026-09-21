@@ -26,6 +26,7 @@ class PrimaryIntent(StrEnum):
 class NextAction(StrEnum):
     ASK_CLARIFYING_QUESTION = "ask_clarifying_question"
     CALL_SCHEME_RETRIEVAL = "call_scheme_retrieval"
+    ASSESS_SCHEMES = "assess_schemes"
     RESPOND_DIRECTLY = "respond_directly"
 
 
@@ -33,6 +34,18 @@ class RetrievalToolName(StrEnum):
     SEMANTIC_SEARCH = "semantic_search"
     STATE_SCOPED_SEARCH = "state_scoped_search"
     TOPIC_SCOPED_SEARCH = "topic_scoped_search"
+
+
+class SchemeFitStatus(StrEnum):
+    MATCHES_KNOWN_FACTS = "matches_known_facts"
+    POTENTIAL_OPTION = "potential_option"
+    CONFLICTS_WITH_KNOWN_FACTS = "conflicts_with_known_facts"
+
+
+class AssessmentNextAction(StrEnum):
+    RESPOND = "respond"
+    ASK_QUESTION = "ask_question"
+    TARGETED_SEARCH = "targeted_search"
 
 
 def _new_id() -> str:
@@ -124,6 +137,44 @@ class TopSchemesArtifact(BaseModel):
     schemes: list[TopSchemeArtifactEntry] = Field(default_factory=list)
 
 
+class ClarificationNeed(BaseModel):
+    """One material user fact needed to assess one or more schemes."""
+
+    fact_key: str
+    question: str
+    reason: str
+    scheme_ids: list[str] = Field(default_factory=list)
+
+
+class PendingClarification(ClarificationNeed):
+    """Clarification retained across turns without replacing unrelated needs."""
+
+    goal: str
+    asked: bool = False
+
+
+class SchemeFitAssessment(BaseModel):
+    """Evidence-backed fit decision for one fully hydrated candidate."""
+
+    scheme_id: str
+    status: SchemeFitStatus
+    summary: str
+    matched_facts: list[str] = Field(default_factory=list)
+    unknown_conditions: list[str] = Field(default_factory=list)
+    conflicts: list[str] = Field(default_factory=list)
+    evidence: list[str] = Field(default_factory=list)
+
+
+class SchemeAssessmentBatch(BaseModel):
+    """Assessment of the current candidate set and its next workflow action."""
+
+    assessments: list[SchemeFitAssessment] = Field(default_factory=list)
+    clarification_needs: list[ClarificationNeed] = Field(default_factory=list)
+    next_action: AssessmentNextAction = AssessmentNextAction.RESPOND
+    targeted_search_query: str | None = None
+    rationale: str = ""
+
+
 class SessionMemory(BaseModel):
     """Persistent per-chat memory distilled away from raw trace payloads."""
 
@@ -136,6 +187,9 @@ class SessionMemory(BaseModel):
     active_constraints: dict[str, Any] = Field(default_factory=dict)
     recent_scheme_refs: list[SchemeRef] = Field(default_factory=list)
     selected_scheme_ref: SchemeRef | None = None
+    pending_clarifications: dict[str, PendingClarification] = Field(
+        default_factory=dict
+    )
 
 
 class SessionSnapshot(BaseModel):
@@ -150,7 +204,11 @@ class SessionSnapshot(BaseModel):
     active_constraints: dict[str, Any] = Field(default_factory=dict)
     recent_scheme_refs: list[SchemeRef] = Field(default_factory=list)
     selected_scheme_ref: SchemeRef | None = None
+    pending_clarifications: dict[str, PendingClarification] = Field(
+        default_factory=dict
+    )
     relevant_schemes: list["RelevantScheme"] = Field(default_factory=list)
+    latest_scheme_assessment: SchemeAssessmentBatch | None = None
     latest_grounding_pack: GroundingPack | None = None
     latest_top_schemes_artifact: TopSchemesArtifact | None = None
 
@@ -171,6 +229,7 @@ class SessionSnapshot(BaseModel):
             active_constraints=dict(self.active_constraints),
             recent_scheme_refs=recent_refs,
             selected_scheme_ref=self.selected_scheme_ref,
+            pending_clarifications=dict(self.pending_clarifications),
         )
 
     @classmethod
@@ -179,6 +238,7 @@ class SessionSnapshot(BaseModel):
         session_memory: SessionMemory,
         *,
         relevant_schemes: list["RelevantScheme"] | None = None,
+        latest_scheme_assessment: SchemeAssessmentBatch | None = None,
         latest_grounding_pack: GroundingPack | None = None,
         latest_top_schemes_artifact: TopSchemesArtifact | None = None,
     ) -> "SessionSnapshot":
@@ -192,7 +252,9 @@ class SessionSnapshot(BaseModel):
             active_constraints=dict(session_memory.active_constraints),
             recent_scheme_refs=list(session_memory.recent_scheme_refs),
             selected_scheme_ref=session_memory.selected_scheme_ref,
+            pending_clarifications=dict(session_memory.pending_clarifications),
             relevant_schemes=list(relevant_schemes or []),
+            latest_scheme_assessment=latest_scheme_assessment,
             latest_grounding_pack=latest_grounding_pack,
             latest_top_schemes_artifact=latest_top_schemes_artifact,
         )
@@ -213,6 +275,7 @@ class UserIntentClassification(BaseModel):
     user_goal: str
     needs_clarification: bool = False
     clarification_question: str | None = None
+    clarification_fact_key: str | None = None
     is_followup: bool = False
     should_update_user_profile: bool = False
     extracted_profile_updates: list[IntentFact] = Field(default_factory=list)
@@ -428,6 +491,7 @@ class AgenticTurnResult(BaseModel):
     decision: OrchestratorDecision
     session_memory: SessionMemory
     grounding_pack: GroundingPack | None = None
+    scheme_assessment: SchemeAssessmentBatch | None = None
     top_schemes_artifact: TopSchemesArtifact | None = None
     session_snapshot: SessionSnapshot
     workflow_trace: list[WorkflowTraceStep] = Field(default_factory=list)
@@ -478,6 +542,27 @@ class RetrievalPlannedEvent(Event):
     session_snapshot: SessionSnapshot
     classification: UserIntentClassification
     decision: OrchestratorDecision
+
+
+class AssessmentRequestedEvent(Event):
+    """Workflow event requesting evidence-based scheme fit assessment."""
+
+    user_message: str
+    session_snapshot: SessionSnapshot
+    classification: UserIntentClassification
+    decision: OrchestratorDecision
+    assessment_round: int = 0
+
+
+class TargetedSearchRequestedEvent(Event):
+    """One bounded corrective search requested by the assessment node."""
+
+    user_message: str
+    session_snapshot: SessionSnapshot
+    classification: UserIntentClassification
+    decision: OrchestratorDecision
+    query: str
+    assessment_round: int
 
 
 class ResponseRequestedEvent(Event):

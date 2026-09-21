@@ -6,42 +6,49 @@ from typing import Any
 from uuid import uuid4
 
 from bson import ObjectId
+from llama_index.core.workflow import Context, StartEvent, StopEvent, Workflow, step
 from opentelemetry import trace
 from pymongo import AsyncMongoClient
-
-from llama_index.core.workflow import Context, StartEvent, StopEvent, Workflow, step
 
 from src.agentic.fact_utils import aggregate_intent_facts
 from src.agentic.intent_classifier import UserIntentClassifier
 from src.agentic.models import (
     AgenticTurnResult,
+    AssessmentNextAction,
+    AssessmentRequestedEvent,
+    ClarificationNeed,
     GroundingPack,
     GroundingSchemeCard,
     IntentClassifiedEvent,
     IntentFact,
     NextAction,
     OrchestratorDecision,
+    PendingClarification,
     PrimaryIntent,
     RelevantScheme,
+    ResponseRequestedEvent,
     RetrievalPlan,
     RetrievalPlannedEvent,
     RetrievalToolCall,
     RetrievalToolName,
-    ResponseRequestedEvent,
     RetrievedScheme,
+    SchemeAssessmentBatch,
+    SchemeFitStatus,
     SchemeRef,
     SessionMemory,
     SessionSnapshot,
+    TargetedSearchRequestedEvent,
+    ToolSelectionEvent,
     TopSchemeArtifactEntry,
     TopSchemesArtifact,
+    UserIntentClassification,
     WorkflowAnswerDeltaEvent,
     WorkflowArtifactReadyEvent,
-    WorkflowTraceStep,
-    ToolSelectionEvent,
-    UserIntentClassification,
     WorkflowStatusEvent,
+    WorkflowTraceStep,
 )
 from src.agentic.retrieval_planner import RetrievalToolPlanner
+from src.agentic.scheme_assessor import SchemeFitAssessor
 from src.config.settings import settings
 from src.data_ingestion.enrichment_pipeline import build_enriched_scheme
 from src.llm import TextGenerationClient, build_generation_client
@@ -57,6 +64,11 @@ Reply in plain language.
 Treat the original user message as authoritative. Session summaries, retrieval rank, and retrieval metadata are derived context and must not override or narrow it.
 If the orchestrator wants clarification, ask only one focused question.
 If retrieval results are provided, ground the answer only in those schemes.
+Use the structured scheme assessment to distinguish matches, potential options, conflicts,
+and unknown facts. The complete non-conflicting scheme records are provided for answer detail.
+Do not revive a scheme that the assessment marked as conflicting.
+Do not repeat a pending clarification whose asked field is true. If it remains unanswered,
+describe the relevant option conditionally instead.
 Treat retrieved schemes as candidates, not recommendations. Compare each scheme's stated purpose and mandatory eligibility conditions with the user's actual need before presenting it as a fit.
 Distinguish materially different purposes such as a recurring pension, a one-time marriage gift, a business-startup loan, business-expansion support, training, and market access.
 Do not present a scheme as relevant if its state or eligibility clearly contradicts an explicit user constraint.
@@ -70,6 +82,66 @@ When citing results, include a short References section with scheme names and UR
 
 def facts_to_dict(facts: list[IntentFact]) -> dict[str, str]:
     return {fact.key: fact.value for fact in facts}
+
+
+def has_known_fact(user_profile: dict[str, Any], fact_key: str) -> bool:
+    value = user_profile.get(fact_key)
+    if isinstance(value, str):
+        return normalize_text(value) is not None
+    if value is None or isinstance(value, (list, tuple, set, dict)) and not value:
+        return False
+    return fact_key in user_profile
+
+
+def merge_pending_clarifications(
+    *,
+    existing: dict[str, PendingClarification],
+    proposed: list[ClarificationNeed],
+    user_profile: dict[str, Any],
+    goal: str,
+    active_scheme_ids: set[str] | None = None,
+) -> dict[str, PendingClarification]:
+    """Merge by fact key; resolve only answered or no-longer-relevant entries."""
+
+    pending = {
+        key: item.model_copy(deep=True)
+        for key, item in existing.items()
+        if item.goal == goal and not has_known_fact(user_profile, key)
+    }
+    if active_scheme_ids is not None:
+        pending = {
+            key: item
+            for key, item in pending.items()
+            if not item.scheme_ids or active_scheme_ids.intersection(item.scheme_ids)
+        }
+
+    for need in proposed:
+        key = normalize_text(need.fact_key)
+        if not key or has_known_fact(user_profile, key):
+            continue
+        current = pending.get(key)
+        if current is None:
+            pending[key] = PendingClarification(
+                **need.model_copy(update={"fact_key": key}).model_dump(),
+                goal=goal,
+            )
+            continue
+        pending[key] = current.model_copy(
+            update={
+                "scheme_ids": list(dict.fromkeys(current.scheme_ids + need.scheme_ids)),
+            }
+        )
+    return pending
+
+
+def choose_clarification(
+    *,
+    pending: dict[str, PendingClarification],
+) -> PendingClarification | None:
+    return next(
+        (item for item in pending.values() if not item.asked),
+        None,
+    )
 
 
 def is_enriched_collection(collection_name: str | None) -> bool:
@@ -146,14 +218,20 @@ def fallback_retrieval_plan(
     user_message: str,
     classification: UserIntentClassification,
     session_snapshot: SessionSnapshot,
+    default_query: str | None = None,
 ) -> RetrievalPlan:
     raw_filters = {
         **session_snapshot.user_profile,
+        **aggregate_intent_facts(classification.extracted_profile_updates),
         **aggregate_intent_facts(classification.retrieval_filters),
     }
     intent_profile = build_retrieval_intent_profile(
         user_message=user_message,
-        retrieval_query=classification.discovery_query or classification.retrieval_query,
+        retrieval_query=(
+            default_query
+            or classification.discovery_query
+            or classification.retrieval_query
+        ),
         fit_query=classification.fit_query,
         raw_filters=raw_filters,
     )
@@ -252,7 +330,9 @@ def _format_scheme_ref(scheme_ref: SchemeRef | None) -> str:
         return "none"
     parts = [scheme_ref.name or scheme_ref.scheme_id]
     qualifiers = [
-        item for item in (scheme_ref.state, scheme_ref.level, scheme_ref.provider) if item
+        item
+        for item in (scheme_ref.state, scheme_ref.level, scheme_ref.provider)
+        if item
     ]
     if qualifiers:
         parts.append(f"({', '.join(qualifiers)})")
@@ -301,7 +381,9 @@ def _build_why_relevant(scheme: RelevantScheme) -> str:
 
 def _build_application_summary(scheme: RelevantScheme) -> str | None:
     parts: list[str] = []
-    online = _normalize_compact_text(scheme.application_mode_details.online, max_chars=140)
+    online = _normalize_compact_text(
+        scheme.application_mode_details.online, max_chars=140
+    )
     offline = _normalize_compact_text(
         scheme.application_mode_details.offline, max_chars=140
     )
@@ -355,7 +437,9 @@ def build_grounding_pack(
     ]
     selection_hint = None
     if selected_scheme_ref is not None:
-        selection_hint = f"User-selected scheme context: {_format_scheme_ref(selected_scheme_ref)}"
+        selection_hint = (
+            f"User-selected scheme context: {_format_scheme_ref(selected_scheme_ref)}"
+        )
 
     return GroundingPack(
         chat_session_id=chat_session_id,
@@ -417,13 +501,18 @@ def build_session_memory(
     raw_constraints = aggregate_intent_facts(classification.retrieval_filters)
     canonical_constraints = build_retrieval_intent_profile(
         user_message=user_message,
-        retrieval_query=classification.discovery_query or classification.retrieval_query,
+        retrieval_query=classification.discovery_query
+        or classification.retrieval_query,
         fit_query=classification.fit_query,
         raw_filters=raw_constraints,
     ).filters.model_dump(exclude_none=True)
     active_constraints = {
         **base_memory.active_constraints,
         **canonical_constraints,
+    }
+    user_profile = {
+        **base_memory.user_profile,
+        **profile_updates,
     }
     recent_scheme_refs = (
         _collect_recent_scheme_refs(relevant_schemes)
@@ -437,28 +526,66 @@ def build_session_memory(
     )
     if prior_summary:
         summary_parts.append(f"Prior context: {prior_summary}")
+    continuation_goal = normalize_text(decision.tool_payload.get("continuation_goal"))
+    if (
+        not continuation_goal
+        and session_snapshot.last_action == NextAction.ASK_CLARIFYING_QUESTION.value
+    ):
+        continuation_goal = session_snapshot.last_user_goal
     current_request = _normalize_compact_text(user_message, max_chars=140)
     if current_request:
         summary_parts.append(f"Current request: {current_request}")
+    if continuation_goal and continuation_goal != user_message:
+        summary_parts.append(f"Continuing goal: {continuation_goal}")
     if recent_scheme_refs:
-        summary_parts.append(f"Recent schemes: {_format_scheme_refs(recent_scheme_refs)}")
+        summary_parts.append(
+            f"Recent schemes: {_format_scheme_refs(recent_scheme_refs)}"
+        )
+
+    resolved_goal = continuation_goal or user_message
+    pending_clarifications = merge_pending_clarifications(
+        existing=base_memory.pending_clarifications,
+        proposed=[],
+        user_profile=user_profile,
+        goal=resolved_goal,
+    )
+    clarification_fact_key = normalize_text(
+        decision.tool_payload.get("clarification_fact_key")
+    )
+    clarification_question = normalize_text(decision.tool_payload.get("question"))
+    if clarification_fact_key and clarification_question:
+        pending_clarifications = merge_pending_clarifications(
+            existing=pending_clarifications,
+            proposed=[
+                ClarificationNeed(
+                    fact_key=clarification_fact_key,
+                    question=clarification_question,
+                    reason="Needed to continue the current user goal.",
+                )
+            ],
+            user_profile=user_profile,
+            goal=resolved_goal,
+        )
+
+    if clarification_fact_key in pending_clarifications:
+        pending_clarifications[clarification_fact_key] = pending_clarifications[
+            clarification_fact_key
+        ].model_copy(update={"asked": True})
 
     return SessionMemory(
         chat_session_id=session_snapshot.chat_session_id or base_memory.chat_session_id,
-        user_profile={
-            **base_memory.user_profile,
-            **profile_updates,
-        },
+        user_profile=user_profile,
         preferences=dict(base_memory.preferences),
         conversation_summary=_normalize_compact_text(
             " ".join(summary_parts),
             max_chars=320,
         ),
-        last_user_goal=user_message,
+        last_user_goal=resolved_goal,
         last_action=last_action or decision.next_action.value,
         active_constraints=active_constraints,
         recent_scheme_refs=recent_scheme_refs,
         selected_scheme_ref=base_memory.selected_scheme_ref,
+        pending_clarifications=pending_clarifications,
     )
 
 
@@ -467,6 +594,8 @@ def _build_reply_prompt(
     user_message: str,
     session_memory: SessionMemory,
     grounding_pack: GroundingPack | None,
+    scheme_assessment: SchemeAssessmentBatch | None = None,
+    relevant_schemes: list[RelevantScheme] | None = None,
 ) -> str:
     lines = [
         "Original user message (authoritative):",
@@ -482,7 +611,29 @@ def _build_reply_prompt(
         f"- active_constraints: {_format_mapping(session_memory.active_constraints)}",
         f"- recent_scheme_refs: {_format_scheme_refs(session_memory.recent_scheme_refs)}",
         f"- selected_scheme_ref: {_format_scheme_ref(session_memory.selected_scheme_ref)}",
+        (
+            "- pending_clarifications: "
+            f"{_format_mapping({key: item.model_dump(mode='json') for key, item in session_memory.pending_clarifications.items()})}"
+        ),
     ]
+
+    if scheme_assessment is not None:
+        lines.extend(
+            [
+                "",
+                "Structured scheme assessment:",
+                scheme_assessment.model_dump_json(exclude_none=True),
+                "",
+                "Complete evidence for non-conflicting schemes:",
+                json.dumps(
+                    [
+                        scheme.model_dump(mode="json", exclude_none=True)
+                        for scheme in (relevant_schemes or [])
+                    ],
+                    ensure_ascii=True,
+                ),
+            ]
+        )
 
     if grounding_pack is None:
         lines.extend(["", "Grounding pack:", "none"])
@@ -537,7 +688,9 @@ def _set_trace_context_attributes(
     current_span = trace.get_current_span()
     if not current_span.is_recording():
         return
-    current_span.set_attribute("jurisai.chat_session_id", session_memory.chat_session_id)
+    current_span.set_attribute(
+        "jurisai.chat_session_id", session_memory.chat_session_id
+    )
     current_span.set_attribute("jurisai.turn_id", turn_id)
     if top_schemes_artifact is not None:
         current_span.set_attribute(
@@ -551,6 +704,7 @@ class BasicAgenticWorkflow(Workflow):
         self,
         *,
         classifier: UserIntentClassifier | None = None,
+        assessor: SchemeFitAssessor | None = None,
         llm: TextGenerationClient | None = None,
         retriever: QdrantSchemeSearchClient | None = None,
         mongo_client: AsyncMongoClient[dict[str, Any]] | None = None,
@@ -560,13 +714,16 @@ class BasicAgenticWorkflow(Workflow):
         timeout: float | None = None,
         verbose: bool = False,
     ) -> None:
-        resolved_timeout = settings.workflow.timeout_seconds if timeout is None else timeout
+        resolved_timeout = (
+            settings.workflow.timeout_seconds if timeout is None else timeout
+        )
         super().__init__(timeout=resolved_timeout, verbose=verbose)
         self._llm = llm or build_generation_client(
             provider=settings.workflow.generation_provider,
             model=settings.workflow.generation_model,
         )
         self._classifier = classifier or UserIntentClassifier(llm=self._llm)
+        self._assessor = assessor or SchemeFitAssessor(llm=self._llm)
         self._retrieval_planner = RetrievalToolPlanner(llm=self._llm)
         self._retriever = retriever or QdrantSchemeSearchClient()
         self._mongo_client = mongo_client or AsyncMongoClient(settings.mongodb_uri)
@@ -650,7 +807,9 @@ class BasicAgenticWorkflow(Workflow):
                     mode="json",
                     exclude_none=True,
                 ),
-                "classification": classification.model_dump(mode="json", exclude_none=True),
+                "classification": classification.model_dump(
+                    mode="json", exclude_none=True
+                ),
             },
         )
         ctx.write_event_to_stream(
@@ -673,7 +832,7 @@ class BasicAgenticWorkflow(Workflow):
         self,
         ctx: Context,
         ev: IntentClassifiedEvent,
-    ) -> ResponseRequestedEvent | ToolSelectionEvent:
+    ) -> ResponseRequestedEvent | ToolSelectionEvent | AssessmentRequestedEvent:
         decision = self._decide_next_action(ev.classification, ev.session_snapshot)
         await ctx.store.set("decision", decision.model_dump())
         await self._append_trace_step(
@@ -697,6 +856,14 @@ class BasicAgenticWorkflow(Workflow):
                 decision=decision,
             )
 
+        if decision.next_action == NextAction.ASSESS_SCHEMES:
+            return AssessmentRequestedEvent(
+                user_message=ev.user_message,
+                session_snapshot=ev.session_snapshot,
+                classification=ev.classification,
+                decision=decision,
+            )
+
         return ResponseRequestedEvent(
             user_message=ev.user_message,
             session_snapshot=ev.session_snapshot,
@@ -711,7 +878,9 @@ class BasicAgenticWorkflow(Workflow):
         ev: ToolSelectionEvent,
     ) -> RetrievalPlannedEvent:
         raw_filters = ev.decision.tool_payload.get("filters") or {}
-        default_query = normalize_text(ev.decision.tool_payload.get("query")) or ev.user_message
+        default_query = (
+            normalize_text(ev.decision.tool_payload.get("query")) or ev.user_message
+        )
         planner_error: str | None = None
 
         try:
@@ -735,6 +904,7 @@ class BasicAgenticWorkflow(Workflow):
                 user_message=ev.user_message,
                 classification=ev.classification,
                 session_snapshot=ev.session_snapshot,
+                default_query=default_query,
             )
 
         updated_payload = {
@@ -777,7 +947,7 @@ class BasicAgenticWorkflow(Workflow):
         self,
         ctx: Context,
         ev: RetrievalPlannedEvent,
-    ) -> ResponseRequestedEvent:
+    ) -> AssessmentRequestedEvent:
         retrieval_plan = RetrievalPlan.model_validate(
             ev.decision.tool_payload.get("retrieval_plan") or {}
         )
@@ -831,9 +1001,13 @@ class BasicAgenticWorkflow(Workflow):
             output_payload = tool_call["output_payload"]
             normalized_queries.append(output_payload["normalized_query"])
             raw_hit_count += int(output_payload["raw_hit_count"])
-            query_topics = list(dict.fromkeys(query_topics + output_payload["query_topics"]))
+            query_topics = list(
+                dict.fromkeys(query_topics + output_payload["query_topics"])
+            )
             query_tags = list(dict.fromkeys(query_tags + output_payload["query_tags"]))
-            query_terms = list(dict.fromkeys(query_terms + output_payload["query_terms"]))
+            query_terms = list(
+                dict.fromkeys(query_terms + output_payload["query_terms"])
+            )
             applied_filters.update(output_payload["applied_filters"])
             ignored_filters.update(output_payload["ignored_filters"])
             important_ignored_filters.update(
@@ -904,7 +1078,9 @@ class BasicAgenticWorkflow(Workflow):
             "top_schemes_artifact_id": top_schemes_artifact.artifact_id,
         }
         decision = ev.decision.model_copy(update={"tool_payload": updated_payload})
-        await ctx.store.set("retrieval", {"tool_calls": executed_tool_calls, "results": merged_results})
+        await ctx.store.set(
+            "retrieval", {"tool_calls": executed_tool_calls, "results": merged_results}
+        )
         await ctx.store.set(
             "session_memory",
             session_memory.model_dump(mode="json", exclude_none=True),
@@ -932,7 +1108,10 @@ class BasicAgenticWorkflow(Workflow):
                 ),
                 "top_schemes_artifact_id": top_schemes_artifact.artifact_id,
                 "retrieved_schemes": merged_results,
-                "session_relevant_schemes": [scheme.model_dump(mode="json", exclude_none=True) for scheme in relevant_schemes],
+                "session_relevant_schemes": [
+                    scheme.model_dump(mode="json", exclude_none=True)
+                    for scheme in relevant_schemes
+                ],
             },
         )
         ctx.write_event_to_stream(
@@ -944,21 +1123,229 @@ class BasicAgenticWorkflow(Workflow):
                 ),
             )
         )
-        ctx.write_event_to_stream(
-            WorkflowArtifactReadyEvent(
-                artifact_type=top_schemes_artifact.artifact_type,
-                artifact_id=top_schemes_artifact.artifact_id,
-                payload=top_schemes_artifact.model_dump(
-                    mode="json",
-                    exclude_none=True,
-                ),
-            )
-        )
-        return ResponseRequestedEvent(
+        return AssessmentRequestedEvent(
             user_message=ev.user_message,
             session_snapshot=updated_session_snapshot,
             classification=ev.classification,
             decision=decision,
+        )
+
+    @step
+    async def assess_schemes(
+        self,
+        ctx: Context,
+        ev: AssessmentRequestedEvent,
+    ) -> ResponseRequestedEvent | TargetedSearchRequestedEvent:
+        relevant_schemes = list(ev.session_snapshot.relevant_schemes)
+        session_memory = build_session_memory(
+            user_message=ev.user_message,
+            session_snapshot=ev.session_snapshot,
+            classification=ev.classification,
+            decision=ev.decision,
+            relevant_schemes=relevant_schemes,
+            last_action="schemes_assessed",
+        )
+        assessment = self._assessor.assess(
+            user_message=ev.user_message,
+            session_memory=session_memory,
+            schemes=relevant_schemes,
+        )
+        await self._append_trace_step(
+            ctx,
+            stage="schemes_assessed",
+            title="Scheme Fit Assessment",
+            payload={
+                "assessment_round": ev.assessment_round,
+                "known_user_facts": session_memory.user_profile,
+                "assessment": assessment.model_dump(mode="json", exclude_none=True),
+            },
+        )
+        ctx.write_event_to_stream(
+            WorkflowStatusEvent(
+                stage="schemes_assessed",
+                detail=f"Assessed {len(assessment.assessments)} candidate schemes",
+            )
+        )
+
+        if (
+            assessment.next_action == AssessmentNextAction.TARGETED_SEARCH
+            and assessment.targeted_search_query
+            and ev.assessment_round < 1
+        ):
+            return TargetedSearchRequestedEvent(
+                user_message=ev.user_message,
+                session_snapshot=ev.session_snapshot,
+                classification=ev.classification,
+                decision=ev.decision,
+                query=assessment.targeted_search_query,
+                assessment_round=ev.assessment_round + 1,
+            )
+
+        active_scheme_ids = {
+            item.scheme_id
+            for item in assessment.assessments
+            if item.status != SchemeFitStatus.CONFLICTS_WITH_KNOWN_FACTS
+        }
+        pending = merge_pending_clarifications(
+            existing=session_memory.pending_clarifications,
+            proposed=assessment.clarification_needs,
+            user_profile=session_memory.user_profile,
+            goal=session_memory.last_user_goal or ev.user_message,
+            active_scheme_ids=active_scheme_ids,
+        )
+        clarification = None
+        if assessment.next_action == AssessmentNextAction.ASK_QUESTION:
+            clarification = choose_clarification(pending=pending)
+            if clarification:
+                pending[clarification.fact_key] = clarification.model_copy(
+                    update={"asked": True}
+                )
+                clarification = pending[clarification.fact_key]
+
+        session_memory = session_memory.model_copy(
+            update={
+                "pending_clarifications": pending,
+                "last_action": (
+                    NextAction.ASK_CLARIFYING_QUESTION.value
+                    if clarification
+                    else "schemes_assessed"
+                ),
+            }
+        )
+        assessment_by_id = {item.scheme_id: item for item in assessment.assessments}
+        answer_schemes = [
+            scheme
+            for scheme in relevant_schemes
+            if assessment_by_id.get(scheme.scheme_id) is None
+            or assessment_by_id[scheme.scheme_id].status
+            != SchemeFitStatus.CONFLICTS_WITH_KNOWN_FACTS
+        ]
+        turn_id = str(await ctx.store.get("turn_id") or _new_turn_id())
+        grounding_pack = build_grounding_pack(
+            chat_session_id=session_memory.chat_session_id,
+            turn_id=turn_id,
+            user_message=ev.user_message,
+            retrieval_query=ev.decision.tool_payload.get("query"),
+            relevant_schemes=answer_schemes,
+            applied_filters=ev.decision.tool_payload.get("applied_filters") or {},
+            ignored_filters=ev.decision.tool_payload.get("ignored_filters") or {},
+            important_ignored_filters=ev.decision.tool_payload.get(
+                "important_ignored_filters"
+            )
+            or {},
+            selected_scheme_ref=session_memory.selected_scheme_ref,
+        )
+        top_schemes_artifact = build_top_schemes_artifact(
+            chat_session_id=session_memory.chat_session_id,
+            turn_id=turn_id,
+            relevant_schemes=answer_schemes,
+        )
+        updated_snapshot = SessionSnapshot.from_session_memory(
+            session_memory,
+            relevant_schemes=relevant_schemes,
+            latest_scheme_assessment=assessment,
+            latest_grounding_pack=grounding_pack,
+            latest_top_schemes_artifact=top_schemes_artifact,
+        )
+        updated_payload = {
+            **ev.decision.tool_payload,
+            "scheme_assessment": assessment.model_dump(mode="json", exclude_none=True),
+        }
+        if clarification:
+            updated_payload.update(
+                {
+                    "question": clarification.question,
+                    "clarification_fact_key": clarification.fact_key,
+                    "continuation_goal": session_memory.last_user_goal,
+                }
+            )
+        decision = ev.decision.model_copy(
+            update={
+                "next_action": (
+                    NextAction.ASK_CLARIFYING_QUESTION
+                    if clarification
+                    else NextAction.RESPOND_DIRECTLY
+                ),
+                "selected_agent": (
+                    "scheme_fit_clarifier" if clarification else "chat_responder"
+                ),
+                "tool_payload": updated_payload,
+            }
+        )
+        await ctx.store.set(
+            "session_memory",
+            session_memory.model_dump(mode="json", exclude_none=True),
+        )
+        await ctx.store.set(
+            "scheme_assessment",
+            assessment.model_dump(mode="json", exclude_none=True),
+        )
+        ctx.write_event_to_stream(
+            WorkflowArtifactReadyEvent(
+                artifact_type=top_schemes_artifact.artifact_type,
+                artifact_id=top_schemes_artifact.artifact_id,
+                payload=top_schemes_artifact.model_dump(mode="json", exclude_none=True),
+            )
+        )
+        return ResponseRequestedEvent(
+            user_message=ev.user_message,
+            session_snapshot=updated_snapshot,
+            classification=ev.classification,
+            decision=decision,
+        )
+
+    @step
+    async def targeted_search(
+        self,
+        ctx: Context,
+        ev: TargetedSearchRequestedEvent,
+    ) -> AssessmentRequestedEvent:
+        state = normalize_text(ev.session_snapshot.user_profile.get("state"))
+        tool_call = RetrievalToolCall(
+            tool_name=(
+                RetrievalToolName.STATE_SCOPED_SEARCH
+                if state
+                else RetrievalToolName.SEMANTIC_SEARCH
+            ),
+            query=ev.query,
+            fit_query=ev.query,
+            state=state,
+            reasoning="One corrective search requested after evidence assessment.",
+        )
+        execution = self._execute_retrieval_tool_call(
+            user_message=ev.user_message,
+            tool_call=tool_call,
+        )
+        new_results = merge_retrieved_scheme_results(
+            [execution],
+            limit=settings.workflow.retrieval_limit,
+        )
+        new_schemes = await self._hydrate_relevant_schemes(new_results)
+        best_by_id = {
+            scheme.scheme_id: scheme for scheme in ev.session_snapshot.relevant_schemes
+        }
+        for scheme in new_schemes:
+            current = best_by_id.get(scheme.scheme_id)
+            if current is None or scheme.match_score > current.match_score:
+                best_by_id[scheme.scheme_id] = scheme
+        combined = sorted(
+            best_by_id.values(),
+            key=lambda item: item.match_score,
+            reverse=True,
+        )[: settings.workflow.retrieval_limit]
+        snapshot = ev.session_snapshot.model_copy(update={"relevant_schemes": combined})
+        await self._append_trace_step(
+            ctx,
+            stage="targeted_search_completed",
+            title="Targeted Corrective Search",
+            payload=execution,
+        )
+        return AssessmentRequestedEvent(
+            user_message=ev.user_message,
+            session_snapshot=snapshot,
+            classification=ev.classification,
+            decision=ev.decision,
+            assessment_round=ev.assessment_round,
         )
 
     @step
@@ -971,10 +1358,26 @@ class BasicAgenticWorkflow(Workflow):
         relevant_schemes = list(ev.session_snapshot.relevant_schemes)
         current_grounding_pack = ev.session_snapshot.latest_grounding_pack
         current_top_schemes_artifact = ev.session_snapshot.latest_top_schemes_artifact
-        if ev.session_snapshot.last_user_goal == ev.user_message:
+        current_scheme_assessment = ev.session_snapshot.latest_scheme_assessment
+        clarification_question = normalize_text(
+            ev.decision.tool_payload.get("question")
+        )
+        is_clarification = (
+            ev.decision.next_action == NextAction.ASK_CLARIFYING_QUESTION
+            and clarification_question is not None
+        )
+        response_last_action = (
+            NextAction.ASK_CLARIFYING_QUESTION.value
+            if is_clarification
+            else "response_generated"
+        )
+        if (
+            current_scheme_assessment is not None
+            or ev.session_snapshot.last_user_goal == ev.user_message
+        ):
             base_memory = ev.session_snapshot.to_session_memory()
             session_memory = base_memory.model_copy(
-                update={"last_action": "response_generated"}
+                update={"last_action": response_last_action}
             )
         else:
             session_memory = build_session_memory(
@@ -983,11 +1386,12 @@ class BasicAgenticWorkflow(Workflow):
                 classification=ev.classification,
                 decision=ev.decision,
                 relevant_schemes=relevant_schemes,
-                last_action="response_generated",
+                last_action=response_last_action,
             )
         final_session_snapshot = SessionSnapshot.from_session_memory(
             session_memory,
             relevant_schemes=relevant_schemes,
+            latest_scheme_assessment=current_scheme_assessment,
             latest_grounding_pack=current_grounding_pack,
             latest_top_schemes_artifact=current_top_schemes_artifact,
         )
@@ -1006,35 +1410,60 @@ class BasicAgenticWorkflow(Workflow):
                 if current_grounding_pack is not None
                 else None
             ),
+            "scheme_assessment": (
+                current_scheme_assessment.model_dump(mode="json", exclude_none=True)
+                if current_scheme_assessment is not None
+                else None
+            ),
         }
         reply_prompt = _build_reply_prompt(
             user_message=ev.user_message,
             session_memory=session_memory,
             grounding_pack=current_grounding_pack,
+            scheme_assessment=current_scheme_assessment,
+            relevant_schemes=[
+                scheme
+                for scheme in relevant_schemes
+                if current_scheme_assessment is None
+                or next(
+                    (
+                        item.status
+                        for item in current_scheme_assessment.assessments
+                        if item.scheme_id == scheme.scheme_id
+                    ),
+                    SchemeFitStatus.POTENTIAL_OPTION,
+                )
+                != SchemeFitStatus.CONFLICTS_WITH_KNOWN_FACTS
+            ],
         )
-        reply_parts: list[str] = []
-        astream_text = getattr(self._llm, "astream_text", None)
-        if callable(astream_text):
-            async for chunk in astream_text(
-                reply_prompt,
-                system_instruction=REPLY_SYSTEM_PROMPT,
-                model=settings.workflow.generation_model,
-                temperature=0.2,
-            ):
-                if not chunk:
-                    continue
-                reply_parts.append(chunk)
-                ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=chunk))
-            reply = "".join(reply_parts)
+        reply: str
+        if is_clarification and clarification_question is not None:
+            reply = clarification_question
+            ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=reply))
         else:
-            reply = self._llm.generate_text(
-                reply_prompt,
-                system_instruction=REPLY_SYSTEM_PROMPT,
-                model=settings.workflow.generation_model,
-                temperature=0.2,
-            )
-            if reply:
-                ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=reply))
+            reply_parts: list[str] = []
+            astream_text = getattr(self._llm, "astream_text", None)
+            if callable(astream_text):
+                async for chunk in astream_text(
+                    reply_prompt,
+                    system_instruction=REPLY_SYSTEM_PROMPT,
+                    model=settings.workflow.generation_model,
+                    temperature=0.2,
+                ):
+                    if not chunk:
+                        continue
+                    reply_parts.append(chunk)
+                    ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=chunk))
+                reply = "".join(reply_parts)
+            else:
+                reply = self._llm.generate_text(
+                    reply_prompt,
+                    system_instruction=REPLY_SYSTEM_PROMPT,
+                    model=settings.workflow.generation_model,
+                    temperature=0.2,
+                )
+                if reply:
+                    ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=reply))
 
         decision = ev.decision.model_copy(update={"response": reply.strip()})
         await ctx.store.set("response", decision.response)
@@ -1083,6 +1512,7 @@ class BasicAgenticWorkflow(Workflow):
                 decision=decision,
                 session_memory=session_memory,
                 grounding_pack=current_grounding_pack,
+                scheme_assessment=current_scheme_assessment,
                 top_schemes_artifact=current_top_schemes_artifact,
                 session_snapshot=final_session_snapshot,
                 workflow_trace=[
@@ -1140,7 +1570,9 @@ class BasicAgenticWorkflow(Workflow):
                 "fit_query": intent_profile.fit_query,
                 "retrieval_filters_enabled": retrieval["retrieval_filters_enabled"],
                 "retrieval_filter_mode": retrieval["retrieval_filter_mode"],
-                "normalized_filters": intent_profile.filters.model_dump(exclude_none=True),
+                "normalized_filters": intent_profile.filters.model_dump(
+                    exclude_none=True
+                ),
                 "candidate_filters": retrieval["candidate_filters"],
                 "query_topics": intent_profile.query_topics,
                 "query_tags": intent_profile.query_tags,
@@ -1177,17 +1609,23 @@ class BasicAgenticWorkflow(Workflow):
                     continue
 
                 database_name = scheme.mongo_ref.database or settings.database_name
-                collection_name = scheme.mongo_ref.collection or settings.schemes_collection
-                for lookup_collection in preferred_hydration_collections(collection_name):
+                collection_name = (
+                    scheme.mongo_ref.collection or settings.schemes_collection
+                )
+                for lookup_collection in preferred_hydration_collections(
+                    collection_name
+                ):
                     grouped_ids[(database_name, lookup_collection)].append(object_id)
 
             span.set_attribute("jurisai.mongo_lookup_group_count", len(grouped_ids))
             documents_by_key: dict[tuple[str, str, str], dict[str, Any]] = {}
             if grouped_ids:
                 for (database_name, collection_name), object_ids in grouped_ids.items():
-                    documents = await self._mongo_client[database_name][
-                        collection_name
-                    ].find({"_id": {"$in": object_ids}}).to_list(length=None)
+                    documents = (
+                        await self._mongo_client[database_name][collection_name]
+                        .find({"_id": {"$in": object_ids}})
+                        .to_list(length=None)
+                    )
                     for document in documents:
                         documents_by_key[
                             (database_name, collection_name, str(document["_id"]))
@@ -1197,11 +1635,15 @@ class BasicAgenticWorkflow(Workflow):
             hydrated_schemes: list[RelevantScheme] = []
             for scheme in parsed_schemes:
                 database_name = scheme.mongo_ref.database or settings.database_name
-                collection_name = scheme.mongo_ref.collection or settings.schemes_collection
+                collection_name = (
+                    scheme.mongo_ref.collection or settings.schemes_collection
+                )
                 document_id = scheme.mongo_ref.document_id or ""
                 resolved_document: dict[str, Any] | None = None
                 resolved_collection: str | None = None
-                for lookup_collection in preferred_hydration_collections(collection_name):
+                for lookup_collection in preferred_hydration_collections(
+                    collection_name
+                ):
                     resolved_document = documents_by_key.get(
                         (database_name, lookup_collection, document_id)
                     )
@@ -1210,7 +1652,9 @@ class BasicAgenticWorkflow(Workflow):
                         break
 
                 if resolved_document is None:
-                    hydrated_schemes.append(RelevantScheme.from_retrieved_scheme(scheme))
+                    hydrated_schemes.append(
+                        RelevantScheme.from_retrieved_scheme(scheme)
+                    )
                     continue
 
                 hydrated_schemes.append(
@@ -1229,7 +1673,25 @@ class BasicAgenticWorkflow(Workflow):
         classification: UserIntentClassification,
         session_snapshot: SessionSnapshot,
     ) -> OrchestratorDecision:
-        if classification.needs_clarification:
+        clarification_question = normalize_text(classification.clarification_question)
+        clarification_fact_key = normalize_text(classification.clarification_fact_key)
+        pending_clarification = session_snapshot.pending_clarifications.get(
+            clarification_fact_key or ""
+        )
+        repeated_clarification = bool(
+            pending_clarification and pending_clarification.asked
+        )
+        if (
+            classification.needs_clarification
+            and clarification_question
+            and not repeated_clarification
+        ):
+            continuation_goal = (
+                session_snapshot.last_user_goal
+                if session_snapshot.last_action
+                == NextAction.ASK_CLARIFYING_QUESTION.value
+                else None
+            )
             return OrchestratorDecision(
                 next_action=NextAction.ASK_CLARIFYING_QUESTION,
                 selected_agent="user_clarifier",
@@ -1237,22 +1699,88 @@ class BasicAgenticWorkflow(Workflow):
                     "missing_context": facts_to_dict(
                         classification.extracted_profile_updates
                     ),
-                    "question": classification.clarification_question,
+                    "question": clarification_question,
+                    "clarification_fact_key": clarification_fact_key,
+                    "continuation_goal": continuation_goal,
                 },
             )
 
-        if classification.primary_intent in {
-            PrimaryIntent.SCHEME_DISCOVERY,
-            PrimaryIntent.FOLLOW_UP,
-        }:
+        if repeated_clarification and session_snapshot.relevant_schemes:
+            return OrchestratorDecision(
+                next_action=NextAction.ASSESS_SCHEMES,
+                selected_agent="scheme_fit_assessor",
+                tool_payload={
+                    "continuation_goal": session_snapshot.last_user_goal,
+                    "avoid_repeating_clarification": clarification_fact_key,
+                },
+            )
+
+        is_clarification_answer = (
+            classification.primary_intent == PrimaryIntent.PROFILE_UPDATE
+            and session_snapshot.last_action == NextAction.ASK_CLARIFYING_QUESTION.value
+            and bool(session_snapshot.last_user_goal)
+        )
+        profile_updates = aggregate_intent_facts(
+            classification.extracted_profile_updates
+        )
+        answered_pending_key = any(
+            key in session_snapshot.pending_clarifications for key in profile_updates
+        )
+        if (
+            is_clarification_answer
+            and answered_pending_key
+            and session_snapshot.relevant_schemes
+        ):
+            return OrchestratorDecision(
+                next_action=NextAction.ASSESS_SCHEMES,
+                selected_agent="scheme_fit_assessor",
+                tool_payload={
+                    "continuation_goal": session_snapshot.last_user_goal,
+                    "filters": {
+                        **session_snapshot.user_profile,
+                        **profile_updates,
+                    },
+                },
+            )
+        followup_query = (
+            classification.discovery_query or classification.retrieval_query
+        )
+        followup_needs_retrieval = (
+            classification.primary_intent == PrimaryIntent.FOLLOW_UP
+            and (bool(followup_query) or session_snapshot.latest_grounding_pack is None)
+        )
+        if (
+            classification.primary_intent == PrimaryIntent.SCHEME_DISCOVERY
+            or followup_needs_retrieval
+            or is_clarification_answer
+        ):
+            if is_clarification_answer:
+                retrieval_query = session_snapshot.last_user_goal
+                profile_context = ", ".join(
+                    f"{key}: {value}" for key, value in profile_updates.items()
+                )
+                fit_query = (
+                    f"eligibility: {retrieval_query}; {profile_context}"
+                    if profile_context
+                    else retrieval_query
+                )
+            else:
+                retrieval_query = followup_query or classification.user_goal
+                fit_query = classification.fit_query or retrieval_query
             return OrchestratorDecision(
                 next_action=NextAction.CALL_SCHEME_RETRIEVAL,
                 selected_agent="retrieval_planner",
                 tool_payload={
-                    "query": classification.discovery_query or classification.retrieval_query,
-                    "fit_query": classification.fit_query,
+                    "query": retrieval_query,
+                    "fit_query": fit_query,
+                    "continuation_goal": (
+                        session_snapshot.last_user_goal
+                        if is_clarification_answer
+                        else None
+                    ),
                     "filters": {
                         **session_snapshot.user_profile,
+                        **profile_updates,
                         **aggregate_intent_facts(classification.retrieval_filters),
                     },
                 },

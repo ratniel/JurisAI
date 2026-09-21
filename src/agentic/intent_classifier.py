@@ -3,10 +3,10 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from src.agentic.models import SessionMemory, SessionSnapshot, UserIntentClassification
 from src.config.settings import settings
 from src.llm import TextGenerationClient, build_generation_client
 from src.llm.providers import GenerationProviderName
-from src.agentic.models import SessionMemory, SessionSnapshot, UserIntentClassification
 
 INTENT_CLASSIFIER_SYSTEM_PROMPT = """
 You classify user turns for a public-benefits and government-schemes assistant.
@@ -19,8 +19,29 @@ Be conservative and cheap:
 - prefer general_question only for broad product/help questions
 - prefer out_of_scope when the request is unrelated to the assistant's domain
 
-Set needs_clarification=true only when routing would be materially better with one more question.
+Ask for missing context conversationally instead of expecting a pre-built user profile.
+Set needs_clarification=true only when one missing fact would materially improve routing or
+the next retrieval. When clarification is needed:
+- ask exactly one focused question and put that exact question in clarification_question
+- put the stable snake_case profile key in clarification_fact_key
+- choose the missing fact with the highest impact on the user's current request
+- prioritize state/UT for open-ended discovery when location materially changes the result
+- ask about age range, social category, household-income range, disability, occupation,
+  student status, gender, residence type, or marital status only when it is relevant
+- never ask for a full profile, exact date of birth, exact address, Aadhaar, phone, or email
+- do not ask for information already present in the user message or session memory
+- do not ask a pending clarification again when its asked field is true; leave it pending
+  unless the user supplies the fact
+If the previous action was ask_clarifying_question and the user supplies the requested fact,
+extract it into extracted_profile_updates using the pending clarification's exact fact key so
+the prior goal can continue. Do not rewrite unrelated pending clarifications.
+Use stable profile keys where possible: state, age_range, social_category, marital_status,
+gender, disability_status, occupation, student_status, household_income_range, residence_type.
 If scheme retrieval would be useful, fill discovery_query, fit_query, and retrieval_filters using only facts present in the user message or session snapshot.
+For a follow-up that can be answered from recent scheme context, leave discovery_query and
+retrieval_query empty. Populate them when a new or materially revised search is needed, or
+when the user requests details not carried in compact grounding such as required documents
+or full FAQ content.
 Prefer canonical retrieval filter keys when possible: `state`, `level`, `provider`, `provider_type`, `ministry`, `application_mode`, `tags`, `topics`.
 For discovery_query, write a short grounded query that best matches scheme name and details text.
 For fit_query, write a compact query that best matches eligibility and benefits text, using at most:
@@ -46,7 +67,9 @@ def _render_recent_scheme_refs(session_memory: SessionMemory) -> str:
     for scheme_ref in session_memory.recent_scheme_refs[:5]:
         parts = [scheme_ref.name or scheme_ref.scheme_id]
         qualifiers = [
-            item for item in (scheme_ref.state, scheme_ref.level, scheme_ref.provider) if item
+            item
+            for item in (scheme_ref.state, scheme_ref.level, scheme_ref.provider)
+            if item
         ]
         if qualifiers:
             parts.append(f"({', '.join(qualifiers)})")
@@ -60,7 +83,9 @@ def _render_selected_scheme(session_memory: SessionMemory) -> str:
         return "none"
 
     parts = [selected.name or selected.scheme_id]
-    qualifiers = [item for item in (selected.state, selected.level, selected.provider) if item]
+    qualifiers = [
+        item for item in (selected.state, selected.level, selected.provider) if item
+    ]
     if qualifiers:
         parts.append(f"({', '.join(qualifiers)})")
     return " ".join(parts)
@@ -85,6 +110,10 @@ def _build_classifier_prompt(
         f"- active_constraints: {_render_mapping(session_memory.active_constraints)}",
         f"- recent_scheme_refs: {_render_recent_scheme_refs(session_memory)}",
         f"- selected_scheme_ref: {_render_selected_scheme(session_memory)}",
+        (
+            "- pending_clarifications: "
+            f"{json.dumps({key: item.model_dump(mode='json') for key, item in session_memory.pending_clarifications.items()}, ensure_ascii=True, sort_keys=True)}"
+        ),
     ]
     return "\n".join(lines).strip()
 
