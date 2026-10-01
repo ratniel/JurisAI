@@ -567,7 +567,7 @@ class WorkflowMongoClientTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(hydrated[0].name, "Hydrated Scheme")
         self.assertEqual(
             enriched_collection.queries,
-            [{"_id": {"$in": [document_id]}}],
+            [{"_id": {"$in": [str(document_id), document_id]}}],
         )
         self.assertFalse(fake_client.closed)
         await workflow.aclose()
