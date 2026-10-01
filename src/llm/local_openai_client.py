@@ -5,10 +5,12 @@ import logging
 import re
 from typing import Any, TypeVar
 
-from litellm import BadRequestError, UnsupportedParamsError, completion
+import litellm
+from litellm import BadRequestError, UnsupportedParamsError
 from pydantic import BaseModel
 
 from src.config.settings import settings
+from src.observability.phoenix_tracing import using_llm_provider
 
 StructuredModelT = TypeVar("StructuredModelT", bound=BaseModel)
 
@@ -219,16 +221,17 @@ class LocalOpenAICompatibleClient:
             completion_kwargs["extra_body"] = {
                 "chat_template_kwargs": {"enable_thinking": False}
             }
-        return completion(
-            model=self._resolve_model_name(model),
-            custom_llm_provider="openai",
-            messages=messages,
-            base_url=self._base_url,
-            api_key=self._api_key,
-            timeout=self._timeout_seconds,
-            temperature=temperature,
-            **completion_kwargs,
-        )
+        with using_llm_provider(self.provider_name):
+            return litellm.completion(
+                model=self._resolve_model_name(model),
+                custom_llm_provider="openai",
+                messages=messages,
+                base_url=self._base_url,
+                api_key=self._api_key,
+                timeout=self._timeout_seconds,
+                temperature=temperature,
+                **completion_kwargs,
+            )
 
     def _record_invocation(
         self,

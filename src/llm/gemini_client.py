@@ -286,7 +286,7 @@ class GeminiClient:
         usage_metadata = getattr(response, "usage_metadata", None)
         return LLMInvocationMetadata(
             provider=self.provider_name,
-            model=model_name,
+            model=response.model_version or model_name,
             usage=TokenUsage(
                 prompt_tokens=self._coerce_int(
                     getattr(usage_metadata, "prompt_token_count", None),

@@ -6,6 +6,7 @@ from llama_index.llms.google_genai import GoogleGenAI
 from pydantic import BaseModel
 
 from src.config.settings import settings
+from src.observability.phoenix_tracing import google_sdk_tracing
 
 StructuredModelT = TypeVar("StructuredModelT", bound=BaseModel)
 
@@ -51,7 +52,8 @@ class LlamaIndexGoogleGenAIClient:
             prompt=prompt,
             system_instruction=system_instruction,
         )
-        return llm.complete(full_prompt).text
+        with google_sdk_tracing():
+            return llm.complete(full_prompt).text
 
     def generate_structured(
         self,
@@ -73,7 +75,8 @@ class LlamaIndexGoogleGenAIClient:
             prompt=prompt,
             system_instruction=system_instruction,
         )
-        response = structured_llm.complete(full_prompt)
+        with google_sdk_tracing():
+            response = structured_llm.complete(full_prompt)
         return response.raw
 
     def _build_llm(

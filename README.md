@@ -11,3 +11,7 @@ Run `bun run dev` from the repo root to start the API on port 8000 and Vite on p
 Validation: `bun run lint:web`, `bun run build:web`, and `uv run python -m unittest discover -s tests -p 'test_*.py'`.
 
 The chat streams progress and answers, persists sessions in MongoDB, and shows a collapsible scheme shelf with full details and labeled source links. See `docs/production-data-pipeline.md` for indexing.
+
+## Phoenix observability
+
+After `uv sync`, configure the Phoenix collector and restart the backend. LLM child spans expose provider, requested/effective model, and reported token usage; chats group under standard `session.id`. See [Phoenix tracing](docs/phoenix_tracing.md) for configuration, dashboard filters, and verification commands.
