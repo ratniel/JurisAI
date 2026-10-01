@@ -395,7 +395,7 @@ def build_top_schemes_artifact(
                 documents_required=scheme.documents_required,
                 faq=scheme.faq,
                 application_modes=scheme.application_mode_details,
-                references=list(scheme.sources),
+                sources=list(scheme.sources),
                 retrieval_reason=_build_why_relevant(scheme),
             )
             for scheme in relevant_schemes
@@ -1166,20 +1166,27 @@ class BasicAgenticWorkflow(Workflow):
             if not parsed_schemes:
                 return []
 
-            grouped_ids: dict[tuple[str, str], list[ObjectId]] = defaultdict(list)
+            # Some collections (schemes_enriched, test_schemes_enriched) store
+            # _id as a plain string rather than a native ObjectId - a legacy
+            # data issue, not something we can assume is fixed everywhere.
+            # Querying with both representations tolerates either type
+            # without needing to know up front which one a given collection
+            # actually uses.
+            grouped_ids: dict[tuple[str, str], list[ObjectId | str]] = defaultdict(list)
             for scheme in parsed_schemes:
                 document_id = scheme.mongo_ref.document_id
                 if not document_id:
                     continue
+                lookup_values: list[ObjectId | str] = [document_id]
                 try:
-                    object_id = ObjectId(document_id)
+                    lookup_values.append(ObjectId(document_id))
                 except Exception:
-                    continue
+                    pass
 
                 database_name = scheme.mongo_ref.database or settings.database_name
                 collection_name = scheme.mongo_ref.collection or settings.schemes_collection
                 for lookup_collection in preferred_hydration_collections(collection_name):
-                    grouped_ids[(database_name, lookup_collection)].append(object_id)
+                    grouped_ids[(database_name, lookup_collection)].extend(lookup_values)
 
             span.set_attribute("jurisai.mongo_lookup_group_count", len(grouped_ids))
             documents_by_key: dict[tuple[str, str, str], dict[str, Any]] = {}

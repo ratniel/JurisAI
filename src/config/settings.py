@@ -80,6 +80,20 @@ class QdrantSettings(BaseModel):
             "QDRANT_DENSE_VECTOR_NAME",
         ),
     )
+    sparse_vector_name: str = Field(
+        default="keyword_sparse_vector",
+        validation_alias=AliasChoices(
+            "sparse_vector_name",
+            "QDRANT_SPARSE_VECTOR_NAME",
+        ),
+    )
+    sparse_keyword_dimensions: int = Field(
+        default=32768,
+        validation_alias=AliasChoices(
+            "sparse_keyword_dimensions",
+            "QDRANT_SPARSE_KEYWORD_DIMENSIONS",
+        ),
+    )
 
 
 class EmbeddingSettings(BaseModel):
@@ -88,6 +102,10 @@ class EmbeddingSettings(BaseModel):
     backend: Literal["local", "gemini"] = Field(
         default="local",
         validation_alias=AliasChoices("backend", "EMBEDDING_BACKEND"),
+    )
+    model: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("model", "EMBEDDING_MODEL"),
     )
     local_model: str = Field(
         default="all-MiniLM-L6-v2",
@@ -209,14 +227,14 @@ class WorkflowSettings(BaseModel):
     generation_provider: Literal[
         "gemini", "llamaindex_google", "local_openai", "openrouter"
     ] = Field(
-        default="gemini",
+        default="openrouter",
         validation_alias=AliasChoices(
             "generation_provider",
             "WORKFLOW_GENERATION_PROVIDER",
         ),
     )
     generation_model: str = Field(
-        default="models/gemini-flash-latest",
+        default="openrouter/free",
         validation_alias=AliasChoices(
             "generation_model",
             "WORKFLOW_GENERATION_MODEL",
@@ -232,14 +250,14 @@ class WorkflowSettings(BaseModel):
     intent_provider: Literal[
         "gemini", "llamaindex_google", "local_openai", "openrouter"
     ] = Field(
-        default="gemini",
+        default="openrouter",
         validation_alias=AliasChoices(
             "intent_provider",
             "WORKFLOW_INTENT_PROVIDER",
         ),
     )
     intent_model: str = Field(
-        default="models/gemini-flash-lite-latest",
+        default="openrouter/free",
         validation_alias=AliasChoices(
             "intent_model",
             "WORKFLOW_INTENT_MODEL",
@@ -292,6 +310,45 @@ class PhoenixSettings(BaseModel):
     api_key: str | None = Field(
         default=None,
         validation_alias=AliasChoices("api_key", "PHOENIX_API_KEY"),
+    )
+
+
+class ApiSettings(BaseModel):
+    """HTTP API and frontend integration settings."""
+
+    host: str = Field(
+        default="127.0.0.1",
+        validation_alias=AliasChoices("host", "API_HOST"),
+    )
+    port: int = Field(
+        default=8000,
+        validation_alias=AliasChoices("port", "API_PORT"),
+    )
+    reload: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("reload", "API_RELOAD"),
+    )
+    cors_origins: tuple[str, ...] = Field(
+        default=("http://127.0.0.1:5173", "http://localhost:5173"),
+        validation_alias=AliasChoices("cors_origins", "API_CORS_ORIGINS"),
+    )
+    chat_sessions_collection: str = Field(
+        default="chat_sessions",
+        validation_alias=AliasChoices(
+            "chat_sessions_collection",
+            "CHAT_SESSIONS_COLLECTION",
+        ),
+    )
+    chat_runs_collection: str = Field(
+        default="chat_runs",
+        validation_alias=AliasChoices(
+            "chat_runs_collection",
+            "CHAT_RUNS_COLLECTION",
+        ),
+    )
+    frontend_dist_dir: str = Field(
+        default="web/dist",
+        validation_alias=AliasChoices("frontend_dist_dir", "FRONTEND_DIST_DIR"),
     )
 
 
@@ -362,6 +419,7 @@ class Settings(BaseSettings):
     openrouter: OpenRouterSettings = Field(default_factory=OpenRouterSettings)
     workflow: WorkflowSettings = Field(default_factory=WorkflowSettings)
     phoenix: PhoenixSettings = Field(default_factory=PhoenixSettings)
+    api: ApiSettings = Field(default_factory=ApiSettings)
     eval: RetrievalEvalSettings = Field(default_factory=RetrievalEvalSettings)
     legacy_mongodb_uri: str | None = Field(
         default=None,
@@ -396,6 +454,11 @@ class Settings(BaseSettings):
     legacy_embedding_backend: Literal["local", "gemini"] | None = Field(
         default=None,
         validation_alias="EMBEDDING_BACKEND",
+        exclude=True,
+    )
+    legacy_embedding_model: str | None = Field(
+        default=None,
+        validation_alias="EMBEDDING_MODEL",
         exclude=True,
     )
     legacy_local_embedding_model: str | None = Field(
@@ -519,6 +582,8 @@ class Settings(BaseSettings):
             self.qdrant.api_key = self.legacy_qdrant_api_key
         if self.legacy_embedding_backend is not None:
             self.embeddings.backend = self.legacy_embedding_backend
+        if self.legacy_embedding_model is not None:
+            self.embeddings.model = self.legacy_embedding_model
         if self.legacy_local_embedding_model is not None:
             self.embeddings.local_model = self.legacy_local_embedding_model
         if self.legacy_gemini_embedding_model is not None:
@@ -594,6 +659,8 @@ class Settings(BaseSettings):
         return self.openrouter.model
 
     def embedding_model(self, backend: Literal["local", "gemini"] | None = None) -> str:
+        if self.embeddings.model:
+            return self.embeddings.model
         resolved_backend = backend or self.embeddings.backend
         if resolved_backend == "local":
             return self.embeddings.local_model

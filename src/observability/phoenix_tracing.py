@@ -5,6 +5,7 @@ import re
 from dataclasses import dataclass
 from urllib.parse import urlparse
 
+from opentelemetry import trace
 from openinference.instrumentation.google_genai import GoogleGenAIInstrumentor
 from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
 from phoenix.otel import register
@@ -113,3 +114,14 @@ def configure_phoenix_tracing(
             f"endpoint={endpoint_detail}."
         ),
     )
+
+
+def flush_phoenix_tracing() -> None:
+    """Best-effort flush for long-running processes before shutdown."""
+
+    tracer_provider = trace.get_tracer_provider()
+    for method_name in ("force_flush", "shutdown"):
+        method = getattr(tracer_provider, method_name, None)
+        if callable(method):
+            method()
+            break

@@ -1,0 +1,345 @@
+.scheme-details-toggle,
+.more-schemes-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0;
+  padding: 0;
+  background-color: transparent;
+  box-shadow: none;
+  color: var(--bronze-hi);
+  font: inherit;
+  font-size: 0.74rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.scheme-details-toggle:hover,
+.more-schemes-toggle:hover {
+  color: var(--text);
+}
+
+.scheme-details-toggle:focus-visible,
+.more-schemes-toggle:focus-visible {
+  outline: 1px solid var(--bronze);
+  outline-offset: 6px;
+  border-radius: 2px;
+}
+
+.disclosure-icon {
+  flex: none;
+  transition: transform 180ms ease;
+}
+
+.disclosure-icon-open {
+  transform: rotate(180deg);
+}
+
+.live-progress-shell {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.live-progress-toggle-button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  padding: 2px 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.86rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.live-progress-toggle-button:hover {
+  color: var(--text);
+}
+
+.live-progress-toggle-button:focus-visible {
+  outline: 1px solid var(--bronze);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.live-progress-toggle-button .disclosure-icon {
+  color: var(--dim);
+}
+
+.live-progress-details {
+  display: grid;
+  gap: 14px;
+  margin: 2px 0 4px 5px;
+  padding-left: 15px;
+  border-left: 1px solid #554a3b;
+}
+
+.live-progress-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 9px;
+}
+
+.live-progress-step .stage-dot {
+  width: 6px;
+  height: 6px;
+  margin-top: 6px;
+}
+
+.live-progress-step .stage-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.live-progress-step .stage-detail {
+  margin-top: 3px;
+}
+
+.more-schemes {
+  padding: 5px 0 0;
+}
+
+.more-schemes-toggle {
+  padding: 12px 2px;
+  border-top: 1px solid #ffffff12;
+  border-bottom: 1px solid #ffffff12;
+}
+
+.more-schemes-list {
+  display: grid;
+  gap: 10px;
+  padding-top: 10px;
+}
+
+.chat-grid > .scheme-shelf {
+  grid-row: 3;
+}
+
+.transcript-panel > .message-scroll-area {
+  grid-row: 2;
+}
+
+.chat-shell {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.chat-app-frame {
+  height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+.topbar {
+  flex: none;
+}
+
+.chat-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 12px;
+  overflow: hidden;
+  padding-top: 18px;
+}
+
+.transcript-panel > .panel-header {
+  grid-row: 1;
+}
+
+.transcript-panel > .message-scroll-area {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px 8px 12px 0;
+  scrollbar-color: #6b5b45 transparent;
+  scrollbar-width: thin;
+}
+
+.transcript-panel > .composer {
+  grid-row: 4;
+  margin: 0;
+  padding: 0 0 max(14px, env(safe-area-inset-bottom));
+  background: var(--bg);
+}
+
+.scheme-shelf {
+  min-width: 0;
+  max-height: none;
+  overflow: hidden;
+  padding: 10px 0;
+  border-top: 1px solid #ffffff12;
+  border-bottom: 1px solid #ffffff12;
+}
+
+.scheme-shelf-expanded {
+  max-height: min(34dvh, 310px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 15px;
+}
+
+.scheme-shelf .artifact-heading {
+  align-items: center;
+  padding-bottom: 10px;
+}
+
+.scheme-shelf .artifact-heading > div {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.scheme-shelf .artifact-heading strong {
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.shelf-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  padding: 4px 0;
+  background: transparent;
+  color: var(--bronze-hi);
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.shelf-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.shelf-secondary-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  padding: 4px 0;
+  background: transparent;
+  color: var(--dim);
+  font: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.shelf-secondary-toggle:hover {
+  color: var(--text);
+}
+
+.shelf-toggle:hover {
+  color: var(--text);
+}
+
+.scheme-rail {
+  display: flex;
+  align-items: stretch;
+  align-self: start;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 1px 1px 8px;
+  scroll-snap-type: x proximity;
+  scrollbar-color: #6b5b45 transparent;
+  scrollbar-width: thin;
+}
+
+.scheme-rail .scheme-card {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 clamp(280px, 31vw, 360px);
+  scroll-snap-align: start;
+}
+
+.scheme-rail .scheme-card > div:last-child {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.scheme-rail .scheme-highlight {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.scheme-sources {
+  display: grid;
+  gap: 7px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.scheme-sources-label {
+  color: var(--dim);
+  font: 500 0.62rem 'DM Mono', monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.scheme-source-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 14px;
+}
+
+.scheme-source-links .official-source {
+  margin-top: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.scheme-rail .scheme-details[open] .scheme-highlight {
+  display: block;
+}
+
+@media (max-width: 760px) {
+  .chat-grid {
+    gap: 9px;
+    padding-top: 12px;
+  }
+
+  .transcript-panel > .panel-header {
+    display: none;
+  }
+
+  .scheme-shelf {
+    padding-block: 8px;
+  }
+
+  .scheme-shelf-expanded {
+    max-height: min(31dvh, 250px);
+    padding-bottom: 11px;
+  }
+
+  .scheme-rail .scheme-card {
+    flex-basis: min(84vw, 330px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disclosure-icon {
+    transition: none;
+  }
+}

@@ -33,3 +33,12 @@ evals/agentic_workflow/runs/run_log.csv
 TODO.md
 completed_tasks.md
 docs/retrieval_status_*.md
+
+# node
+node_modules/
+
+# Keep in-progress Polish UI work separate from the indexing pipeline PR.
+/web/
+
+# local indexing manifests
+.local/embedding_manifests/

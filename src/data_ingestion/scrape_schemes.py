@@ -136,27 +136,56 @@ class ScrapeSchemes:
         ]
         raw_result = await raw_collection.bulk_write(raw_operations, ordered=False)
 
+        # Pin the enriched document's _id to the raw document's real,
+        # authoritative ObjectId, rather than letting Mongo assign it
+        # independently. Without this, two separate bulk_write calls (one per
+        # collection) produce two unrelated ObjectIds for the same scheme,
+        # breaking any later lookup that joins schemes to schemes_enriched by
+        # _id (e.g. Qdrant's mongo_ref.document_id hydration).
+        raw_ids_by_url: dict[str, Any] = {
+            doc["url"]: doc["_id"]
+            async for doc in raw_collection.find(
+                {"url": {"$in": [scheme.url for scheme in schemes]}},
+                {"url": 1, "_id": 1},
+            )
+        }
+
         enriched_collection: AsyncCollection[dict[str, Any]] = self.client[
             settings.database_name
         ][settings.mongo.schemes_enriched_collection]
-        enriched_operations = [
-            ReplaceOne(
-                filter={"url": scheme.url},
-                replacement=dump_enriched_scheme_for_storage(
-                    build_enriched_scheme(scheme)
-                ),
-                upsert=True,
+        enriched_operations: list[ReplaceOne] = []
+        for scheme in schemes:
+            raw_id = raw_ids_by_url.get(scheme.url)
+            if raw_id is None:
+                logger.warning(
+                    f"No raw document id found for {scheme.url}; "
+                    "skipping enriched upsert."
+                )
+                continue
+            enriched_payload = dump_enriched_scheme_for_storage(
+                build_enriched_scheme(scheme)
             )
-            for scheme in schemes
-        ]
-        enriched_result = await enriched_collection.bulk_write(
-            enriched_operations,
-            ordered=False,
+            enriched_payload["_id"] = raw_id
+            enriched_operations.append(
+                ReplaceOne(
+                    filter={"url": scheme.url},
+                    replacement=enriched_payload,
+                    upsert=True,
+                )
+            )
+        enriched_result = (
+            await enriched_collection.bulk_write(enriched_operations, ordered=False)
+            if enriched_operations
+            else None
         )
 
         return max(
             raw_result.upserted_count + raw_result.matched_count,
-            enriched_result.upserted_count + enriched_result.matched_count,
+            (
+                enriched_result.upserted_count + enriched_result.matched_count
+                if enriched_result is not None
+                else 0
+            ),
         )
 
     async def _find_existing_schemes(
