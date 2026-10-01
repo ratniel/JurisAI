@@ -39,6 +39,72 @@
   transform: rotate(180deg);
 }
 
+.live-progress-shell {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.live-progress-toggle-button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  padding: 2px 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.86rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.live-progress-toggle-button:hover {
+  color: var(--text);
+}
+
+.live-progress-toggle-button:focus-visible {
+  outline: 1px solid var(--bronze);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.live-progress-toggle-button .disclosure-icon {
+  color: var(--dim);
+}
+
+.live-progress-details {
+  display: grid;
+  gap: 14px;
+  margin: 2px 0 4px 5px;
+  padding-left: 15px;
+  border-left: 1px solid #554a3b;
+}
+
+.live-progress-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 9px;
+}
+
+.live-progress-step .stage-dot {
+  width: 6px;
+  height: 6px;
+  margin-top: 6px;
+}
+
+.live-progress-step .stage-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.live-progress-step .stage-detail {
+  margin-top: 3px;
+}
+
 .more-schemes {
   padding: 5px 0 0;
 }

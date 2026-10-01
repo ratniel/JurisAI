@@ -404,11 +404,6 @@ export function ChatPage() {
                       : 'Ask about eligibility, benefits, documents, or the best fit'}
                   </h2>
                 </div>
-                {sending ? (
-                  <span className="chip subtle">
-                    {latestStageDescription?.detail ?? 'Working on your request'}
-                  </span>
-                ) : null}
               </div>
 
               <div className="message-scroll-area" ref={messageScrollAreaRef}>
@@ -537,47 +532,41 @@ function LiveAssistantBubble({
   stageLog: StageEntry[]
 }) {
   const latestStage = stageLog.at(-1)
-  const completedStages = stageLog.slice(0, -1)
   const latestStageContent = latestStage
     ? describeStageEntry(latestStage)
     : {
         label: 'Thinking',
         detail: 'Preparing your grounded response.',
       }
-  const canExpand = completedStages.length > 0
-
+  const visibleStages = stageLog.length
+    ? stageLog
+    : [{ stage: 'run_started', detail: 'Starting.' }]
   return (
-    <article className="message-bubble message-assistant message-live">
-      <p className="message-role">JurisAI</p>
+    <>
+      <section className="live-progress-shell">
+        <div aria-live="polite" aria-atomic="true">
+          <button
+            aria-expanded={expanded}
+            aria-label={`${latestStageContent.label}. ${expanded ? 'Hide' : 'Show'} progress details`}
+            className="live-progress-toggle-button"
+            onClick={onToggleExpanded}
+            type="button"
+          >
+            <span>{latestStageContent.label}</span>
+            <CaretDown
+              aria-hidden="true"
+              className={expanded ? 'disclosure-icon disclosure-icon-open' : 'disclosure-icon'}
+              size={15}
+            />
+          </button>
+        </div>
 
-      <div aria-live="polite" className="live-progress-shell">
-        <button
-          aria-expanded={canExpand ? expanded : false}
-          className={`live-progress-card ${expanded ? 'live-progress-card-expanded' : ''} ${
-            errorMessage ? 'live-progress-card-error' : ''
-          }`}
-          onClick={canExpand ? onToggleExpanded : undefined}
-          type="button"
-        >
-          <span className="stage-dot" />
-          <div className="live-progress-copy">
-            <p className="stage-label">{latestStageContent.label}</p>
-            <p className="stage-detail">{latestStageContent.detail}</p>
-          </div>
-          <span className="live-progress-toggle">
-            {canExpand ? (expanded ? 'Hide steps' : 'Show steps') : 'Live'}
-          </span>
-        </button>
-
-        {expanded && completedStages.length ? (
-          <div className="stage-list">
-            {completedStages.map((entry, index) => {
+        {expanded ? (
+          <div className="live-progress-details">
+            {visibleStages.map((entry, index) => {
               const describedEntry = describeStageEntry(entry)
               return (
-                <div
-                  key={`${entry.stage}-${index}`}
-                  className="stage-item stage-item-complete"
-                >
+                <div key={`${entry.stage}-${index}`} className="live-progress-step">
                   <span className="stage-dot" />
                   <div>
                     <p className="stage-label">{describedEntry.label}</p>
@@ -588,16 +577,14 @@ function LiveAssistantBubble({
             })}
           </div>
         ) : null}
-
-      </div>
+      </section>
 
       {draftAnswer.trim() ? (
-        <div className="streamed-answer">
+        <article className="message-bubble message-assistant">
+          <p className="message-role">JurisAI</p>
           <MarkdownBlock className="message-content markdown-content" content={draftAnswer} />
-        </div>
-      ) : errorMessage ? null : (
-        <p className="message-pending">Preparing grounded answer…</p>
-      )}
+        </article>
+      ) : null}
 
       {errorMessage ? (
         <section className="inline-error live-error-block" aria-live="polite">
@@ -606,7 +593,7 @@ function LiveAssistantBubble({
           <button className="inline-button" onClick={onRetry} type="button">Retry</button>
         </section>
       ) : null}
-    </article>
+    </>
   )
 }
 
@@ -785,75 +772,56 @@ function describeStageEntry(entry: StageEntry): { label: string; detail: string 
         detail: 'Starting a grounded run for this request.',
       }
     case 'intent_classified': {
-      const match = entry.detail.match(/^(.*?) \(confidence=([\d.]+)\)$/)
-      if (!match) {
-        return { label: friendlyStageLabel(entry.stage), detail: "Reviewing your request and finding relevant scheme information." }
-      }
       return {
         label: friendlyStageLabel(entry.stage),
-        detail: `Detected intent: ${match[1]} (${Math.round(Number(match[2]) * 100)}% confidence).`,
+        detail: 'Understanding your needs and the kind of support you are looking for.',
       }
     }
-    case 'decision_made': {
-      const match = entry.detail.match(/^(.*?) via (.*)$/)
-      if (!match) {
-        return { label: friendlyStageLabel(entry.stage), detail: "Reviewing your request and finding relevant scheme information." }
-      }
+    case 'decision_made':
       return {
         label: friendlyStageLabel(entry.stage),
-        detail: `Next step: ${humanizeToken(match[1])} using ${humanizeToken(match[2])}.`,
+        detail: 'Choosing how to find the most relevant schemes for your request.',
       }
-    }
     case 'retrieval_planned':
       return {
         label: friendlyStageLabel(entry.stage),
-        detail: entry.detail.replace('tool call(s) selected', 'retrieval tool(s) selected.'),
+        detail: 'Preparing the searches needed to find matching schemes.',
       }
-    case 'retrieval_started': {
-      const match = entry.detail.match(/^(.+?) with query=(.+)$/)
-      if (!match) {
-        return { label: friendlyStageLabel(entry.stage), detail: "Reviewing your request and finding relevant scheme information." }
-      }
+    case 'retrieval_started':
       return {
         label: friendlyStageLabel(entry.stage),
-        detail: `Running ${humanizeToken(match[1])} for ${match[2]}.`,
+        detail: 'Looking for government schemes that fit your situation.',
       }
-    }
     case 'retrieval_completed': {
-      const match = entry.detail.match(/^(\d+) schemes \(ignored_filters=(.+)\)$/)
-      if (!match) {
-        return { label: friendlyStageLabel(entry.stage), detail: "Reviewing your request and finding relevant scheme information." }
-      }
-      const ignoredFilters =
-        match[2] === '[]'
-          ? 'No important filters were ignored.'
-          : `Ignored filters: ${match[2]}.`
+      const match = entry.detail.match(/^(\d+) schemes/)
       return {
         label: friendlyStageLabel(entry.stage),
-        detail: `Reviewed ${match[1]} candidate schemes. ${ignoredFilters}`,
+        detail: match
+          ? `Reviewing ${match[1]} schemes found for your request.`
+          : 'Reviewing the schemes found for your request.',
       }
     }
     case 'artifact_ready':
-      return {
-        label: friendlyStageLabel(entry.stage),
-        detail: entry.detail.replace('scheme(s)', 'scheme shortlist item(s)'),
+      {
+        const count = entry.detail.match(/\d+/)?.[0]
+        return {
+          label: friendlyStageLabel(entry.stage),
+          detail: count
+            ? `${count} schemes are ready for you to review.`
+            : 'The matching schemes are ready for you to review.',
+        }
       }
     case 'response_generated':
       return {
-        label: friendlyStageLabel(entry.stage),
-        detail: `Drafting the final answer with ${humanizeToken(entry.detail)}.`,
+        label: 'Writing your answer',
+        detail: 'Putting together a clear answer based on the schemes found.',
       }
     default:
-      return { label: friendlyStageLabel(entry.stage), detail: "Reviewing your request and finding relevant scheme information." }
+      return {
+        label: friendlyStageLabel(entry.stage),
+        detail: 'Reviewing your request and finding relevant scheme information.',
+      }
   }
-}
-
-function humanizeToken(value: string): string {
-  return value
-    .replace(/^['"]|['"]$/g, '')
-    .split('_')
-    .filter(Boolean)
-    .join(' ')
 }
 
 function getSchemeBadgeLabel(scheme: TopSchemeArtifactEntry): string {
