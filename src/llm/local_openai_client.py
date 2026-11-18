@@ -9,6 +9,7 @@ from litellm import BadRequestError, UnsupportedParamsError, completion
 from pydantic import BaseModel
 
 from src.config.settings import settings
+from src.llm.contracts import LLMInvocationMetadata, TokenUsage
 
 StructuredModelT = TypeVar("StructuredModelT", bound=BaseModel)
 
@@ -37,7 +38,7 @@ class LocalOpenAICompatibleClient:
         config = settings.local_generation
         self.default_model = model or config.model
         self.provider_name = "local_openai"
-        self.last_invocation_metadata: dict[str, Any] | None = None
+        self.last_invocation_metadata: LLMInvocationMetadata | None = None
         self.invocation_history: list[dict[str, Any]] = []
         self._base_url = base_url or config.base_url
         self._api_key = api_key or config.api_key
@@ -260,7 +261,10 @@ class LocalOpenAICompatibleClient:
             "usage": self._usage_to_dict(getattr(response, "usage", None)),
             "error": error,
         }
-        self.last_invocation_metadata = metadata
+        self.last_invocation_metadata = self._build_invocation_metadata(
+            response=response,
+            model_name=str(getattr(response, "model", "") or self._resolve_model_name(model)),
+        )
         self.invocation_history.append(metadata)
 
     @staticmethod
@@ -371,3 +375,93 @@ class LocalOpenAICompatibleClient:
     @staticmethod
     def _strip_thinking_content(text: str) -> str:
         return _THINK_BLOCK_PATTERN.sub("", text).strip()
+
+
+    def _build_invocation_metadata(
+        self,
+        *,
+        response: Any,
+        model_name: str,
+    ) -> LLMInvocationMetadata:
+        usage = self._extract_usage(getattr(response, "usage", None))
+        finish_reason = None
+        try:
+            finish_reason = response.choices[0].finish_reason
+        except (AttributeError, IndexError, KeyError, TypeError):
+            finish_reason = None
+        return LLMInvocationMetadata(
+            provider=self.provider_name,
+            model=model_name,
+            usage=usage,
+            finish_reason=finish_reason,
+            raw_usage=self._usage_to_dict(getattr(response, "usage", None)),
+        )
+
+
+    @classmethod
+    def _extract_usage(cls, usage: Any) -> TokenUsage:
+        payload = cls._usage_to_dict(usage)
+        prompt_tokens = cls._coerce_int(
+            payload.get("prompt_tokens"),
+            payload.get("input_tokens"),
+            payload.get("prompt_token_count"),
+        )
+        completion_tokens = cls._coerce_int(
+            payload.get("completion_tokens"),
+            payload.get("output_tokens"),
+            payload.get("candidates_token_count"),
+        )
+        total_tokens = cls._coerce_int(
+            payload.get("total_tokens"),
+            payload.get("total_token_count"),
+            prompt_tokens + completion_tokens,
+        )
+        reasoning_tokens = cls._coerce_int(
+            payload.get("reasoning_tokens"),
+            payload.get("thoughts_token_count"),
+        )
+        cached_tokens = cls._coerce_int(
+            payload.get("cached_tokens"),
+            payload.get("cached_content_token_count"),
+        )
+        prompt_details = payload.get("prompt_tokens_details") or payload.get(
+            "input_tokens_details"
+        )
+        completion_details = payload.get("completion_tokens_details") or payload.get(
+            "output_tokens_details"
+        )
+        if isinstance(prompt_details, dict):
+            cached_tokens = max(
+                cached_tokens,
+                cls._coerce_int(
+                    prompt_details.get("cached_tokens"),
+                    prompt_details.get("cached_tokens_count"),
+                ),
+            )
+        if isinstance(completion_details, dict):
+            reasoning_tokens = max(
+                reasoning_tokens,
+                cls._coerce_int(
+                    completion_details.get("reasoning_tokens"),
+                    completion_details.get("reasoning_tokens_count"),
+                ),
+            )
+        return TokenUsage(
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            total_tokens=total_tokens,
+            reasoning_tokens=reasoning_tokens,
+            cached_tokens=cached_tokens,
+        )
+
+
+    @staticmethod
+    def _coerce_int(*values: Any) -> int:
+        for value in values:
+            if value is None:
+                continue
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                continue
+        return 0

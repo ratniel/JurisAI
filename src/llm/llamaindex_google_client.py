@@ -6,6 +6,7 @@ from llama_index.llms.google_genai import GoogleGenAI
 from pydantic import BaseModel
 
 from src.config.settings import settings
+from src.llm.contracts import LLMInvocationMetadata
 
 StructuredModelT = TypeVar("StructuredModelT", bound=BaseModel)
 
@@ -28,6 +29,8 @@ class LlamaIndexGoogleGenAIClient:
             )
 
         self.default_model = model or settings.gemini_model
+        self.provider_name = "llamaindex_google"
+        self.last_invocation_metadata: LLMInvocationMetadata | None = None
         self._api_key = resolved_api_key
         self._temperature = temperature
         self._max_retries = max_retries
@@ -51,7 +54,12 @@ class LlamaIndexGoogleGenAIClient:
             prompt=prompt,
             system_instruction=system_instruction,
         )
-        return llm.complete(full_prompt).text
+        response = llm.complete(full_prompt)
+        self.last_invocation_metadata = LLMInvocationMetadata(
+            provider=self.provider_name,
+            model=model or self.default_model,
+        )
+        return response.text
 
     def generate_structured(
         self,
@@ -74,6 +82,10 @@ class LlamaIndexGoogleGenAIClient:
             system_instruction=system_instruction,
         )
         response = structured_llm.complete(full_prompt)
+        self.last_invocation_metadata = LLMInvocationMetadata(
+            provider=self.provider_name,
+            model=model or self.default_model,
+        )
         return response.raw
 
     def _build_llm(

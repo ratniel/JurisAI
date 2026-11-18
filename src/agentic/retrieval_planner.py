@@ -10,6 +10,7 @@ from src.agentic.models import (
     UserIntentClassification,
 )
 from src.config.settings import settings
+from src.llm.contracts import LLMInvocationMetadata
 from src.llm import TextGenerationClient, build_generation_client
 
 RETRIEVAL_TOOL_PLANNER_SYSTEM_PROMPT = """
@@ -117,6 +118,11 @@ class RetrievalToolPlanner:
             model=model or settings.workflow.generation_model,
         )
         self._model = model or settings.workflow.generation_model
+
+    @property
+    def last_invocation_metadata(self) -> LLMInvocationMetadata | None:
+        return getattr(self._llm, "last_invocation_metadata", None)
+
 
     def plan(
         self,

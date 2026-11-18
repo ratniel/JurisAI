@@ -7,6 +7,7 @@ from uuid import uuid4
 from llama_index.core.workflow import Event
 from pydantic import BaseModel, Field, model_validator
 
+from src.llm.contracts import LLMInvocationMetadata
 from src.scheme_contracts import (
     EnrichedApplicationModes,
     EnrichedSchemeData,
@@ -125,6 +126,27 @@ class TopSchemesArtifact(BaseModel):
     schemes: list[TopSchemeArtifactEntry] = Field(default_factory=list)
 
 
+class TokenUsageTotals(BaseModel):
+    """Small cumulative token audit kept with session state."""
+
+    invocation_count: int = 0
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+    total_tokens: int = 0
+    reasoning_tokens: int = 0
+    cached_tokens: int = 0
+
+
+
+class LLMUsageRecord(BaseModel):
+    """Per-call usage record retained in workflow trace output."""
+
+    stage: str
+    title: str
+    metadata: LLMInvocationMetadata
+
+
+
 class SessionMemory(BaseModel):
     """Persistent per-chat memory distilled away from raw trace payloads."""
 
@@ -137,6 +159,7 @@ class SessionMemory(BaseModel):
     active_constraints: dict[str, Any] = Field(default_factory=dict)
     recent_scheme_refs: list[SchemeRef] = Field(default_factory=list)
     selected_scheme_ref: SchemeRef | None = None
+    llm_usage_totals: TokenUsageTotals = Field(default_factory=TokenUsageTotals)
 
 
 class SessionSnapshot(BaseModel):
@@ -151,6 +174,7 @@ class SessionSnapshot(BaseModel):
     active_constraints: dict[str, Any] = Field(default_factory=dict)
     recent_scheme_refs: list[SchemeRef] = Field(default_factory=list)
     selected_scheme_ref: SchemeRef | None = None
+    llm_usage_totals: TokenUsageTotals = Field(default_factory=TokenUsageTotals)
     relevant_schemes: list["RelevantScheme"] = Field(default_factory=list)
     latest_grounding_pack: GroundingPack | None = None
     latest_top_schemes_artifact: TopSchemesArtifact | None = None
@@ -172,6 +196,7 @@ class SessionSnapshot(BaseModel):
             active_constraints=dict(self.active_constraints),
             recent_scheme_refs=recent_refs,
             selected_scheme_ref=self.selected_scheme_ref,
+            llm_usage_totals=self.llm_usage_totals.model_copy(),
         )
 
     @classmethod
@@ -193,6 +218,7 @@ class SessionSnapshot(BaseModel):
             active_constraints=dict(session_memory.active_constraints),
             recent_scheme_refs=list(session_memory.recent_scheme_refs),
             selected_scheme_ref=session_memory.selected_scheme_ref,
+            llm_usage_totals=session_memory.llm_usage_totals.model_copy(),
             relevant_schemes=list(relevant_schemes or []),
             latest_grounding_pack=latest_grounding_pack,
             latest_top_schemes_artifact=latest_top_schemes_artifact,
@@ -437,6 +463,7 @@ class AgenticTurnResult(BaseModel):
     grounding_pack: GroundingPack | None = None
     top_schemes_artifact: TopSchemesArtifact | None = None
     session_snapshot: SessionSnapshot
+    llm_usage_records: list[LLMUsageRecord] = Field(default_factory=list)
     workflow_trace: list[WorkflowTraceStep] = Field(default_factory=list)
 
 
