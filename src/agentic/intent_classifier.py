@@ -4,6 +4,7 @@ import json
 from typing import Any
 
 from src.config.settings import settings
+from src.llm.contracts import LLMInvocationMetadata
 from src.llm import TextGenerationClient, build_generation_client
 from src.llm.providers import GenerationProviderName
 from src.agentic.models import SessionMemory, SessionSnapshot, UserIntentClassification
@@ -102,6 +103,11 @@ class UserIntentClassifier:
             model=model or settings.workflow.intent_model,
         )
         self._model = model or settings.workflow.intent_model
+
+    @property
+    def last_invocation_metadata(self) -> LLMInvocationMetadata | None:
+        return getattr(self._llm, "last_invocation_metadata", None)
+
 
     def classify(
         self,

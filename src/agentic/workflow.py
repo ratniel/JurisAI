@@ -19,6 +19,7 @@ from src.agentic.models import (
     GroundingSchemeCard,
     IntentClassifiedEvent,
     IntentFact,
+    LLMUsageRecord,
     NextAction,
     OrchestratorDecision,
     PrimaryIntent,
@@ -32,6 +33,7 @@ from src.agentic.models import (
     SchemeRef,
     SessionMemory,
     SessionSnapshot,
+    TokenUsageTotals,
     TopSchemeArtifactEntry,
     TopSchemesArtifact,
     WorkflowAnswerDeltaEvent,
@@ -44,6 +46,7 @@ from src.agentic.models import (
 from src.agentic.retrieval_planner import RetrievalToolPlanner
 from src.config.settings import settings
 from src.data_ingestion.enrichment_pipeline import build_enriched_scheme
+from src.llm.contracts import LLMInvocationMetadata
 from src.llm import TextGenerationClient, build_generation_client
 from src.retrieval import QdrantSchemeSearchClient
 from src.retrieval.query_intent import build_retrieval_intent_profile
@@ -108,6 +111,37 @@ def build_relevant_scheme_from_lookup_document(
         enriched_document.model_dump(by_alias=True),
         scheme,
     )
+
+
+def _add_token_usage_totals(
+    left: TokenUsageTotals,
+    right: TokenUsageTotals,
+) -> TokenUsageTotals:
+    return TokenUsageTotals(
+        invocation_count=left.invocation_count + right.invocation_count,
+        prompt_tokens=left.prompt_tokens + right.prompt_tokens,
+        completion_tokens=left.completion_tokens + right.completion_tokens,
+        total_tokens=left.total_tokens + right.total_tokens,
+        reasoning_tokens=left.reasoning_tokens + right.reasoning_tokens,
+        cached_tokens=left.cached_tokens + right.cached_tokens,
+    )
+
+
+def _usage_totals_from_records(records: list[LLMUsageRecord]) -> TokenUsageTotals:
+    totals = TokenUsageTotals()
+    for record in records:
+        totals = _add_token_usage_totals(
+            totals,
+            TokenUsageTotals(
+                invocation_count=1,
+                prompt_tokens=record.metadata.usage.prompt_tokens,
+                completion_tokens=record.metadata.usage.completion_tokens,
+                total_tokens=record.metadata.usage.total_tokens,
+                reasoning_tokens=record.metadata.usage.reasoning_tokens,
+                cached_tokens=record.metadata.usage.cached_tokens,
+            ),
+        )
+    return totals
 
 
 def coerce_retrieval_plan(
@@ -459,6 +493,7 @@ def build_session_memory(
         active_constraints=active_constraints,
         recent_scheme_refs=recent_scheme_refs,
         selected_scheme_ref=base_memory.selected_scheme_ref,
+        llm_usage_totals=base_memory.llm_usage_totals.model_copy(),
     )
 
 
@@ -604,6 +639,28 @@ class BasicAgenticWorkflow(Workflow):
         existing_trace.append(trace_payload)
         await ctx.store.set("workflow_trace", existing_trace)
 
+    @staticmethod
+    async def _append_llm_usage_record(
+        ctx: Context,
+        *,
+        stage: str,
+        title: str,
+        metadata: LLMInvocationMetadata | None,
+    ) -> LLMUsageRecord | None:
+        if metadata is None:
+            return None
+
+        record = LLMUsageRecord(
+            stage=stage,
+            title=title,
+            metadata=metadata,
+        )
+        existing_records = list(await ctx.store.get("llm_usage_records", []))
+        existing_records.append(record.model_dump(mode="json", exclude_none=True))
+        await ctx.store.set("llm_usage_records", existing_records)
+        return record
+
+
     @step
     async def classify_intent(
         self,
@@ -632,6 +689,10 @@ class BasicAgenticWorkflow(Workflow):
             user_message=user_message,
             session_snapshot=session_snapshot,
             session_memory=session_memory,
+        )
+        await self._append_llm_usage_record(
+            ctx, stage="intent_classifier_usage", title="Intent Classifier LLM Usage",
+            metadata=getattr(self._classifier, "last_invocation_metadata", None),
         )
         await ctx.store.set("classification", classification.model_dump())
         await ctx.store.set(
@@ -724,6 +785,11 @@ class BasicAgenticWorkflow(Workflow):
             planner_error = str(exc)
             planned = None
 
+        await self._append_llm_usage_record(
+            ctx, stage="retrieval_planner_usage", title="Retrieval Planner LLM Usage",
+            metadata=(getattr(self._retrieval_planner, "last_invocation_metadata", None)
+                if planner_error is None else None),
+        )
         retrieval_plan = coerce_retrieval_plan(
             plan=planned,
             default_query=ev.classification.discovery_query or default_query,
@@ -1036,6 +1102,16 @@ class BasicAgenticWorkflow(Workflow):
             if reply:
                 ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=reply))
 
+        await self._append_llm_usage_record(
+            ctx, stage="response_generation_usage", title="Final Response LLM Usage",
+            metadata=getattr(self._llm, "last_invocation_metadata", None),
+        )
+        turn_usage_records = [LLMUsageRecord.model_validate(item)
+            for item in await ctx.store.get("llm_usage_records", [])]
+        session_memory.llm_usage_totals = _add_token_usage_totals(
+            session_memory.llm_usage_totals, _usage_totals_from_records(turn_usage_records),
+        )
+        final_session_snapshot.llm_usage_totals = session_memory.llm_usage_totals.model_copy()
         decision = ev.decision.model_copy(update={"response": reply.strip()})
         await ctx.store.set("response", decision.response)
         await ctx.store.set(
@@ -1048,7 +1124,10 @@ class BasicAgenticWorkflow(Workflow):
             title="Final Grounded Generation",
             payload={
                 "input_payload": generation_input,
-                "output_payload": {"response": decision.response},
+                "output_payload": {
+                    "response": decision.response,
+                    "llm_usage_records": [record.model_dump(mode="json") for record in turn_usage_records],
+                },
             },
         )
         await self._append_trace_step(
@@ -1085,6 +1164,7 @@ class BasicAgenticWorkflow(Workflow):
                 grounding_pack=current_grounding_pack,
                 top_schemes_artifact=current_top_schemes_artifact,
                 session_snapshot=final_session_snapshot,
+                llm_usage_records=turn_usage_records,
                 workflow_trace=[
                     WorkflowTraceStep.model_validate(item)
                     for item in await ctx.store.get("workflow_trace", [])

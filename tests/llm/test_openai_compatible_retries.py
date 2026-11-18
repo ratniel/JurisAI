@@ -51,8 +51,8 @@ def test_text_generation_retries_two_empty_responses() -> None:
         "success",
     ]
     assert client.last_invocation_metadata is not None
-    assert client.last_invocation_metadata["provider"] == "openrouter"
-    assert client.last_invocation_metadata["response_model"] == "free/model-c"
+    assert client.last_invocation_metadata.provider == "openrouter"
+    assert client.last_invocation_metadata.model == "free/model-c"
 
 
 def test_structured_generation_retries_two_invalid_responses() -> None:
