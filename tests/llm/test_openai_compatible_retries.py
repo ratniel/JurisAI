@@ -41,7 +41,7 @@ def test_text_generation_retries_two_empty_responses() -> None:
         calls.append(kwargs)
         return next(responses)
 
-    with patch("src.llm.local_openai_client.completion", fake_completion):
+    with patch("src.llm.local_openai_client.litellm.completion", fake_completion):
         assert client.generate_text("Answer") == "Grounded answer"
     assert len(calls) == 3
     assert {call["max_retries"] for call in calls} == {2}
@@ -70,7 +70,7 @@ def test_structured_generation_retries_two_invalid_responses() -> None:
         calls.append(kwargs)
         return next(responses)
 
-    with patch("src.llm.local_openai_client.completion", fake_completion):
+    with patch("src.llm.local_openai_client.litellm.completion", fake_completion):
         result = client.generate_structured("Classify", SampleStructuredResponse)
 
     assert result.answer == "valid"
@@ -88,7 +88,7 @@ def test_transport_error_is_not_retried_by_the_inference_layer() -> None:
         call_count += 1
         raise PermissionError("permanent failure")
 
-    with patch("src.llm.local_openai_client.completion", fake_completion):
+    with patch("src.llm.local_openai_client.litellm.completion", fake_completion):
         try:
             client.generate_text("Answer")
         except PermissionError as exc:

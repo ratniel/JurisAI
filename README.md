@@ -36,3 +36,12 @@ The chat streams progress and answers.
 It stores sessions in MongoDB.
 It shows scheme details and labeled source links.
 See [the data pipeline](docs/production-data-pipeline.md) for indexing.
+
+## Phoenix observability
+
+Run `uv sync` to install the tracing dependencies.
+Configure the Phoenix collector.
+Restart the backend.
+LLM child spans show the provider, requested model, returned model, and reported token usage.
+Phoenix groups chat traces by `session.id`.
+See [Phoenix tracing](docs/phoenix_tracing.md) for setup and verification commands.

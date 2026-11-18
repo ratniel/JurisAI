@@ -7,6 +7,7 @@ from uuid import uuid4
 
 from bson import ObjectId
 from opentelemetry import trace
+from openinference.instrumentation import using_attributes
 from pymongo import AsyncMongoClient
 
 from llama_index.core.workflow import Context, StartEvent, StopEvent, Workflow, step
@@ -45,6 +46,7 @@ from src.agentic.retrieval_planner import RetrievalToolPlanner
 from src.config.settings import settings
 from src.data_ingestion.enrichment_pipeline import build_enriched_scheme
 from src.llm import TextGenerationClient, build_generation_client
+from src.observability.phoenix_tracing import trace_workflow_step
 from src.retrieval import QdrantSchemeSearchClient
 from src.retrieval.query_intent import build_retrieval_intent_profile
 from src.scheme_contracts import normalize_text, normalize_topics
@@ -583,6 +585,14 @@ class BasicAgenticWorkflow(Workflow):
             else retrieval_filter_mode
         )
 
+    def run(self, *args, **kwargs):
+        snapshot = SessionSnapshot.model_validate(kwargs.get("session_snapshot") or {})
+        snapshot.chat_session_id = snapshot.chat_session_id or _new_turn_id()
+        kwargs["session_snapshot"] = snapshot.model_dump(mode="json", exclude_none=True)
+        # Workflow tasks inherit this context when super().run creates them.
+        with using_attributes(session_id=snapshot.chat_session_id):
+            return super().run(*args, **kwargs)
+
     async def aclose(self) -> None:
         if self._owns_mongo_client:
             await self._mongo_client.close()
@@ -605,6 +615,7 @@ class BasicAgenticWorkflow(Workflow):
         await ctx.store.set("workflow_trace", existing_trace)
 
     @step
+    @trace_workflow_step
     async def classify_intent(
         self,
         ctx: Context,
@@ -669,6 +680,7 @@ class BasicAgenticWorkflow(Workflow):
         )
 
     @step
+    @trace_workflow_step
     async def route_turn(
         self,
         ctx: Context,
@@ -705,6 +717,7 @@ class BasicAgenticWorkflow(Workflow):
         )
 
     @step
+    @trace_workflow_step
     async def plan_retrieval_tools(
         self,
         ctx: Context,
@@ -773,6 +786,7 @@ class BasicAgenticWorkflow(Workflow):
         )
 
     @step
+    @trace_workflow_step
     async def retrieve_schemes(
         self,
         ctx: Context,
@@ -962,6 +976,7 @@ class BasicAgenticWorkflow(Workflow):
         )
 
     @step
+    @trace_workflow_step
     async def generate_reply(
         self,
         ctx: Context,

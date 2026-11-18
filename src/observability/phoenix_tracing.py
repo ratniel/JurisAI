@@ -2,17 +2,117 @@ from __future__ import annotations
 
 import os
 import re
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
+from functools import wraps
+from typing import Literal
 from urllib.parse import urlparse
 
-from opentelemetry import trace
+from opentelemetry import context, trace
+from opentelemetry.instrumentation.utils import (
+    _SUPPRESS_INSTRUMENTATION_KEY,
+    is_instrumentation_enabled,
+)
+from openinference.instrumentation import suppress_tracing
 from openinference.instrumentation.google_genai import GoogleGenAIInstrumentor
-from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
+from openinference.instrumentation.llama_index import LlamaIndexInstrumentor, get_current_span
+from openinference.instrumentation.litellm import LiteLLMInstrumentor
 from phoenix.otel import register
+from wrapt import wrap_function_wrapper
 
 from src.config.settings import settings
 
 _TRACING_CONFIGURED = False
+_GOOGLE_SDK_ONLY: ContextVar[bool] = ContextVar("jurisai.google_sdk_only", default=False)
+_LLM_PROVIDER: ContextVar[str | None] = ContextVar("jurisai.llm_provider", default=None)
+
+
+@contextmanager
+def using_llm_provider(provider: str):
+    """Distinguish our serving provider from LiteLLM's OpenAI wire protocol."""
+    token = _LLM_PROVIDER.set(provider)
+    try:
+        yield
+    finally:
+        _LLM_PROVIDER.reset(token)
+
+
+@contextmanager
+def google_sdk_tracing():
+    """Let the Google SDK own LLM spans, not duplicate LlamaIndex wrappers."""
+    if not is_instrumentation_enabled():
+        yield
+        return
+    token = _GOOGLE_SDK_ONLY.set(True)
+    try:
+        with suppress_tracing():
+            yield
+    finally:
+        _GOOGLE_SDK_ONLY.reset(token)
+
+
+def _restore_google_sdk_tracing(wrapped, instance, args, kwargs):
+    if not _GOOGLE_SDK_ONLY.get():
+        return wrapped(*args, **kwargs)
+    # Use the same OTel suppression key as both official instrumentors.
+    token = context.attach(context.set_value(_SUPPRESS_INSTRUMENTATION_KEY, False))
+    try:
+        return wrapped(*args, **kwargs)
+    finally:
+        context.detach(token)
+
+
+def trace_workflow_step(fn):
+    """Expose LlamaIndex's active step span to SDK and manual OTel spans."""
+    @wraps(fn)
+    async def wrapped(*args, **kwargs):
+        span = get_current_span() or trace.get_current_span()
+        with trace.use_span(span, end_on_exit=False):
+            return await fn(*args, **kwargs)
+
+    return wrapped
+
+
+def _set_llm_request_attributes(model: str | None, provider: str | None):
+    span = trace.get_current_span()
+    # Do not label a workflow or caller span when SDK tracing is suppressed.
+    if not is_instrumentation_enabled() or not span.is_recording():
+        return None
+    if provider:
+        span.set_attribute("llm.provider", provider)
+    if model:
+        span.set_attribute("llm.request.model_name", model)
+        span.set_attribute("llm.model_name", model)
+    return span
+
+
+def _set_llm_response_attributes(span, model: str | None) -> None:
+    if span is not None and model:
+        span.set_attribute("llm.response.model_name", model)
+        span.set_attribute("llm.model_name", model)
+
+
+def _enrich_litellm_completion(wrapped, instance, args, kwargs):
+    span = _set_llm_request_attributes(kwargs.get("model"), _LLM_PROVIDER.get())
+    response = wrapped(*args, **kwargs)
+    _set_llm_response_attributes(span, getattr(response, "model", None))
+    return response
+
+
+def _enrich_google_call(wrapped, instance, args, kwargs):
+    span = _set_llm_request_attributes(kwargs.get("model"), "google")
+    response = wrapped(*args, **kwargs)
+    _set_llm_response_attributes(span, getattr(response, "model_version", None))
+    return response
+
+
+async def _enrich_async_google_call(wrapped, instance, args, kwargs):
+    span = _set_llm_request_attributes(kwargs.get("model"), "google")
+    response = await wrapped(*args, **kwargs)
+    _set_llm_response_attributes(span, getattr(response, "model_version", None))
+    return response
+
 
 
 @dataclass(frozen=True)
@@ -40,7 +140,7 @@ def _normalize_collector_endpoint(endpoint: str | None) -> str | None:
     return parsed._replace(path="/v1/traces").geturl()
 
 
-def _infer_protocol(endpoint: str | None) -> str | None:
+def _infer_protocol(endpoint: str | None) -> Literal["http/protobuf", "grpc"] | None:
     if not endpoint or "://" not in endpoint:
         return None
 
@@ -102,7 +202,21 @@ def configure_phoenix_tracing(
         verbose=False,
     )
     LlamaIndexInstrumentor().instrument(tracer_provider=tracer_provider)
+    # Enrichment runs INSIDE the SDK instrumentor's span, before it ends.
+    # The official instrumentors own payloads, usage, errors and stream lifetime.
+    wrap_function_wrapper("litellm", "completion", _enrich_litellm_completion)
+    LiteLLMInstrumentor().instrument(tracer_provider=tracer_provider)
+    for method in ("generate_content", "generate_content_stream"):
+        wrap_function_wrapper("google.genai.models", f"Models.{method}", _enrich_google_call)
+        wrap_function_wrapper(
+            "google.genai.models", f"AsyncModels.{method}", _enrich_async_google_call
+        )
     GoogleGenAIInstrumentor().instrument(tracer_provider=tracer_provider)
+    # This outer wrapper re-enables only SDK calls inside the suppressed adapter.
+    for method in ("generate_content", "generate_content_stream"):
+        wrap_function_wrapper(
+            "google.genai.models", f"Models.{method}", _restore_google_sdk_tracing
+        )
     _TRACING_CONFIGURED = True
     endpoint_detail = normalized_endpoint or collector_endpoint
     if normalized_endpoint and normalized_endpoint != collector_endpoint:
