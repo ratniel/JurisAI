@@ -105,6 +105,10 @@
 
 - Use `docs/harness_document_guidelines.md` as the shared convention for writing and updating repo-root and surface-local harness documents.
 - Use `docs/production-data-pipeline.md` for MongoDB and Qdrant production data promotion. Keep each Qdrant `mongo_ref` resolvable to the matching MongoDB database, collection, and document ID.
+- Read the current harness docs before changing retrieval, eval, workflow, or UI behavior.
+- Update these rules when a new project decision changes the required behavior.
+- Before removing a checkout, preserve all important local files and verify the saved copy.
+- Keep private snapshots and run outputs under an ignored local path.
 - Update this file when project rules or architectural decisions change.
 - Update `README.md` when setup or execution steps change.
 - Update `docs/version_control_workflow.md` when the branching or PR process changes, or when we complete a new branch/PR audit.
