@@ -294,6 +294,16 @@ For actual retrieval and coverage checks:
 
 - `eval_persona_schemes_vectors_v1`
 
+The full-scheme workflow uses `nomic-ai/nomic-embed-text-v1.5` by default.
+Its default collection is `schemes_vectors_v3_nomic_embed_text_v1_5`.
+This collection uses 768-dimensional vectors.
+It contains the `embedding_a` and `embedding_b` profiles.
+Dense search remains the default.
+
+Set `QDRANT_COLLECTION` to use another collection.
+Set `EMBEDDING_MODEL` to use its matching embedding model.
+The evaluation subset above remains a separate, explicit target.
+
 ## Retrieval Debug Output
 
 The dashboard relies on extra debug output added to the Qdrant client.
