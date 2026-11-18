@@ -7,10 +7,13 @@ from bson import ObjectId
 
 from src.agentic.fact_utils import aggregate_intent_facts
 from src.agentic.models import (
+    AgenticTurnResult,
+    GroundingPack,
     IntentFact,
     MongoReference,
     NextAction,
     OrchestratorDecision,
+    PrimaryIntent,
     RelevantScheme,
     RetrievalToolCall,
     RetrievalToolName,
@@ -195,6 +198,221 @@ class WorkflowHelperTests(unittest.TestCase):
             plan.tool_calls[0].fit_query,
             "eligibility: farmer in maharashtra benefits: support or subsidy",
         )
+
+    def test_fallback_retrieval_plan_uses_clarification_profile_update(self) -> None:
+        classification = UserIntentClassification(
+            primary_intent=PrimaryIntent.PROFILE_UPDATE,
+            confidence=0.95,
+            user_goal="Share state",
+            extracted_profile_updates=[
+                IntentFact(key="state", value="Maharashtra")
+            ],
+            discovery_query="engineering scholarships",
+            reasoning="User answered the state clarification.",
+        )
+
+        plan = fallback_retrieval_plan(
+            user_message="Maharashtra",
+            classification=classification,
+            session_snapshot=SessionSnapshot(),
+        )
+
+        self.assertEqual(plan.tool_calls[0].tool_name, RetrievalToolName.STATE_SCOPED_SEARCH)
+        self.assertEqual(plan.tool_calls[0].state, "Maharashtra")
+
+    def test_fallback_retrieval_plan_preserves_deferred_goal(self) -> None:
+        classification = UserIntentClassification(
+            primary_intent=PrimaryIntent.PROFILE_UPDATE,
+            confidence=0.95,
+            user_goal="Share state",
+            extracted_profile_updates=[
+                IntentFact(key="state", value="Maharashtra")
+            ],
+            reasoning="User answered the state clarification.",
+        )
+
+        plan = fallback_retrieval_plan(
+            user_message="Maharashtra",
+            classification=classification,
+            session_snapshot=SessionSnapshot(),
+            default_query="Find engineering scholarships",
+        )
+
+        self.assertEqual(plan.tool_calls[0].query, "Find engineering scholarships")
+
+    def test_decision_preserves_exact_clarification_question(self) -> None:
+        classification = UserIntentClassification(
+            primary_intent=PrimaryIntent.SCHEME_DISCOVERY,
+            confidence=0.9,
+            user_goal="Find student scholarships",
+            needs_clarification=True,
+            clarification_question="Which state or Union Territory do you live in?",
+            reasoning="State has the highest impact on the search.",
+        )
+
+        decision = BasicAgenticWorkflow._decide_next_action(
+            classification,
+            SessionSnapshot(),
+        )
+
+        self.assertEqual(decision.next_action, NextAction.ASK_CLARIFYING_QUESTION)
+        self.assertEqual(
+            decision.tool_payload["question"],
+            "Which state or Union Territory do you live in?",
+        )
+
+    def test_blank_clarification_question_falls_through_to_retrieval(self) -> None:
+        classification = UserIntentClassification(
+            primary_intent=PrimaryIntent.SCHEME_DISCOVERY,
+            confidence=0.9,
+            user_goal="Find student scholarships",
+            needs_clarification=True,
+            reasoning="Classifier did not supply a usable question.",
+        )
+
+        decision = BasicAgenticWorkflow._decide_next_action(
+            classification,
+            SessionSnapshot(),
+        )
+
+        self.assertEqual(decision.next_action, NextAction.CALL_SCHEME_RETRIEVAL)
+
+    def test_clarification_answer_resumes_prior_goal_with_profile_fact(self) -> None:
+        classification = UserIntentClassification(
+            primary_intent=PrimaryIntent.PROFILE_UPDATE,
+            confidence=0.96,
+            user_goal="Share state",
+            extracted_profile_updates=[
+                IntentFact(key="state", value="Maharashtra")
+            ],
+            reasoning="User answered the pending clarification.",
+        )
+        snapshot = SessionSnapshot(
+            last_user_goal="Find engineering scholarships",
+            last_action=NextAction.ASK_CLARIFYING_QUESTION.value,
+        )
+
+        decision = BasicAgenticWorkflow._decide_next_action(
+            classification,
+            snapshot,
+        )
+
+        self.assertEqual(decision.next_action, NextAction.CALL_SCHEME_RETRIEVAL)
+        self.assertEqual(decision.tool_payload["query"], "Find engineering scholarships")
+        self.assertEqual(decision.tool_payload["filters"]["state"], "Maharashtra")
+        self.assertIn("state: Maharashtra", decision.tool_payload["fit_query"])
+
+        memory = build_session_memory(
+            user_message="Maharashtra",
+            session_snapshot=snapshot,
+            classification=classification,
+            decision=decision,
+            relevant_schemes=[],
+            last_action="retrieval_completed",
+        )
+        self.assertEqual(memory.last_user_goal, "Find engineering scholarships")
+
+    def test_consecutive_clarification_preserves_prior_goal(self) -> None:
+        classification = UserIntentClassification(
+            primary_intent=PrimaryIntent.PROFILE_UPDATE,
+            confidence=0.91,
+            user_goal="Share state",
+            extracted_profile_updates=[
+                IntentFact(key="state", value="Maharashtra")
+            ],
+            needs_clarification=True,
+            clarification_question="Which category do you belong to?",
+            reasoning="Category is still needed.",
+        )
+        snapshot = SessionSnapshot(
+            last_user_goal="Find engineering scholarships",
+            last_action=NextAction.ASK_CLARIFYING_QUESTION.value,
+        )
+
+        decision = BasicAgenticWorkflow._decide_next_action(
+            classification,
+            snapshot,
+        )
+        memory = build_session_memory(
+            user_message="Maharashtra",
+            session_snapshot=snapshot,
+            classification=classification,
+            decision=decision,
+            relevant_schemes=[],
+            last_action=NextAction.ASK_CLARIFYING_QUESTION.value,
+        )
+
+        self.assertEqual(decision.next_action, NextAction.ASK_CLARIFYING_QUESTION)
+        self.assertEqual(
+            decision.tool_payload["continuation_goal"],
+            "Find engineering scholarships",
+        )
+        self.assertEqual(memory.last_user_goal, "Find engineering scholarships")
+
+    def test_followup_reuses_grounding_when_no_new_search_is_requested(self) -> None:
+        classification = UserIntentClassification(
+            primary_intent=PrimaryIntent.FOLLOW_UP,
+            confidence=0.93,
+            user_goal="Explain the benefits of the first result",
+            reasoning="Existing grounded results can answer the question.",
+        )
+        snapshot = SessionSnapshot(
+            latest_grounding_pack=GroundingPack(
+                chat_session_id="chat-123",
+                turn_id="turn-123",
+                user_message="Find scholarships in Maharashtra",
+            )
+        )
+
+        decision = BasicAgenticWorkflow._decide_next_action(
+            classification,
+            snapshot,
+        )
+
+        self.assertEqual(decision.next_action, NextAction.RESPOND_DIRECTLY)
+
+    def test_followup_retrieves_when_classifier_requests_revised_search(self) -> None:
+        classification = UserIntentClassification(
+            primary_intent=PrimaryIntent.FOLLOW_UP,
+            confidence=0.93,
+            user_goal="Find alternatives for diploma students",
+            discovery_query="diploma student scholarships Maharashtra",
+            reasoning="The user requested a materially revised search.",
+        )
+        snapshot = SessionSnapshot(
+            latest_grounding_pack=GroundingPack(
+                chat_session_id="chat-123",
+                turn_id="turn-123",
+                user_message="Find engineering scholarships in Maharashtra",
+            )
+        )
+
+        decision = BasicAgenticWorkflow._decide_next_action(
+            classification,
+            snapshot,
+        )
+
+        self.assertEqual(decision.next_action, NextAction.CALL_SCHEME_RETRIEVAL)
+        self.assertEqual(
+            decision.tool_payload["query"],
+            "diploma student scholarships Maharashtra",
+        )
+
+    def test_followup_retrieves_when_no_prior_grounding_is_available(self) -> None:
+        classification = UserIntentClassification(
+            primary_intent=PrimaryIntent.FOLLOW_UP,
+            confidence=0.9,
+            user_goal="Explain the scheme benefits",
+            reasoning="Follow-up has no reusable grounding.",
+        )
+
+        decision = BasicAgenticWorkflow._decide_next_action(
+            classification,
+            SessionSnapshot(),
+        )
+
+        self.assertEqual(decision.next_action, NextAction.CALL_SCHEME_RETRIEVAL)
+        self.assertEqual(decision.tool_payload["query"], "Explain the scheme benefits")
 
     def test_retrieval_tool_call_backfills_fit_query_from_discovery_query(self) -> None:
         tool_call = RetrievalToolCall.model_validate(
@@ -498,6 +716,44 @@ class _FakeMongoClient:
 
 
 class WorkflowMongoClientTests(unittest.IsolatedAsyncioTestCase):
+    async def test_clarification_reply_uses_routed_question_without_generation_call(
+        self,
+    ) -> None:
+        classification = UserIntentClassification(
+            primary_intent=PrimaryIntent.SCHEME_DISCOVERY,
+            confidence=0.9,
+            user_goal="Find scholarships",
+            needs_clarification=True,
+            clarification_question="Which state or Union Territory do you live in?",
+            reasoning="State has the highest impact on retrieval.",
+        )
+        classifier = Mock()
+        classifier.classify.return_value = classification
+        llm = Mock()
+        workflow = BasicAgenticWorkflow(
+            llm=llm,
+            classifier=classifier,
+            retriever=Mock(),
+            mongo_client=Mock(),
+        )
+
+        result = AgenticTurnResult.model_validate(
+            await workflow.run(
+                user_message="Can you find scholarships for me?",
+                session_snapshot={},
+            )
+        )
+
+        self.assertEqual(
+            result.decision.response,
+            "Which state or Union Territory do you live in?",
+        )
+        self.assertEqual(
+            result.session_memory.last_action,
+            NextAction.ASK_CLARIFYING_QUESTION.value,
+        )
+        llm.generate_text.assert_not_called()
+
     async def test_hydration_reuses_injected_mongo_client_without_closing_it(self) -> None:
         document_id = ObjectId()
         enriched_collection = _FakeCollection(

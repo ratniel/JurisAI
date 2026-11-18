@@ -146,14 +146,20 @@ def fallback_retrieval_plan(
     user_message: str,
     classification: UserIntentClassification,
     session_snapshot: SessionSnapshot,
+    default_query: str | None = None,
 ) -> RetrievalPlan:
     raw_filters = {
         **session_snapshot.user_profile,
+        **aggregate_intent_facts(classification.extracted_profile_updates),
         **aggregate_intent_facts(classification.retrieval_filters),
     }
     intent_profile = build_retrieval_intent_profile(
         user_message=user_message,
-        retrieval_query=classification.discovery_query or classification.retrieval_query,
+        retrieval_query=(
+            default_query
+            or classification.discovery_query
+            or classification.retrieval_query
+        ),
         fit_query=classification.fit_query,
         raw_filters=raw_filters,
     )
@@ -437,9 +443,17 @@ def build_session_memory(
     )
     if prior_summary:
         summary_parts.append(f"Prior context: {prior_summary}")
+    continuation_goal = normalize_text(decision.tool_payload.get("continuation_goal"))
+    if (
+        not continuation_goal
+        and session_snapshot.last_action == NextAction.ASK_CLARIFYING_QUESTION.value
+    ):
+        continuation_goal = session_snapshot.last_user_goal
     current_request = _normalize_compact_text(user_message, max_chars=140)
     if current_request:
         summary_parts.append(f"Current request: {current_request}")
+    if continuation_goal and continuation_goal != user_message:
+        summary_parts.append(f"Continuing goal: {continuation_goal}")
     if recent_scheme_refs:
         summary_parts.append(f"Recent schemes: {_format_scheme_refs(recent_scheme_refs)}")
 
@@ -454,7 +468,7 @@ def build_session_memory(
             " ".join(summary_parts),
             max_chars=320,
         ),
-        last_user_goal=user_message,
+        last_user_goal=continuation_goal or user_message,
         last_action=last_action or decision.next_action.value,
         active_constraints=active_constraints,
         recent_scheme_refs=recent_scheme_refs,
@@ -735,6 +749,7 @@ class BasicAgenticWorkflow(Workflow):
                 user_message=ev.user_message,
                 classification=ev.classification,
                 session_snapshot=ev.session_snapshot,
+                default_query=default_query,
             )
 
         updated_payload = {
@@ -971,10 +986,22 @@ class BasicAgenticWorkflow(Workflow):
         relevant_schemes = list(ev.session_snapshot.relevant_schemes)
         current_grounding_pack = ev.session_snapshot.latest_grounding_pack
         current_top_schemes_artifact = ev.session_snapshot.latest_top_schemes_artifact
+        clarification_question = normalize_text(
+            ev.decision.tool_payload.get("question")
+        )
+        is_clarification = (
+            ev.decision.next_action == NextAction.ASK_CLARIFYING_QUESTION
+            and clarification_question is not None
+        )
+        response_last_action = (
+            NextAction.ASK_CLARIFYING_QUESTION.value
+            if is_clarification
+            else "response_generated"
+        )
         if ev.session_snapshot.last_user_goal == ev.user_message:
             base_memory = ev.session_snapshot.to_session_memory()
             session_memory = base_memory.model_copy(
-                update={"last_action": "response_generated"}
+                update={"last_action": response_last_action}
             )
         else:
             session_memory = build_session_memory(
@@ -983,7 +1010,7 @@ class BasicAgenticWorkflow(Workflow):
                 classification=ev.classification,
                 decision=ev.decision,
                 relevant_schemes=relevant_schemes,
-                last_action="response_generated",
+                last_action=response_last_action,
             )
         final_session_snapshot = SessionSnapshot.from_session_memory(
             session_memory,
@@ -1012,29 +1039,34 @@ class BasicAgenticWorkflow(Workflow):
             session_memory=session_memory,
             grounding_pack=current_grounding_pack,
         )
-        reply_parts: list[str] = []
-        astream_text = getattr(self._llm, "astream_text", None)
-        if callable(astream_text):
-            async for chunk in astream_text(
-                reply_prompt,
-                system_instruction=REPLY_SYSTEM_PROMPT,
-                model=settings.workflow.generation_model,
-                temperature=0.2,
-            ):
-                if not chunk:
-                    continue
-                reply_parts.append(chunk)
-                ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=chunk))
-            reply = "".join(reply_parts)
+        reply: str
+        if is_clarification and clarification_question is not None:
+            reply = clarification_question
+            ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=reply))
         else:
-            reply = self._llm.generate_text(
-                reply_prompt,
-                system_instruction=REPLY_SYSTEM_PROMPT,
-                model=settings.workflow.generation_model,
-                temperature=0.2,
-            )
-            if reply:
-                ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=reply))
+            reply_parts: list[str] = []
+            astream_text = getattr(self._llm, "astream_text", None)
+            if callable(astream_text):
+                async for chunk in astream_text(
+                    reply_prompt,
+                    system_instruction=REPLY_SYSTEM_PROMPT,
+                    model=settings.workflow.generation_model,
+                    temperature=0.2,
+                ):
+                    if not chunk:
+                        continue
+                    reply_parts.append(chunk)
+                    ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=chunk))
+                reply = "".join(reply_parts)
+            else:
+                reply = self._llm.generate_text(
+                    reply_prompt,
+                    system_instruction=REPLY_SYSTEM_PROMPT,
+                    model=settings.workflow.generation_model,
+                    temperature=0.2,
+                )
+                if reply:
+                    ctx.write_event_to_stream(WorkflowAnswerDeltaEvent(delta=reply))
 
         decision = ev.decision.model_copy(update={"response": reply.strip()})
         await ctx.store.set("response", decision.response)
@@ -1236,7 +1268,14 @@ class BasicAgenticWorkflow(Workflow):
         classification: UserIntentClassification,
         session_snapshot: SessionSnapshot,
     ) -> OrchestratorDecision:
-        if classification.needs_clarification:
+        clarification_question = normalize_text(classification.clarification_question)
+        if classification.needs_clarification and clarification_question:
+            continuation_goal = (
+                session_snapshot.last_user_goal
+                if session_snapshot.last_action
+                == NextAction.ASK_CLARIFYING_QUESTION.value
+                else None
+            )
             return OrchestratorDecision(
                 next_action=NextAction.ASK_CLARIFYING_QUESTION,
                 selected_agent="user_clarifier",
@@ -1244,22 +1283,62 @@ class BasicAgenticWorkflow(Workflow):
                     "missing_context": facts_to_dict(
                         classification.extracted_profile_updates
                     ),
-                    "question": classification.clarification_question,
+                    "question": clarification_question,
+                    "continuation_goal": continuation_goal,
                 },
             )
 
-        if classification.primary_intent in {
-            PrimaryIntent.SCHEME_DISCOVERY,
-            PrimaryIntent.FOLLOW_UP,
-        }:
+        is_clarification_answer = (
+            classification.primary_intent == PrimaryIntent.PROFILE_UPDATE
+            and session_snapshot.last_action
+            == NextAction.ASK_CLARIFYING_QUESTION.value
+            and bool(session_snapshot.last_user_goal)
+        )
+        followup_query = (
+            classification.discovery_query or classification.retrieval_query
+        )
+        followup_needs_retrieval = (
+            classification.primary_intent == PrimaryIntent.FOLLOW_UP
+            and (
+                bool(followup_query)
+                or session_snapshot.latest_grounding_pack is None
+            )
+        )
+        if (
+            classification.primary_intent == PrimaryIntent.SCHEME_DISCOVERY
+            or followup_needs_retrieval
+            or is_clarification_answer
+        ):
+            profile_updates = aggregate_intent_facts(
+                classification.extracted_profile_updates
+            )
+            if is_clarification_answer:
+                retrieval_query = session_snapshot.last_user_goal
+                profile_context = ", ".join(
+                    f"{key}: {value}" for key, value in profile_updates.items()
+                )
+                fit_query = (
+                    f"eligibility: {retrieval_query}; {profile_context}"
+                    if profile_context
+                    else retrieval_query
+                )
+            else:
+                retrieval_query = followup_query or classification.user_goal
+                fit_query = classification.fit_query or retrieval_query
             return OrchestratorDecision(
                 next_action=NextAction.CALL_SCHEME_RETRIEVAL,
                 selected_agent="retrieval_planner",
                 tool_payload={
-                    "query": classification.discovery_query or classification.retrieval_query,
-                    "fit_query": classification.fit_query,
+                    "query": retrieval_query,
+                    "fit_query": fit_query,
+                    "continuation_goal": (
+                        session_snapshot.last_user_goal
+                        if is_clarification_answer
+                        else None
+                    ),
                     "filters": {
                         **session_snapshot.user_profile,
+                        **profile_updates,
                         **aggregate_intent_facts(classification.retrieval_filters),
                     },
                 },

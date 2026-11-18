@@ -19,6 +19,8 @@
   - state-scoped search
   - topic-scoped search
 - The LLM/orchestrator should decide which retrieval tool to use, whether to pass filters, and how to compose retrieval with final answer generation.
+- Do not rerun retrieval on every conversational turn. Reuse the latest grounding pack for follow-ups that do not request a new or materially revised search. Run retrieval when scheme discovery is requested, the classifier supplies a new retrieval query, prior grounding is unavailable, or a clarification answer must resume a deferred search.
+- Clarification should ask for only one missing fact: the fact with the highest expected impact on the current retrieval. Preserve the prior goal, merge the answer into session profile context, and resume that goal with an appropriate query.
 - Keep the base retrieval primitives simple and explicit. Do not hide too much policy inside a single monolithic search function.
 - Use one shared eval corpus. Do not introduce persona-scoped vector collections or persona-only retrieval shortcuts.
 - Use one shared retrieval evaluation runner in `src/eval/retrieval_eval.py`.
