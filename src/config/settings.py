@@ -56,14 +56,14 @@ class QdrantSettings(BaseModel):
         validation_alias=AliasChoices("api_key", "QDRANT_API_KEY"),
     )
     default_collection: str = Field(
-        default="test_schemes_vectors",
+        default="schemes_vectors_v3_nomic_embed_text_v1_5",
         validation_alias=AliasChoices(
             "default_collection",
             "QDRANT_COLLECTION",
         ),
     )
     production_collection: str = Field(
-        default="schemes_vectors",
+        default="schemes_vectors_v3_nomic_embed_text_v1_5",
         validation_alias=AliasChoices(
             "production_collection",
             "QDRANT_PRODUCTION_COLLECTION",
@@ -108,7 +108,7 @@ class EmbeddingSettings(BaseModel):
         validation_alias=AliasChoices("model", "EMBEDDING_MODEL"),
     )
     local_model: str = Field(
-        default="all-MiniLM-L6-v2",
+        default="nomic-ai/nomic-embed-text-v1.5",
         validation_alias=AliasChoices(
             "local_model",
             "LOCAL_EMBEDDING_MODEL",

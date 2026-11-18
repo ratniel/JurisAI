@@ -117,7 +117,10 @@ class LocalOpenAICompatibleClient:
         **config_overrides: Any,
     ) -> StructuredModelT:
         schema = response_model.model_json_schema()
-        response_format = config_overrides.pop("response_format", {"type": "json_object"})
+        response_format = config_overrides.pop(
+            "response_format",
+            self._build_json_schema_response_format(schema=schema, schema_name=response_model.__name__),
+        )
         structured_prompt = self._build_structured_prompt(prompt, schema)
         structured_system_instruction = self._build_structured_system_instruction(
             system_instruction=system_instruction,
@@ -158,7 +161,9 @@ class LocalOpenAICompatibleClient:
                 )
 
             try:
-                content = self._extract_text(response)
+                content = self._extract_structured_text(
+                    response, model=self._resolve_model_name(model),
+                )
                 payload = self._extract_json_payload(content)
                 result = response_model.model_validate(payload)
             except ValueError as exc:
@@ -316,6 +321,22 @@ class LocalOpenAICompatibleClient:
         return f"{system_instruction}\n\n{suffix}"
 
     @staticmethod
+    def _build_json_schema_response_format(
+        *,
+        schema: dict[str, Any],
+        schema_name: str,
+    ) -> dict[str, Any]:
+        return {
+            "type": "json_schema",
+            "json_schema": {
+                "name": schema_name,
+                "strict": True,
+                "schema": schema,
+            },
+        }
+
+
+    @staticmethod
     def _should_retry_without_response_format(exc: Exception) -> bool:
         message = str(exc).lower()
         if isinstance(exc, (BadRequestError, UnsupportedParamsError)):
@@ -342,6 +363,44 @@ class LocalOpenAICompatibleClient:
                 for item in content
             )
         return str(content or "")
+
+    @classmethod
+    def _extract_structured_text(
+        cls,
+        response: Any,
+        *,
+        model: str,
+    ) -> str:
+        try:
+            message = response.choices[0].message
+        except (AttributeError, IndexError, KeyError, TypeError) as exc:
+            raise ValueError("Local model response did not include a chat message.") from exc
+
+        content = cls._coerce_message_field_to_text(getattr(message, "content", ""))
+        if content.strip():
+            return content
+
+        if model == "qwen3.5-4b-mlx":
+            reasoning_content = cls._coerce_message_field_to_text(
+                getattr(message, "reasoning_content", "")
+            )
+            if reasoning_content.strip():
+                return reasoning_content
+
+        return content
+
+
+    @staticmethod
+    def _coerce_message_field_to_text(value: Any) -> str:
+        if isinstance(value, str):
+            return value
+        if isinstance(value, list):
+            return "".join(
+                item.get("text", "") if isinstance(item, dict) else str(item)
+                for item in value
+            )
+        return str(value or "")
+
 
     @classmethod
     def _extract_json_payload(cls, text: str) -> Any:

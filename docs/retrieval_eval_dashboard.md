@@ -294,6 +294,16 @@ For actual retrieval and coverage checks:
 
 - `eval_persona_schemes_vectors_v1`
 
+The full-scheme workflow uses `nomic-ai/nomic-embed-text-v1.5` by default.
+Its default collection is `schemes_vectors_v3_nomic_embed_text_v1_5`.
+This collection uses 768-dimensional vectors.
+It contains the `embedding_a` and `embedding_b` profiles.
+Dense search remains the default.
+
+Set `QDRANT_COLLECTION` to use another collection.
+Set `EMBEDDING_MODEL` to use its matching embedding model.
+The evaluation subset above remains a separate, explicit target.
+
 ## Retrieval Debug Output
 
 The dashboard relies on extra debug output added to the Qdrant client.
@@ -360,3 +370,11 @@ It does not yet include:
 - advanced filters inside the coverage table
 
 Those can be added later once the retrieval dataset stabilizes.
+
+## Rebuild the retrieval run log
+
+Run `uv run python scripts/export_retrieval_run_log.py` from the repository root.
+The command reads timestamped retrieval JSON files under `evals/retrieval/runs/`.
+It uses the shared `refresh_run_log` function to rebuild `run_log.csv`.
+Keep the source JSON files when you need to rebuild their history.
+The command does not run retrieval or call a model.
