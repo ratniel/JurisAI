@@ -9,6 +9,7 @@ dependencies = [
     "beanie>=1.27.0",
     "bertopic>=0.17.4",
     "einops>=0.8.1",
+    "fastapi>=0.115.14,<0.116.0",
     "google-genai>=1.66.0",
     "gradio>=5.23.3",
     "hdbscan>=0.8.41",

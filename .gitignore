@@ -37,8 +37,5 @@ docs/retrieval_status_*.md
 # node
 node_modules/
 
-# Keep in-progress Polish UI work separate from the indexing pipeline PR.
-/web/
-
-# local indexing manifests
-.local/embedding_manifests/
+# local notes, snapshots, and indexing manifests
+.local/
