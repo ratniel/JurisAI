@@ -360,3 +360,11 @@ It does not yet include:
 - advanced filters inside the coverage table
 
 Those can be added later once the retrieval dataset stabilizes.
+
+## Rebuild the retrieval run log
+
+Run `uv run python scripts/export_retrieval_run_log.py` from the repository root.
+The command reads timestamped retrieval JSON files under `evals/retrieval/runs/`.
+It uses the shared `refresh_run_log` function to rebuild `run_log.csv`.
+Keep the source JSON files when you need to rebuild their history.
+The command does not run retrieval or call a model.
