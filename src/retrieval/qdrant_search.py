@@ -4,6 +4,7 @@ from typing import Any
 
 from opentelemetry import trace
 from qdrant_client import QdrantClient, models
+from qdrant_client.http.models import QueryResponse
 
 from src.agentic.models import MongoReference, RetrievedScheme
 from src.config.settings import settings
@@ -11,12 +12,13 @@ from src.llm import EmbeddingClient, build_embedding_client
 from src.llm.providers import EmbeddingProviderName
 from src.retrieval.query_intent import RetrievalIntentProfile
 from src.retrieval.rule_engine import RETRIEVAL_FILTER_MODES, build_qdrant_filter
+from src.retrieval.sparse_keyword import build_sparse_keyword_vector
 from src.scheme_contracts import (
     QdrantSchemeMetadata,
     SchemeRuleFilters,
     coerce_rule_filters,
-    normalize_topics,
 )
+from src.scheme_contracts import normalize_topics
 
 TRACER = trace.get_tracer(__name__)
 
@@ -59,8 +61,7 @@ class QdrantSchemeSearchClient:
             provider=embedding_backend,
             model=embedding_model,
         )
-        self._dense_vector_name_cache: str | None = None
-        self._dense_vector_name_resolved = False
+        self._collection_capabilities: dict[str, bool] | None = None
 
     def search(
         self,
@@ -73,6 +74,7 @@ class QdrantSchemeSearchClient:
         include_debug: bool = False,
         enable_filters: bool | None = None,
         filter_mode: str | None = None,
+        retrieval_strategy: str | None = None,
     ) -> dict[str, Any]:
         with TRACER.start_as_current_span("jurisai.qdrant_search") as span:
             span.set_attribute("jurisai.collection", self._collection_name)
@@ -80,6 +82,9 @@ class QdrantSchemeSearchClient:
             span.set_attribute("jurisai.limit", limit)
             span.set_attribute("jurisai.profile_count", len(profiles))
             span.set_attribute("jurisai.query_text_length", len(query_text))
+            resolved_retrieval_strategy = self._resolve_retrieval_strategy(
+                retrieval_strategy=retrieval_strategy
+            )
             resolved_filter_mode = self._resolve_filter_mode(
                 enable_filters=enable_filters,
                 filter_mode=filter_mode,
@@ -102,6 +107,10 @@ class QdrantSchemeSearchClient:
             span.set_attribute("jurisai.ignored_filter_count", len(ignored_filters))
             span.set_attribute("jurisai.retrieval_filters_enabled", filters_enabled)
             span.set_attribute("jurisai.retrieval_filter_mode", resolved_filter_mode)
+            span.set_attribute(
+                "jurisai.retrieval_strategy",
+                resolved_retrieval_strategy,
+            )
 
             raw_points: list[Any] = []
             per_profile_limit = max(limit, 5)
@@ -118,6 +127,7 @@ class QdrantSchemeSearchClient:
                     model=self._embedding_model,
                     task_type="RETRIEVAL_QUERY",
                 )
+                sparse_query_vector = build_sparse_keyword_vector(profile_query_text)
                 with TRACER.start_as_current_span(
                     "jurisai.qdrant_profile_query"
                 ) as profile_span:
@@ -128,14 +138,17 @@ class QdrantSchemeSearchClient:
                         len(profile_query_text),
                     )
                     profile_span.set_attribute("jurisai.limit", per_profile_limit)
-                    response = self._client.query_points(
-                        collection_name=self._collection_name,
-                        query=query_vector,
-                        using=self._dense_vector_name(),
-                        query_filter=_merge_filters(query_filter, profile_name),
+                    profile_span.set_attribute(
+                        "jurisai.retrieval_strategy",
+                        resolved_retrieval_strategy,
+                    )
+                    response = self._query_profile_points(
+                        profile_name=profile_name,
+                        query_filter=query_filter,
+                        dense_query_vector=query_vector,
+                        sparse_query_vector=sparse_query_vector,
                         limit=per_profile_limit,
-                        with_payload=True,
-                        with_vectors=False,
+                        retrieval_strategy=resolved_retrieval_strategy,
                     )
                     profile_span.set_attribute("jurisai.raw_hits", len(response.points))
                     raw_points.extend(response.points)
@@ -143,7 +156,9 @@ class QdrantSchemeSearchClient:
                         profile_debug.append(
                             {
                                 "embedding_profile": profile_name,
+                                "retrieval_strategy": resolved_retrieval_strategy,
                                 "query_text": profile_query_text,
+                                "keyword_query_terms": len(sparse_query_vector.indices),
                                 "raw_hit_count": len(response.points),
                                 "raw_hits": [
                                     self._debug_point_summary(point) for point in response.points
@@ -163,6 +178,7 @@ class QdrantSchemeSearchClient:
                 "results": [result.model_dump() for result in ordered_hits[:limit]],
                 "retrieval_filters_enabled": filters_enabled,
                 "retrieval_filter_mode": resolved_filter_mode,
+                "retrieval_strategy": resolved_retrieval_strategy,
                 "candidate_filters": candidate_filters,
                 "applied_filters": applied_filters,
                 "ignored_filters": ignored_filters,
@@ -175,21 +191,85 @@ class QdrantSchemeSearchClient:
                 }
             return payload
 
-    def _dense_vector_name(self) -> str | None:
-        if self._dense_vector_name_resolved:
-            return self._dense_vector_name_cache
-
-        vectors_config = self._client.get_collection(
-            self._collection_name
-        ).config.params.vectors
-        self._dense_vector_name_cache = (
+    def _query_profile_points(
+        self,
+        *,
+        profile_name: str,
+        query_filter: models.Filter | None,
+        dense_query_vector: list[float],
+        sparse_query_vector: models.SparseVector,
+        limit: int,
+        retrieval_strategy: str,
+    ) -> QueryResponse:
+        merged_filter = _merge_filters(query_filter, profile_name)
+        collection_capabilities = self._collection_schema_capabilities()
+        dense_using = (
             settings.qdrant.dense_vector_name
-            if isinstance(vectors_config, dict)
-            and settings.qdrant.dense_vector_name in vectors_config
+            if collection_capabilities["named_dense"]
             else None
         )
-        self._dense_vector_name_resolved = True
-        return self._dense_vector_name_cache
+        sparse_using = settings.qdrant.sparse_vector_name
+
+        if retrieval_strategy == "dense":
+            return self._client.query_points(
+                collection_name=self._collection_name,
+                query=dense_query_vector,
+                using=dense_using,
+                query_filter=merged_filter,
+                limit=limit,
+                with_payload=True,
+                with_vectors=False,
+            )
+
+        if not collection_capabilities["sparse"]:
+            raise ValueError(
+                f"Collection {self._collection_name!r} does not expose sparse vectors. "
+                "Re-index it with keyword sparse vectors before using sparse or hybrid retrieval."
+            )
+
+        if not sparse_query_vector.indices:
+            return self._client.query_points(
+                collection_name=self._collection_name,
+                query=dense_query_vector,
+                using=dense_using,
+                query_filter=merged_filter,
+                limit=limit,
+                with_payload=True,
+                with_vectors=False,
+            )
+
+        if retrieval_strategy == "sparse":
+            return self._client.query_points(
+                collection_name=self._collection_name,
+                query=sparse_query_vector,
+                using=sparse_using,
+                query_filter=merged_filter,
+                limit=limit,
+                with_payload=True,
+                with_vectors=False,
+            )
+
+        return self._client.query_points(
+            collection_name=self._collection_name,
+            prefetch=[
+                models.Prefetch(
+                    query=dense_query_vector,
+                    using=dense_using,
+                    filter=merged_filter,
+                    limit=limit,
+                ),
+                models.Prefetch(
+                    query=sparse_query_vector,
+                    using=sparse_using,
+                    filter=merged_filter,
+                    limit=limit,
+                ),
+            ],
+            query=models.FusionQuery(fusion=models.Fusion.RRF),
+            limit=limit,
+            with_payload=True,
+            with_vectors=False,
+        )
 
     @staticmethod
     def _profile_query_text(
@@ -223,6 +303,39 @@ class QdrantSchemeSearchClient:
         if enable_filters is None and not settings.workflow.retrieval_filters_enabled:
             return "none"
         return resolved_filter_mode
+
+    @staticmethod
+    def _resolve_retrieval_strategy(
+        *,
+        retrieval_strategy: str | None,
+    ) -> str:
+        resolved_strategy = retrieval_strategy or settings.workflow.retrieval_strategy
+        if resolved_strategy not in {"dense", "hybrid", "sparse"}:
+            raise ValueError(
+                f"Unsupported retrieval strategy {resolved_strategy!r}. "
+                "Expected one of: dense, hybrid, sparse."
+            )
+        return resolved_strategy
+
+    def _collection_schema_capabilities(self) -> dict[str, bool]:
+        if self._collection_capabilities is not None:
+            return self._collection_capabilities
+
+        collection_info = self._client.get_collection(self._collection_name)
+        params = collection_info.config.params
+        vectors_config = getattr(params, "vectors", None)
+        sparse_config = getattr(params, "sparse_vectors", None)
+        named_dense = isinstance(vectors_config, dict) and (
+            settings.qdrant.dense_vector_name in vectors_config
+        )
+        sparse_enabled = isinstance(sparse_config, dict) and (
+            settings.qdrant.sparse_vector_name in sparse_config
+        )
+        self._collection_capabilities = {
+            "named_dense": named_dense,
+            "sparse": sparse_enabled,
+        }
+        return self._collection_capabilities
 
     @staticmethod
     def _debug_point_summary(point: Any) -> dict[str, Any]:

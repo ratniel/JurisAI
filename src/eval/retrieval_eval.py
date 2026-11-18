@@ -300,7 +300,7 @@ def _build_summary(
             else retrieval_filters_enabled
         ),
         "retrieval_filter_mode": retrieval_filter_mode or settings.workflow.retrieval_filter_mode,
-        "retrieval_strategy": retrieval_strategy,
+        "retrieval_strategy": retrieval_strategy or settings.workflow.retrieval_strategy,
         "trace_project": trace_project,
         "trace_status": trace_status,
         "run_trace_id": run_trace_id,
@@ -354,6 +354,7 @@ def iter_retrieval_eval(
     record_ids: list[str] | None = None,
     retrieval_filters_enabled: bool | None = None,
     retrieval_filter_mode: str | None = None,
+    retrieval_strategy: str | None = None,
 ) -> Iterator[tuple[dict[str, Any], dict[str, Any], int, int]]:
     trace_config = configure_phoenix_tracing(
         project_name=trace_project,
@@ -384,6 +385,7 @@ def iter_retrieval_eval(
         if retrieval_filter_mode is None
         else retrieval_filter_mode
     )
+    resolved_retrieval_strategy = retrieval_strategy or settings.workflow.retrieval_strategy
     classifier = UserIntentClassifier(
         llm=build_generation_client(
             provider=resolved_intent_provider,
@@ -483,6 +485,7 @@ def iter_retrieval_eval(
                         include_debug=include_debug,
                         enable_filters=resolved_retrieval_filters_enabled,
                         filter_mode=resolved_retrieval_filter_mode,
+                        retrieval_strategy=resolved_retrieval_strategy,
                     )
 
                 result_ids = [str(item["scheme_id"]) for item in retrieval["results"]]
@@ -579,6 +582,7 @@ def iter_retrieval_eval(
                         "retrieval_filter_mode",
                         resolved_retrieval_filter_mode,
                     ),
+                    "retrieval_strategy": retrieval.get("retrieval_strategy", resolved_retrieval_strategy),
                     "candidate_filters": retrieval.get("candidate_filters", {}),
                     "query_topics": getattr(intent_profile, "query_topics", []),
                     "query_tags": getattr(intent_profile, "query_tags", []),
@@ -637,6 +641,7 @@ def iter_retrieval_eval(
                     embedding_model=resolved_embedding_model,
                     retrieval_filters_enabled=resolved_retrieval_filters_enabled,
                     retrieval_filter_mode=resolved_retrieval_filter_mode,
+                    retrieval_strategy=resolved_retrieval_strategy,
                 )
                 yield final_summary, record_result, index, len(records)
 
@@ -672,6 +677,7 @@ def iter_retrieval_eval(
             embedding_model=resolved_embedding_model,
             retrieval_filters_enabled=resolved_retrieval_filters_enabled,
             retrieval_filter_mode=resolved_retrieval_filter_mode,
+            retrieval_strategy=resolved_retrieval_strategy,
         )
         completed_normally = True
         yield final_summary, last_record_result or {}, len(records), len(records)
@@ -709,6 +715,7 @@ def iter_retrieval_eval(
                 embedding_model=resolved_embedding_model,
                 retrieval_filters_enabled=resolved_retrieval_filters_enabled,
                 retrieval_filter_mode=resolved_retrieval_filter_mode,
+                retrieval_strategy=resolved_retrieval_strategy,
             )
         if persist_artifact and final_summary is not None:
             write_run_artifact(final_summary, resolved_output_path)
@@ -734,6 +741,7 @@ def run_retrieval_eval(
     record_ids: list[str] | None = None,
     retrieval_filters_enabled: bool | None = None,
     retrieval_filter_mode: str | None = None,
+    retrieval_strategy: str | None = None,
 ) -> dict[str, Any]:
     final_summary: dict[str, Any] | None = None
     for final_summary, _, _, _ in iter_retrieval_eval(
@@ -754,6 +762,7 @@ def run_retrieval_eval(
         record_ids=record_ids,
         retrieval_filters_enabled=retrieval_filters_enabled,
         retrieval_filter_mode=retrieval_filter_mode,
+        retrieval_strategy=retrieval_strategy,
     ):
         pass
 
@@ -794,6 +803,7 @@ def run_retrieval_eval(
                 if retrieval_filters_enabled is None
                 else retrieval_filters_enabled
             ),
+            retrieval_strategy=retrieval_strategy or settings.workflow.retrieval_strategy,
             retrieval_filter_mode=(
                 settings.workflow.retrieval_filter_mode
                 if retrieval_filter_mode is None

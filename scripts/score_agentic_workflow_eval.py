@@ -109,6 +109,7 @@ def main() -> None:
         action="store_true",
         help="Disable hard retrieval filters and rely on the agent's queries only.",
     )
+    parser.add_argument("--retrieval-strategy", choices=["dense", "hybrid", "sparse"], default=None)
     args = parser.parse_args()
 
     output_path = (
@@ -139,6 +140,7 @@ def main() -> None:
         record_ids=record_ids,
         retrieval_filters_enabled=not args.disable_retrieval_filters,
         retrieval_filter_mode=("none" if args.disable_retrieval_filters else args.retrieval_filter_mode),
+        retrieval_strategy=args.retrieval_strategy,
     )
     print(json.dumps(summary, indent=2))
     if summary.get("workflow_failure_count"):

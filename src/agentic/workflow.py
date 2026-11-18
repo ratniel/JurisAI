@@ -557,6 +557,7 @@ class BasicAgenticWorkflow(Workflow):
         include_retrieval_debug: bool = False,
         retrieval_filters_enabled: bool | None = None,
         retrieval_filter_mode: str | None = None,
+        retrieval_strategy: str | None = None,
         timeout: float | None = None,
         verbose: bool = False,
     ) -> None:
@@ -582,6 +583,7 @@ class BasicAgenticWorkflow(Workflow):
             if retrieval_filter_mode is None
             else retrieval_filter_mode
         )
+        self._retrieval_strategy = retrieval_strategy or settings.workflow.retrieval_strategy
 
     async def aclose(self) -> None:
         if self._owns_mongo_client:
@@ -1118,6 +1120,7 @@ class BasicAgenticWorkflow(Workflow):
             include_debug=self._include_retrieval_debug,
             enable_filters=self._retrieval_filters_enabled,
             filter_mode=self._retrieval_filter_mode,
+            retrieval_strategy=self._retrieval_strategy,
         )
         ignored_filters = {
             **intent_profile.ignored_filters,
@@ -1140,6 +1143,7 @@ class BasicAgenticWorkflow(Workflow):
                 "fit_query": intent_profile.fit_query,
                 "retrieval_filters_enabled": retrieval["retrieval_filters_enabled"],
                 "retrieval_filter_mode": retrieval["retrieval_filter_mode"],
+                "retrieval_strategy": retrieval.get("retrieval_strategy", self._retrieval_strategy),
                 "normalized_filters": intent_profile.filters.model_dump(exclude_none=True),
                 "candidate_filters": retrieval["candidate_filters"],
                 "query_topics": intent_profile.query_topics,
