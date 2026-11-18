@@ -2,11 +2,23 @@ from __future__ import annotations
 
 import os
 import unittest
+from unittest.mock import patch
 
 from src.config.settings import OpenRouterSettings, Settings, WorkflowSettings
 
 
 class SettingsEnvOverrideTests(unittest.TestCase):
+    def test_nomic_defaults_and_embedding_overrides(self) -> None:
+        with patch.dict(Settings.model_config, {"env_file": None}), patch.dict(os.environ, {}, clear=True):
+            settings = Settings()
+            self.assertEqual(settings.embedding_model(), "nomic-ai/nomic-embed-text-v1.5")
+            self.assertEqual(settings.qdrant.default_collection, "schemes_vectors_v3_nomic_embed_text_v1_5")
+            self.assertEqual(settings.qdrant.production_collection, settings.qdrant.default_collection)
+        with patch.dict(Settings.model_config, {"env_file": None}), patch.dict(os.environ, {"EMBEDDING_MODEL": "all-MiniLM-L6-v2", "QDRANT_COLLECTION": "custom_vectors"}, clear=True):
+            settings = Settings()
+            self.assertEqual(settings.embedding_model(), "all-MiniLM-L6-v2")
+            self.assertEqual(settings.qdrant.default_collection, "custom_vectors")
+
     def test_agentic_workflow_defaults_to_openrouter_free_router(self) -> None:
         workflow = WorkflowSettings()
         openrouter = OpenRouterSettings()
