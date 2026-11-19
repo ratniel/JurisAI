@@ -1410,6 +1410,10 @@ def create_dashboard(
                         value=settings.workflow.generation_model,
                         info="Used by agentic workflow mode for planning and final answer generation.",
                     )
+                    retrieval_strategy = gr.Dropdown(
+                        label="Retrieval strategy", choices=["dense", "hybrid", "sparse"],
+                        value=settings.workflow.retrieval_strategy,
+                    )
                     limit = gr.Number(label="Top-k", value=5, precision=0)
                     collection_name = gr.Textbox(
                         label="Qdrant collection",
@@ -1506,6 +1510,7 @@ def create_dashboard(
             intent_model_value: str,
             generation_provider_value: str,
             generation_model_value: str,
+            retrieval_strategy_value: str,
             limit_value: float,
             collection_name_value: str,
             trace_project_value: str,
@@ -1553,6 +1558,7 @@ def create_dashboard(
                 intent_model=resolved_intent_model,
                 generation_provider=resolved_generation_provider,
                 generation_model=resolved_generation_model,
+                retrieval_strategy=retrieval_strategy_value or settings.workflow.retrieval_strategy,
                 trace_project=resolved_trace_project,
                 phoenix_endpoint=resolved_phoenix_endpoint,
                 persist_artifact=True,
@@ -1585,6 +1591,7 @@ def create_dashboard(
                 intent_model,
                 generation_provider,
                 generation_model,
+                retrieval_strategy,
                 limit,
                 collection_name,
                 trace_project,

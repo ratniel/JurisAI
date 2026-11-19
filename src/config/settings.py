@@ -270,6 +270,10 @@ class WorkflowSettings(BaseModel):
             "WORKFLOW_RETRIEVAL_LIMIT",
         ),
     )
+    retrieval_strategy: Literal["dense", "hybrid", "sparse"] = Field(
+        default="dense",
+        validation_alias=AliasChoices("retrieval_strategy", "WORKFLOW_RETRIEVAL_STRATEGY"),
+    )
     retrieval_filters_enabled: bool = Field(
         default=True,
         validation_alias=AliasChoices(
@@ -550,6 +554,9 @@ class Settings(BaseSettings):
         validation_alias="WORKFLOW_RETRIEVAL_LIMIT",
         exclude=True,
     )
+    legacy_workflow_retrieval_strategy: Literal["dense", "hybrid", "sparse"] | None = Field(
+        default=None, validation_alias="WORKFLOW_RETRIEVAL_STRATEGY", exclude=True,
+    )
     legacy_phoenix_project_name: str | None = Field(
         default=None,
         validation_alias="PHOENIX_PROJECT_NAME",
@@ -618,6 +625,8 @@ class Settings(BaseSettings):
             self.workflow.intent_model = self.legacy_workflow_intent_model
         if self.legacy_workflow_retrieval_limit is not None:
             self.workflow.retrieval_limit = self.legacy_workflow_retrieval_limit
+        if self.legacy_workflow_retrieval_strategy is not None:
+            self.workflow.retrieval_strategy = self.legacy_workflow_retrieval_strategy
         if self.legacy_phoenix_project_name is not None:
             self.phoenix.project_name = self.legacy_phoenix_project_name
         if self.legacy_phoenix_collector_endpoint is not None:

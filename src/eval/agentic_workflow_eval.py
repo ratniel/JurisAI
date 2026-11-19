@@ -88,7 +88,7 @@ def _annotate_workflow_summary(summary: dict[str, Any]) -> None:
         for record in records
         if not record.get("workflow_succeeded")
     ]
-    summary["retrieval_strategy"] = "dense"
+    summary["retrieval_strategy"] = summary.get("retrieval_strategy") or settings.workflow.retrieval_strategy
     summary["workflow_failure_record_ids"] = failure_ids
     summary["workflow_failure_count"] = len(failure_ids)
     summary["nonempty_answer_count"] = sum(
@@ -150,6 +150,7 @@ async def _run_agentic_turn_async(
     embedding_model: str,
     retrieval_filters_enabled: bool,
     retrieval_filter_mode: str,
+    retrieval_strategy: str,
 ) -> AgenticTurnResult:
     from src.retrieval import QdrantSchemeSearchClient
 
@@ -176,6 +177,7 @@ async def _run_agentic_turn_async(
         include_retrieval_debug=True,
         retrieval_filters_enabled=retrieval_filters_enabled,
         retrieval_filter_mode=retrieval_filter_mode,
+        retrieval_strategy=retrieval_strategy,
     )
     try:
         result = await workflow.run(
@@ -233,6 +235,7 @@ def _run_agentic_turn(
     embedding_model: str,
     retrieval_filters_enabled: bool,
     retrieval_filter_mode: str,
+    retrieval_strategy: str,
 ) -> AgenticTurnResult:
     return asyncio.run(
         _run_agentic_turn_async(
@@ -246,6 +249,7 @@ def _run_agentic_turn(
             embedding_model=embedding_model,
             retrieval_filters_enabled=retrieval_filters_enabled,
             retrieval_filter_mode=retrieval_filter_mode,
+            retrieval_strategy=retrieval_strategy,
         )
     )
 
@@ -269,6 +273,7 @@ def iter_agentic_workflow_eval(
     record_ids: list[str] | None = None,
     retrieval_filters_enabled: bool | None = None,
     retrieval_filter_mode: str | None = None,
+    retrieval_strategy: str | None = None,
 ) -> Iterator[tuple[dict[str, Any], dict[str, Any], int, int]]:
     from src.observability import configure_phoenix_tracing
 
@@ -300,6 +305,7 @@ def iter_agentic_workflow_eval(
         if retrieval_filter_mode is None
         else retrieval_filter_mode
     )
+    resolved_retrieval_strategy = retrieval_strategy or settings.workflow.retrieval_strategy
     records = _select_records(record_ids)
     started_at = datetime.now(tz=UTC)
 
@@ -357,6 +363,7 @@ def iter_agentic_workflow_eval(
                             embedding_model=resolved_embedding_model,
                             retrieval_filters_enabled=resolved_retrieval_filters_enabled,
                             retrieval_filter_mode=resolved_retrieval_filter_mode,
+                            retrieval_strategy=resolved_retrieval_strategy,
                         )
                     except Exception as exc:  # noqa: BLE001
                         if fail_on_classifier_error:
@@ -521,6 +528,7 @@ def iter_agentic_workflow_eval(
                         "fit_query": fit_query,
                         "retrieval_filters_enabled": retrieval_filters_enabled_for_record,
                         "retrieval_filter_mode": retrieval_filter_mode_for_record,
+                        "retrieval_strategy": resolved_retrieval_strategy,
                         "candidate_filters": candidate_filters,
                         "query_topics": query_topics,
                         "query_tags": query_tags,
@@ -593,6 +601,7 @@ def iter_agentic_workflow_eval(
                         embedding_model=resolved_embedding_model,
                         retrieval_filters_enabled=resolved_retrieval_filters_enabled,
                         retrieval_filter_mode=resolved_retrieval_filter_mode,
+                        retrieval_strategy=resolved_retrieval_strategy,
                     )
                     final_summary["eval_mode"] = "agentic_workflow"
                     _annotate_workflow_summary(final_summary)
@@ -630,6 +639,7 @@ def iter_agentic_workflow_eval(
             embedding_model=resolved_embedding_model,
             retrieval_filters_enabled=resolved_retrieval_filters_enabled,
             retrieval_filter_mode=resolved_retrieval_filter_mode,
+            retrieval_strategy=resolved_retrieval_strategy,
         )
         final_summary["eval_mode"] = "agentic_workflow"
         _annotate_workflow_summary(final_summary)
@@ -669,6 +679,7 @@ def iter_agentic_workflow_eval(
                 embedding_model=resolved_embedding_model,
                 retrieval_filters_enabled=resolved_retrieval_filters_enabled,
                 retrieval_filter_mode=resolved_retrieval_filter_mode,
+                retrieval_strategy=resolved_retrieval_strategy,
             )
             final_summary["eval_mode"] = "agentic_workflow"
             _annotate_workflow_summary(final_summary)
@@ -696,6 +707,7 @@ def run_agentic_workflow_eval(
     record_ids: list[str] | None = None,
     retrieval_filters_enabled: bool | None = None,
     retrieval_filter_mode: str | None = None,
+    retrieval_strategy: str | None = None,
 ) -> dict[str, Any]:
     final_summary: dict[str, Any] | None = None
     for final_summary, _, _, _ in iter_agentic_workflow_eval(
@@ -716,6 +728,7 @@ def run_agentic_workflow_eval(
         record_ids=record_ids,
         retrieval_filters_enabled=retrieval_filters_enabled,
         retrieval_filter_mode=retrieval_filter_mode,
+        retrieval_strategy=retrieval_strategy,
     ):
         pass
 
@@ -756,6 +769,7 @@ def run_agentic_workflow_eval(
                 if retrieval_filters_enabled is None
                 else retrieval_filters_enabled
             ),
+            retrieval_strategy=retrieval_strategy or settings.workflow.retrieval_strategy,
             retrieval_filter_mode=(
                 settings.workflow.retrieval_filter_mode
                 if retrieval_filter_mode is None

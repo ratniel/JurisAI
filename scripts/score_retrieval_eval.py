@@ -87,6 +87,7 @@ def main() -> None:
         action="store_true",
         help="Disable hard retrieval filters and rely on query similarity only.",
     )
+    parser.add_argument("--retrieval-strategy", choices=["dense", "hybrid", "sparse"], default=None)
     args = parser.parse_args()
 
     output_path = Path(args.output_path) if args.output_path else default_run_output_path()
@@ -109,6 +110,7 @@ def main() -> None:
         record_ids=record_ids,
         retrieval_filters_enabled=not args.disable_retrieval_filters,
         retrieval_filter_mode=("none" if args.disable_retrieval_filters else args.retrieval_filter_mode),
+        retrieval_strategy=args.retrieval_strategy,
     )
     print(json.dumps(summary, indent=2))
     if args.enforce_absolute_gate and summary["absolute_gate_failures"]:
